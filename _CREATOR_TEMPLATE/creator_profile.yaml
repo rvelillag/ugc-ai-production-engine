@@ -1,0 +1,32 @@
+# =======================================================
+# CREATOR & BRAND CONFIGURATION PROFILE
+# =======================================================
+# Completa estas variables para personalizar el avatar y la marca.
+
+creator:
+  name: "Nombre del Creador"          # Ej: "Rachel Bennett"
+  age: 47                             # Edad del avatar
+  gender: "female"                    # "female" / "male"
+  archetype: "Mirror + Convert"       # "Mirror + Convert" | "Authority Expert" | "Lifestyle Peer"
+  target_audience: "Mujeres de 40 a 55 años"
+
+brand:
+  name: "Nombre de la Marca"          # Ej: "Botanique Paris"
+  niche: "Skincare / Cuidado de la piel"
+  social_handle: "@tumarca"
+
+voice:
+  provider: "native_or_elevenlabs"   # "native" (Veo3/Kling) | "elevenlabs"
+  elevenlabs_voice_id: ""             # ID de voz en ElevenLabs (si aplica)
+  speaking_rate_words_per_sec: 2.3    # Cadencia recomendada (2.2 a 2.4 palabras/segundo)
+
+wardrobe_rotation_palette:
+  - "Azul Pizarra Suave"
+  - "Terracota Cálido"
+  - "Verde Salvia"
+  - "Lino Beige Avena"
+  - "Gris Carbón Suave"
+
+manychat:
+  default_keyword: "YOUTHFUL"
+  trigger_action: "Enviar guía gratuita de rutina y producto"

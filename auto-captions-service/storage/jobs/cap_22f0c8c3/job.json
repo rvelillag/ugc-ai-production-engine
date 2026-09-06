@@ -1,0 +1,26 @@
+{
+  "job_id": "cap_22f0c8c3",
+  "status": "transcribing",
+  "progress_percentage": 40,
+  "stage": "Transcribing audio with word timestamps",
+  "request": {
+    "video_url": null,
+    "language": "es",
+    "template": "clean_white",
+    "max_words_per_cue": 4,
+    "highlight_active_word": true,
+    "auto_emoji": true,
+    "position": "bottom_center",
+    "export_srt": true,
+    "export_ass": true,
+    "pause_before_render": false,
+    "callback_url": null
+  },
+  "local_video_path": "storage\\uploads\\upload_Rachel002.mp4",
+  "created_at": "2026-08-31T18:58:17.699939",
+  "completed_at": null,
+  "duration_seconds": null,
+  "processing_time_seconds": null,
+  "error_message": null,
+  "output_files": {}
+}

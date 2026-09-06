@@ -1,0 +1,24 @@
+# =======================================================
+# BRAND PRODUCT CATALOG (Sustitución Automática)
+# =======================================================
+# Registra aquí los productos propios de tu marca para que el generador
+# sustituya automáticamente cualquier marca de terceros de los videos de referencia.
+
+products:
+  - id: "hero_product_01"
+    name: "Milky Botanical Glow Essence"
+    category: "Hydration & Skin Prep"
+    description_visual_for_prompts: "a sleek minimalist frosted glass bottle with a minimalist label and a dropper cap containing a rich milky essence"
+    texture: "creamy dewy milky liquid with fast absorption and bouncy skin finish"
+    key_benefit: "Deep hydration that creates a plump elastic cushion so foundation never creases or settles into fine lines"
+    how_to_apply: "Press gently into clean skin with warm open palms for 60 seconds before applying light makeup"
+    manychat_keyword: "ESSENCE"
+
+  - id: "hero_product_02"
+    name: "Age-Defying Botanical Serum Foundation"
+    category: "Lightweight Treatment Base"
+    description_visual_for_prompts: "a sleek beige squeeze tube with an elegant pump dispenser and minimalist gold cap"
+    texture: "ultra-light serum liquid with light-reflecting natural mineral pigments"
+    key_benefit: "Blurs fine lines, evens skin tone with zero cakey weight, and stays fresh for 12 hours without oxidizing"
+    how_to_apply: "Dot sparingly on cheeks and blend outward with fingertips or a damp sponge"
+    manychat_keyword: "YOUTHFUL"

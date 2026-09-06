@@ -1,0 +1,145 @@
+{
+  "name": "Auto-Captions Animated Pipeline (CapCut Style)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-video-trigger",
+        "options": {}
+      },
+      "name": "Webhook Ingesta de Video",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "id": "node-1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://auto-captions:8000/caption",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"video_url\": \"{{ $json.body.video_url }}\",\n  \"language\": \"{{ $json.body.language || 'es' }}\",\n  \"template\": \"{{ $json.body.template || 'hype_yellow' }}\",\n  \"max_words_per_cue\": 3,\n  \"auto_emoji\": true,\n  \"callback_url\": \"{{ $execution.resumeUrl }}\"\n}",
+        "options": {}
+      },
+      "name": "Disparar Auto-Captions API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        480,
+        300
+      ],
+      "id": "node-2"
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "name": "Esperar Polling",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        720,
+        300
+      ],
+      "id": "node-3"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=http://auto-captions:8000/caption/{{ $node['Disparar Auto-Captions API'].json.job_id }}",
+        "options": {}
+      },
+      "name": "Consultar Estado Job",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        940,
+        300
+      ],
+      "id": "node-4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "completed"
+            }
+          ]
+        }
+      },
+      "name": "¿Completado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        300
+      ],
+      "id": "node-5"
+    }
+  ],
+  "connections": {
+    "Webhook Ingesta de Video": {
+      "main": [
+        [
+          {
+            "node": "Disparar Auto-Captions API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparar Auto-Captions API": {
+      "main": [
+        [
+          {
+            "node": "Esperar Polling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Esperar Polling": {
+      "main": [
+        [
+          {
+            "node": "Consultar Estado Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Estado Job": {
+      "main": [
+        [
+          {
+            "node": "¿Completado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Completado?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Esperar Polling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

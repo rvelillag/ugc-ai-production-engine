@@ -1,0 +1,59 @@
+[Script Info]
+Title: Auto-Captions Animated
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Montserrat Bold,134,&H00FFFFFF&,&H00EAEAEA&,&H00000000&,&H80000000&,-1,0,0,0,100,100,0,0,1,4.0,2.0,2,108,108,345,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:00.94,Default,,0,0,0,,{\fad(90,90)}{\k40}IF {\k32}PEOPLE {\k22}KEEP
+Dialogue: 0,0:00:00.94,0:00:01.80,Default,,0,0,0,,{\fad(90,90)}{\k44}ASKING {\k26}IF {\k16}YOU'RE
+Dialogue: 0,0:00:01.80,0:00:02.88,Default,,0,0,0,,{\fad(90,90)}{\k44}TIRED, {\k10}WHEN {\k12}YOU
+Dialogue: 0,0:00:02.88,0:00:03.64,Default,,0,0,0,,{\fad(90,90)}{\k40}ACTUALLY {\k26}GOT {\k10}A
+Dialogue: 0,0:00:03.64,0:00:04.24,Default,,0,0,0,,{\fad(90,90)}{\k24}FULL {\k18}NIGHT {\k18}OF
+Dialogue: 0,0:00:04.24,0:00:04.56,Default,,0,0,0,,{\fad(90,90)}{\k32}SLEEP,
+Dialogue: 0,0:00:05.02,0:00:05.54,Default,,0,0,0,,{\fad(90,90)}{\k6}THE {\k24}WORST {\k22}THING
+Dialogue: 0,0:00:05.54,0:00:06.00,Default,,0,0,0,,{\fad(90,90)}{\k14}YOU {\k12}CAN {\k20}DO
+Dialogue: 0,0:00:06.00,0:00:06.84,Default,,0,0,0,,{\fad(90,90)}{\k24}IS {\k26}PILE {\k34}ON
+Dialogue: 0,0:00:06.84,0:00:07.64,Default,,0,0,0,,{\fad(90,90)}{\k24}MORE {\k32}HEAVY {\k24}EYE
+Dialogue: 0,0:00:07.64,0:00:07.96,Default,,0,0,0,,{\fad(90,90)}{\k32}CREAM.
+Dialogue: 0,0:00:08.34,0:00:08.96,Default,,0,0,0,,{\fad(90,90)}{\k16}EVER {\k26}WONDER {\k20}WHY
+Dialogue: 0,0:00:08.96,0:00:09.56,Default,,0,0,0,,{\fad(90,90)}{\k16}YOUR {\k24}UNDER {\k20}EYES
+Dialogue: 0,0:00:09.56,0:00:10.42,Default,,0,0,0,,{\fad(90,90)}{\k26}LOOK {\k50}CREASED {\k10}AND
+Dialogue: 0,0:00:10.42,0:00:11.30,Default,,0,0,0,,{\fad(90,90)}{\k26}HEAVY {\k20}BY {\k42}MIDDAY,
+Dialogue: 0,0:00:11.46,0:00:11.90,Default,,0,0,0,,{\fad(90,90)}{\k8}NO {\k14}MATTER {\k22}HOW 🚫
+Dialogue: 0,0:00:11.90,0:00:12.36,Default,,0,0,0,,{\fad(90,90)}{\k16}MUCH {\k10}YOU {\k20}SPEND
+Dialogue: 0,0:00:12.36,0:00:12.90,Default,,0,0,0,,{\fad(90,90)}{\k12}ON {\k16}THAT {\k26}CREAM?
+Dialogue: 0,0:00:13.20,0:00:13.68,Default,,0,0,0,,{\fad(90,90)}{\k28}HERE'S {\k20}WHY.
+Dialogue: 0,0:00:14.12,0:00:15.16,Default,,0,0,0,,{\fad(90,90)}{\k20}AFTER {\k38}50, {\k22}DELICATE
+Dialogue: 0,0:00:15.16,0:00:15.86,Default,,0,0,0,,{\fad(90,90)}{\k32}SKIN {\k24}AROUND {\k14}THE
+Dialogue: 0,0:00:15.86,0:00:16.68,Default,,0,0,0,,{\fad(90,90)}{\k22}EYES {\k24}GETS {\k36}THINNER
+Dialogue: 0,0:00:16.68,0:00:17.42,Default,,0,0,0,,{\fad(90,90)}{\k22}AND {\k26}LOSES {\k26}ITS
+Dialogue: 0,0:00:17.42,0:00:18.06,Default,,0,0,0,,{\fad(90,90)}{\k32}NATURAL {\k32}BOUNCE.
+Dialogue: 0,0:00:18.36,0:00:18.98,Default,,0,0,0,,{\fad(90,90)}{\k14}HEAVY {\k32}CREAMS {\k16}JUST
+Dialogue: 0,0:00:18.98,0:00:19.58,Default,,0,0,0,,{\fad(90,90)}{\k18}SIT {\k16}ON {\k26}TOP, 🔥
+Dialogue: 0,0:00:19.80,0:00:20.34,Default,,0,0,0,,{\fad(90,90)}{\k14}WEIGHING {\k20}DOWN {\k20}YOUR
+Dialogue: 0,0:00:20.34,0:00:20.60,Default,,0,0,0,,{\fad(90,90)}{\k26}EYELIDS.
+Dialogue: 0,0:00:20.98,0:00:21.58,Default,,0,0,0,,{\fad(90,90)}{\k10}WHAT {\k12}YOU {\k38}ACTUALLY
+Dialogue: 0,0:00:21.58,0:00:22.28,Default,,0,0,0,,{\fad(90,90)}{\k36}NEED {\k22}IS {\k12}A
+Dialogue: 0,0:00:22.28,0:00:23.26,Default,,0,0,0,,{\fad(90,90)}{\k32}SKINCARE {\k34}THAT {\k32}GENTLY
+Dialogue: 0,0:00:23.26,0:00:24.08,Default,,0,0,0,,{\fad(90,90)}{\k36}SUPPORTS {\k24}THE {\k22}SKIN
+Dialogue: 0,0:00:24.08,0:00:25.18,Default,,0,0,0,,{\fad(90,90)}{\k20}FROM {\k36}WITHIN, {\k24}SO
+Dialogue: 0,0:00:25.18,0:00:25.80,Default,,0,0,0,,{\fad(90,90)}{\k14}YOUR {\k26}EYES {\k22}LOOK
+Dialogue: 0,0:00:25.80,0:00:26.22,Default,,0,0,0,,{\fad(90,90)}{\k42}SMOOTH,
+Dialogue: 0,0:00:26.78,0:00:27.62,Default,,0,0,0,,{\fad(90,90)}{\k12}BRIGHT, {\k8}AND {\k22}WIDE
+Dialogue: 0,0:00:27.62,0:00:27.90,Default,,0,0,0,,{\fad(90,90)}{\k28}AWAKE.
+Dialogue: 0,0:00:27.90,0:00:29.30,Default,,0,0,0,,{\fad(90,90)}{\k74}COMENT, {\k12}LIFT, {\k2}BELOW,
+Dialogue: 0,0:00:29.58,0:00:29.96,Default,,0,0,0,,{\fad(90,90)}{\k4}AND {\k14}MAKE {\k20}SURE
+Dialogue: 0,0:00:29.96,0:00:30.80,Default,,0,0,0,,{\fad(90,90)}{\k18}YOU'RE {\k34}FOLLOWING {\k32}ME,
+Dialogue: 0,0:00:31.02,0:00:31.74,Default,,0,0,0,,{\fad(90,90)}{\k38}AND {\k14}I'LL {\k20}SEND
+Dialogue: 0,0:00:31.74,0:00:32.54,Default,,0,0,0,,{\fad(90,90)}{\k22}YOU {\k18}MY {\k40}EXACT
+Dialogue: 0,0:00:32.54,0:00:33.38,Default,,0,0,0,,{\fad(90,90)}{\k44}STEP {\k16}-BY {\k24}-STEP
+Dialogue: 0,0:00:33.38,0:00:34.66,Default,,0,0,0,,{\fad(90,90)}{\k32}TIP {\k56}DIRECTLY {\k40}TO 💡
+Dialogue: 0,0:00:34.66,0:00:35.46,Default,,0,0,0,,{\fad(90,90)}{\k16}YOUR {\k64}DMS.

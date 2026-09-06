@@ -1,0 +1,706 @@
+{
+  "job_id": "cap_1dec2ac0",
+  "status": "completed",
+  "progress_percentage": 100,
+  "stage": "Finalizado exitosamente",
+  "request": {
+    "video_url": null,
+    "language": "es",
+    "template": "cyber_cyan",
+    "font_family": "Anton",
+    "animation": "glow_flash",
+    "highlight_color": "#ffea00",
+    "primary_color": null,
+    "outline_color": null,
+    "outline_width": null,
+    "font_size_pct": 7.5,
+    "uppercase": true,
+    "max_words_per_cue": 4,
+    "highlight_active_word": true,
+    "auto_emoji": true,
+    "position": "bottom_center",
+    "export_srt": true,
+    "export_ass": true,
+    "pause_before_render": false,
+    "callback_url": null
+  },
+  "local_video_path": "storage\\uploads\\upload_Rachel003.mp4",
+  "created_at": "2026-09-03T22:47:52.439140",
+  "completed_at": "2026-09-03T22:49:01.179285",
+  "duration_seconds": 36.85,
+  "processing_time_seconds": 68.74,
+  "error_message": null,
+  "output_files": {},
+  "transcript": {
+    "language": "es",
+    "words": [
+      {
+        "word": "chia粒",
+        "start": 0.0,
+        "end": 0.58,
+        "score": 0.034
+      },
+      {
+        "word": "total",
+        "start": 0.58,
+        "end": 0.68,
+        "score": 0.002
+      },
+      {
+        "word": "tendrá",
+        "start": 0.68,
+        "end": 1.06,
+        "score": 0.049
+      },
+      {
+        "word": "una",
+        "start": 1.06,
+        "end": 1.48,
+        "score": 0.101
+      },
+      {
+        "word": "autidwaysites",
+        "start": 1.48,
+        "end": 1.48,
+        "score": 0.006
+      },
+      {
+        "word": "de",
+        "start": 1.48,
+        "end": 1.48,
+        "score": 0.312
+      },
+      {
+        "word": "seguridadimming",
+        "start": 1.48,
+        "end": 2.28,
+        "score": 0.001
+      },
+      {
+        "word": "en",
+        "start": 2.8,
+        "end": 3.32,
+        "score": 0.095
+      },
+      {
+        "word": "estos",
+        "start": 3.32,
+        "end": 3.44,
+        "score": 0.005
+      },
+      {
+        "word": "Cincっos",
+        "start": 3.44,
+        "end": 3.44,
+        "score": 0.004
+      },
+      {
+        "word": "celizados",
+        "start": 3.44,
+        "end": 4.2,
+        "score": 0.144
+      },
+      {
+        "word": "con",
+        "start": 4.2,
+        "end": 5.52,
+        "score": 0.235
+      },
+      {
+        "word": "un",
+        "start": 5.52,
+        "end": 5.76,
+        "score": 0.245
+      },
+      {
+        "word": "capítulo",
+        "start": 5.76,
+        "end": 5.76,
+        "score": 0.249
+      },
+      {
+        "word": "simple.",
+        "start": 5.76,
+        "end": 6.54,
+        "score": 0.797
+      },
+      {
+        "word": "como",
+        "start": 6.54,
+        "end": 6.98,
+        "score": 0.0
+      },
+      {
+        "word": "Suffalo",
+        "start": 6.98,
+        "end": 7.18,
+        "score": 0.006
+      },
+      {
+        "word": "porque",
+        "start": 7.18,
+        "end": 7.8,
+        "score": 0.009
+      },
+      {
+        "word": "no",
+        "start": 7.8,
+        "end": 7.8,
+        "score": 0.237
+      },
+      {
+        "word": "muốn",
+        "start": 7.8,
+        "end": 8.02,
+        "score": 0.001
+      },
+      {
+        "word": "unir",
+        "start": 8.02,
+        "end": 8.48,
+        "score": 0.356
+      },
+      {
+        "word": "todo",
+        "start": 8.48,
+        "end": 8.64,
+        "score": 0.006
+      },
+      {
+        "word": "esto,",
+        "start": 8.64,
+        "end": 8.7,
+        "score": 0.515
+      },
+      {
+        "word": "porque",
+        "start": 8.78,
+        "end": 9.08,
+        "score": 0.774
+      },
+      {
+        "word": "supongo",
+        "start": 9.08,
+        "end": 9.28,
+        "score": 0.384
+      },
+      {
+        "word": "que",
+        "start": 9.28,
+        "end": 9.28,
+        "score": 0.729
+      },
+      {
+        "word": "dan",
+        "start": 9.28,
+        "end": 9.9,
+        "score": 0.0
+      },
+      {
+        "word": "­",
+        "start": 9.9,
+        "end": 10.04,
+        "score": 0.015
+      },
+      {
+        "word": "Velas.",
+        "start": 10.04,
+        "end": 10.66,
+        "score": 0.395
+      },
+      {
+        "word": "De",
+        "start": 11.08,
+        "end": 11.6,
+        "score": 0.012
+      },
+      {
+        "word": "2",
+        "start": 11.6,
+        "end": 11.92,
+        "score": 0.064
+      },
+      {
+        "word": "tablosiditos,",
+        "start": 11.92,
+        "end": 12.68,
+        "score": 0.047
+      },
+      {
+        "word": "de",
+        "start": 12.8,
+        "end": 13.0,
+        "score": 0.009
+      },
+      {
+        "word": "1",
+        "start": 13.0,
+        "end": 13.04,
+        "score": 0.662
+      },
+      {
+        "word": "table",
+        "start": 13.04,
+        "end": 13.4,
+        "score": 0.374
+      },
+      {
+        "word": "c",
+        "start": 13.4,
+        "end": 13.52,
+        "score": 0.001
+      },
+      {
+        "word": "Neo,",
+        "start": 13.52,
+        "end": 13.74,
+        "score": 0.0
+      },
+      {
+        "word": "de",
+        "start": 14.26,
+        "end": 14.44,
+        "score": 0.429
+      },
+      {
+        "word": "1",
+        "start": 14.44,
+        "end": 14.46,
+        "score": 0.862
+      },
+      {
+        "word": "tablofon",
+        "start": 14.46,
+        "end": 15.06,
+        "score": 0.382
+      },
+      {
+        "word": "de",
+        "start": 15.06,
+        "end": 15.14,
+        "score": 0.165
+      },
+      {
+        "word": "natural",
+        "start": 15.14,
+        "end": 15.52,
+        "score": 0.283
+      },
+      {
+        "word": "entre",
+        "start": 15.52,
+        "end": 15.82,
+        "score": 0.001
+      },
+      {
+        "word": "el",
+        "start": 15.82,
+        "end": 16.22,
+        "score": 0.061
+      },
+      {
+        "word": "agua",
+        "start": 16.22,
+        "end": 16.22,
+        "score": 0.036
+      },
+      {
+        "word": "y",
+        "start": 16.22,
+        "end": 16.22,
+        "score": 0.765
+      },
+      {
+        "word": "al",
+        "start": 16.22,
+        "end": 16.54,
+        "score": 0.042
+      },
+      {
+        "word": "hijo",
+        "start": 16.54,
+        "end": 16.94,
+        "score": 0.0
+      },
+      {
+        "word": "con",
+        "start": 16.94,
+        "end": 17.2,
+        "score": 0.003
+      },
+      {
+        "word": "un",
+        "start": 17.2,
+        "end": 17.28,
+        "score": 0.285
+      },
+      {
+        "word": "monopolio,",
+        "start": 17.28,
+        "end": 17.86,
+        "score": 0.199
+      },
+      {
+        "word": "Loki",
+        "start": 17.86,
+        "end": 18.12,
+        "score": 0.0
+      },
+      {
+        "word": "en",
+        "start": 18.12,
+        "end": 18.36,
+        "score": 0.064
+      },
+      {
+        "word": "1",
+        "start": 18.36,
+        "end": 18.52,
+        "score": 0.355
+      },
+      {
+        "word": "minuto",
+        "start": 18.52,
+        "end": 18.92,
+        "score": 0.614
+      },
+      {
+        "word": "y",
+        "start": 18.92,
+        "end": 19.04,
+        "score": 0.737
+      },
+      {
+        "word": "aplicado",
+        "start": 19.04,
+        "end": 19.5,
+        "score": 0.144
+      },
+      {
+        "word": "de",
+        "start": 19.5,
+        "end": 19.68,
+        "score": 0.017
+      },
+      {
+        "word": "la",
+        "start": 19.68,
+        "end": 19.82,
+        "score": 0.08
+      },
+      {
+        "word": "ons",
+        "start": 19.82,
+        "end": 20.06,
+        "score": 0.0
+      },
+      {
+        "word": "criticala",
+        "start": 20.06,
+        "end": 20.24,
+        "score": 0.09
+      },
+      {
+        "word": "a",
+        "start": 20.24,
+        "end": 20.24,
+        "score": 0.016
+      },
+      {
+        "word": "15",
+        "start": 20.24,
+        "end": 20.68,
+        "score": 0.485
+      },
+      {
+        "word": "min,",
+        "start": 20.68,
+        "end": 20.98,
+        "score": 0.877
+      },
+      {
+        "word": "¡asair",
+        "start": 21.76,
+        "end": 22.06,
+        "score": 0.002
+      },
+      {
+        "word": "va",
+        "start": 22.06,
+        "end": 22.06,
+        "score": 0.0
+      },
+      {
+        "word": "ollar",
+        "start": 22.06,
+        "end": 22.36,
+        "score": 0.09
+      },
+      {
+        "word": "púfonis!",
+        "start": 22.36,
+        "end": 23.4,
+        "score": 0.154
+      },
+      {
+        "word": "Fade",
+        "start": 23.4,
+        "end": 23.96,
+        "score": 0.503
+      },
+      {
+        "word": "dark",
+        "start": 23.96,
+        "end": 24.24,
+        "score": 0.52
+      },
+      {
+        "word": "circles,",
+        "start": 24.24,
+        "end": 24.68,
+        "score": 0.994
+      },
+      {
+        "word": "fight",
+        "start": 25.04,
+        "end": 25.4,
+        "score": 0.587
+      },
+      {
+        "word": "early",
+        "start": 25.4,
+        "end": 25.76,
+        "score": 0.971
+      },
+      {
+        "word": "signs",
+        "start": 25.76,
+        "end": 26.08,
+        "score": 0.977
+      },
+      {
+        "word": "of",
+        "start": 26.08,
+        "end": 26.28,
+        "score": 0.989
+      },
+      {
+        "word": "aging",
+        "start": 26.28,
+        "end": 26.58,
+        "score": 0.922
+      },
+      {
+        "word": "and",
+        "start": 26.58,
+        "end": 27.52,
+        "score": 0.081
+      },
+      {
+        "word": "keep",
+        "start": 27.52,
+        "end": 27.7,
+        "score": 0.977
+      },
+      {
+        "word": "wrinkles",
+        "start": 27.7,
+        "end": 28.08,
+        "score": 0.984
+      },
+      {
+        "word": "at",
+        "start": 28.08,
+        "end": 28.26,
+        "score": 0.983
+      },
+      {
+        "word": "bay.",
+        "start": 28.26,
+        "end": 28.56,
+        "score": 0.984
+      },
+      {
+        "word": "Send",
+        "start": 28.86,
+        "end": 29.14,
+        "score": 0.352
+      },
+      {
+        "word": "this",
+        "start": 29.14,
+        "end": 29.36,
+        "score": 0.916
+      },
+      {
+        "word": "to",
+        "start": 29.36,
+        "end": 29.52,
+        "score": 0.994
+      },
+      {
+        "word": "someone",
+        "start": 29.52,
+        "end": 29.82,
+        "score": 0.991
+      },
+      {
+        "word": "that",
+        "start": 29.82,
+        "end": 30.0,
+        "score": 0.93
+      },
+      {
+        "word": "needs",
+        "start": 30.0,
+        "end": 30.16,
+        "score": 0.989
+      },
+      {
+        "word": "to",
+        "start": 30.16,
+        "end": 30.42,
+        "score": 0.974
+      },
+      {
+        "word": "see",
+        "start": 30.42,
+        "end": 30.62,
+        "score": 0.992
+      },
+      {
+        "word": "this",
+        "start": 30.62,
+        "end": 30.98,
+        "score": 0.991
+      },
+      {
+        "word": "and",
+        "start": 30.98,
+        "end": 31.4,
+        "score": 0.8
+      },
+      {
+        "word": "comment",
+        "start": 31.4,
+        "end": 31.72,
+        "score": 0.972
+      },
+      {
+        "word": "lift",
+        "start": 31.72,
+        "end": 32.08,
+        "score": 0.348
+      },
+      {
+        "word": "for",
+        "start": 32.08,
+        "end": 32.4,
+        "score": 0.952
+      },
+      {
+        "word": "my",
+        "start": 32.4,
+        "end": 32.56,
+        "score": 0.996
+      },
+      {
+        "word": "full",
+        "start": 32.56,
+        "end": 32.82,
+        "score": 0.984
+      },
+      {
+        "word": "skin",
+        "start": 32.82,
+        "end": 33.16,
+        "score": 0.97
+      },
+      {
+        "word": "healing",
+        "start": 33.16,
+        "end": 33.52,
+        "score": 0.949
+      },
+      {
+        "word": "guide",
+        "start": 33.52,
+        "end": 33.9,
+        "score": 0.996
+      },
+      {
+        "word": "but",
+        "start": 33.9,
+        "end": 34.44,
+        "score": 0.275
+      },
+      {
+        "word": "make",
+        "start": 34.44,
+        "end": 34.58,
+        "score": 0.99
+      },
+      {
+        "word": "sure",
+        "start": 34.58,
+        "end": 34.76,
+        "score": 0.999
+      },
+      {
+        "word": "you're",
+        "start": 34.76,
+        "end": 34.96,
+        "score": 0.939
+      },
+      {
+        "word": "following",
+        "start": 34.96,
+        "end": 35.22,
+        "score": 0.997
+      },
+      {
+        "word": "otherwise",
+        "start": 35.22,
+        "end": 35.68,
+        "score": 0.718
+      },
+      {
+        "word": "I",
+        "start": 35.68,
+        "end": 35.9,
+        "score": 0.892
+      },
+      {
+        "word": "cannot",
+        "start": 35.9,
+        "end": 36.14,
+        "score": 0.921
+      },
+      {
+        "word": "reach",
+        "start": 36.14,
+        "end": 36.32,
+        "score": 0.984
+      },
+      {
+        "word": "you.",
+        "start": 36.32,
+        "end": 36.6,
+        "score": 0.994
+      }
+    ],
+    "video_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 36.85,
+      "has_audio": true,
+      "audio_codec": "aac",
+      "video_codec": "h264"
+    }
+  },
+  "output_video_url": "http://localhost:8000/caption/cap_1dec2ac0/download/video",
+  "srt_url": "http://localhost:8000/caption/cap_1dec2ac0/download/srt",
+  "ass_url": "http://localhost:8000/caption/cap_1dec2ac0/download/ass",
+  "transcript_url": "http://localhost:8000/caption/cap_1dec2ac0/transcript"
+}

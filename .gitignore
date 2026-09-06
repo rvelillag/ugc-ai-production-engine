@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Temporary Audio/Video files & Deliverables
+*.mp4
+*.wav
+*.mp3
+temp_*
+temp_extract.wav
+auto-captions-service/temp_*.wav
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+*.env.local
+
+# Working instances (optional: ignore specific creators created locally)
+# creators/
