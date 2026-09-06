@@ -1,0 +1,162 @@
+/* Local static stylesheet replacing the Tailwind Play CDN.
+   Hand-authored to cover exactly the utility classes used by index.html,
+   so the UI never breaks again if an external CDN is unreachable. */
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+
+/* ---------- Color tokens ---------- */
+:root {
+  --slate-100:#f1f5f9; --slate-200:#e2e8f0; --slate-300:#cbd5e1; --slate-400:#94a3b8;
+  --slate-500:#64748b; --slate-600:#475569; --slate-700:#334155; --slate-800:#1e293b;
+  --slate-900:#0f172a; --slate-950:#020617;
+  --amber-300:#fcd34d; --amber-400:#fbbf24; --amber-500:#f59e0b;
+  --yellow-400:#facc15; --yellow-500:#eab308;
+  --emerald-400:#34d399; --emerald-800:#065f46; --emerald-950:#022c22;
+  --cyan-400:#22d3ee;
+  --orange-400:#fb923c; --orange-500:#f97316;
+  --pink-400:#f472b6; --pink-500:#ec4899;
+}
+
+/* ---------- Layout ---------- */
+.flex{display:flex} .grid{display:grid} .hidden{display:none} .block{display:block}
+.inline-block{display:inline-block} .flex-col{flex-direction:column} .flex-1{flex:1 1 0%}
+.flex-wrap{flex-wrap:wrap} .items-center{align-items:center} .justify-between{justify-content:space-between}
+.justify-center{justify-content:center} .relative{position:relative} .sticky{position:sticky}
+.top-0{top:0} .z-50{z-index:50} .overflow-hidden{overflow:hidden}
+.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}
+.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.object-contain{object-fit:contain}
+.select-none{user-select:none}
+.cursor-pointer{cursor:pointer}
+.transform{transform:translateZ(0)}
+.group{position:relative}
+
+/* ---------- Sizing ---------- */
+.w-2{width:.5rem} .w-4{width:1rem} .w-5{width:1.25rem} .w-6{width:1.5rem} .w-8{width:2rem} .w-10{width:2.5rem} .w-11{width:2.75rem} .w-full{width:100%}
+.h-2{height:.5rem} .h-4{height:1rem} .h-5{height:1.25rem} .h-6{height:1.5rem} .h-8{height:2rem} .h-10{height:2.5rem} .h-11{height:2.75rem}
+.h-1\.5{height:.375rem} .h-28{height:7rem} .h-full{height:100%}
+.min-h-screen{min-height:100vh} .min-h-\[420px\]{min-height:420px}
+.max-h-\[380px\]{max-height:380px}
+.max-w-7xl{max-width:80rem}
+.aspect-\[9\/16\]{aspect-ratio:9/16}
+.mx-auto{margin-left:auto;margin-right:auto}
+
+/* ---------- Spacing ---------- */
+.p-2\.5{padding:.625rem} .p-3{padding:.75rem} .p-4{padding:1rem} .p-5{padding:1.25rem} .p-6{padding:1.5rem}
+.px-1{padding-left:.25rem;padding-right:.25rem} .px-1\.5{padding-left:.375rem;padding-right:.375rem}
+.px-2{padding-left:.5rem;padding-right:.5rem} .px-2\.5{padding-left:.625rem;padding-right:.625rem}
+.px-3{padding-left:.75rem;padding-right:.75rem} .px-4{padding-left:1rem;padding-right:1rem}
+.py-0\.5{padding-top:.125rem;padding-bottom:.125rem} .py-1{padding-top:.25rem;padding-bottom:.25rem}
+.py-1\.5{padding-top:.375rem;padding-bottom:.375rem} .py-2{padding-top:.5rem;padding-bottom:.5rem}
+.py-2\.5{padding-top:.625rem;padding-bottom:.625rem} .py-3{padding-top:.75rem;padding-bottom:.75rem}
+.py-3\.5{padding-top:.875rem;padding-bottom:.875rem} .py-6{padding-top:1.5rem;padding-bottom:1.5rem}
+.pt-1{padding-top:.25rem} .pt-2{padding-top:.5rem} .pt-3{padding-top:.75rem}
+.mb-1{margin-bottom:.25rem} .mb-2{margin-bottom:.5rem} .mb-3{margin-bottom:.75rem} .mb-4{margin-bottom:1rem}
+.mt-0\.5{margin-top:.125rem} .mt-2{margin-top:.5rem} .mt-4{margin-top:1rem}
+.mr-1\.5{margin-right:.375rem}
+.gap-1\.5{gap:.375rem} .gap-2{gap:.5rem} .gap-2\.5{gap:.625rem} .gap-3{gap:.75rem} .gap-6{gap:1.5rem}
+.space-y-1\.5>*+*{margin-top:.375rem} .space-y-2>*+*{margin-top:.5rem} .space-y-3\.5>*+*{margin-top:.875rem}
+.space-y-4>*+*{margin-top:1rem} .space-y-5>*+*{margin-top:1.25rem}
+
+/* ---------- Borders / radius ---------- */
+.border{border-width:1px;border-style:solid;border-color:var(--slate-800)}
+.border-2{border-width:2px;border-style:solid}
+.border-b{border-bottom-width:1px;border-bottom-style:solid;border-color:var(--slate-800)}
+.border-t{border-top-width:1px;border-top-style:solid;border-color:var(--slate-800)}
+.border-dashed{border-style:dashed}
+.rounded{border-radius:.25rem} .rounded-lg{border-radius:.5rem} .rounded-xl{border-radius:.75rem}
+.rounded-2xl{border-radius:1rem} .rounded-full{border-radius:9999px}
+.border-amber-400{border-color:var(--amber-400)} .border-amber-400\/30{border-color:rgba(251,191,36,.3)}
+.border-emerald-800\/40{border-color:rgba(6,95,70,.4)}
+.border-slate-700{border-color:var(--slate-700)} .border-slate-800{border-color:var(--slate-800)}
+.border-slate-800\/80{border-color:rgba(30,41,59,.8)}
+
+/* ---------- Background colors ---------- */
+.bg-amber-400{background-color:var(--amber-400)} .bg-amber-400\/10{background-color:rgba(251,191,36,.1)}
+.bg-amber-400\/15{background-color:rgba(251,191,36,.15)}
+.bg-cyan-400{background-color:var(--cyan-400)}
+.bg-emerald-400{background-color:var(--emerald-400)} .bg-emerald-950\/60{background-color:rgba(2,44,34,.6)}
+.bg-gradient-to-r{background-image:linear-gradient(to right,var(--tw-from,var(--amber-400)),var(--tw-via,var(--yellow-400)),var(--tw-to,var(--amber-500)))}
+.bg-gradient-to-tr{background-image:linear-gradient(to top right,var(--tw-from,var(--amber-400)),var(--tw-via,var(--yellow-400)),var(--tw-to,var(--amber-500)))}
+.from-amber-400{--tw-from:var(--amber-400)} .via-yellow-400{--tw-via:var(--yellow-400)} .to-amber-500{--tw-to:var(--amber-500)}
+.to-yellow-400{--tw-to:var(--yellow-400)}
+.bg-orange-500{background-color:var(--orange-500)} .bg-pink-500{background-color:var(--pink-500)}
+.bg-slate-200{background-color:var(--slate-200)} .bg-slate-800{background-color:var(--slate-800)}
+.bg-slate-900{background-color:var(--slate-900)} .bg-slate-900\/70{background-color:rgba(15,23,42,.7)}
+.bg-slate-900\/90{background-color:rgba(15,23,42,.9)} .bg-slate-950{background-color:var(--slate-950)}
+.bg-slate-950\/60{background-color:rgba(2,6,23,.6)} .bg-slate-950\/70{background-color:rgba(2,6,23,.7)}
+.bg-transparent{background-color:transparent}
+
+/* ---------- Text ---------- */
+.text-center{text-align:center} .text-left{text-align:left}
+.text-\[10px\]{font-size:10px} .text-\[11px\]{font-size:11px}
+.text-xs{font-size:.75rem} .text-sm{font-size:.875rem} .text-base{font-size:1rem}
+.text-lg{font-size:1.125rem} .text-xl{font-size:1.25rem} .text-2xl{font-size:1.5rem} .text-3xl{font-size:1.875rem}
+.font-medium{font-weight:500} .font-semibold{font-weight:600} .font-bold{font-weight:700}
+.font-extrabold{font-weight:800} .font-black{font-weight:900}
+.leading-tight{line-height:1.25} .tracking-wide{letter-spacing:.025em} .tracking-wider{letter-spacing:.05em}
+.font-montserrat{font-family:'Montserrat',sans-serif} .font-bebas{font-family:'Bebas Neue',sans-serif}
+.font-anton{font-family:'Anton',sans-serif} .font-impact{font-family:Impact,sans-serif}
+.text-amber-400{color:var(--amber-400)} .text-cyan-400{color:var(--cyan-400)}
+.text-emerald-400{color:var(--emerald-400)} .text-orange-400{color:var(--orange-400)}
+.text-pink-400{color:var(--pink-400)} .text-white{color:#fff}
+.text-slate-100{color:var(--slate-100)} .text-slate-200{color:var(--slate-200)}
+.text-slate-300{color:var(--slate-300)} .text-slate-400{color:var(--slate-400)}
+.text-slate-500{color:var(--slate-500)} .text-slate-600{color:var(--slate-600)}
+.text-slate-700{color:var(--slate-700)} .text-slate-950{color:var(--slate-950)}
+
+/* ---------- Effects ---------- */
+.shadow-lg{box-shadow:0 10px 15px -3px rgba(0,0,0,.3),0 4px 6px -4px rgba(0,0,0,.3)}
+.shadow-xl{box-shadow:0 20px 25px -5px rgba(0,0,0,.35),0 8px 10px -6px rgba(0,0,0,.35)}
+.shadow-inner{box-shadow:inset 0 2px 4px rgba(0,0,0,.4)}
+.shadow-amber-400\/20{--tw-shadow-color:rgba(251,191,36,.2)}
+.shadow-amber-500\/25{--tw-shadow-color:rgba(245,158,11,.25)}
+.shadow-yellow-500\/25{--tw-shadow-color:rgba(234,179,8,.25)}
+.drop-shadow-\[0_4px_10px_rgba\(0\,0\,0\,0\.9\)\]{filter:drop-shadow(0 4px 10px rgba(0,0,0,.9))}
+.ring-1{box-shadow:0 0 0 1px var(--ring-color,var(--amber-400))}
+.ring-amber-400{--ring-color:var(--amber-400)}
+.backdrop-blur{backdrop-filter:blur(8px)}
+.opacity-50{opacity:.5}
+.transition{transition:all .15s ease} .transition-all{transition:all .2s ease}
+.duration-300{transition-duration:.3s}
+.appearance-none{appearance:none}
+
+/* ---------- Animation ---------- */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.animate-pulse{animation:pulse 2s cubic-bezier(0.4,0,0.6,1) infinite}
+
+/* ---------- Interactive states ---------- */
+a{color:inherit;text-decoration:none}
+.hover\:bg-amber-300:hover{background-color:var(--amber-300)}
+.hover\:bg-amber-400\/20:hover{background-color:rgba(251,191,36,.2)}
+.hover\:bg-slate-700:hover{background-color:var(--slate-700)}
+.hover\:border-amber-400:hover{border-color:var(--amber-400)}
+.hover\:border-slate-700:hover{border-color:var(--slate-700)}
+.hover\:from-amber-300:hover{--tw-from:var(--amber-300)}
+.hover\:to-yellow-400:hover{--tw-to:var(--yellow-400)}
+.hover\:text-amber-300:hover{color:var(--amber-300)}
+.hover\:text-amber-400:hover{color:var(--amber-400)}
+.group:hover .group-hover\:scale-110{transform:scale(1.1)}
+.focus\:border-amber-400:focus{border-color:var(--amber-400)}
+.focus\:outline-none:focus{outline:none}
+.disabled\:opacity-50:disabled{opacity:.5}
+.disabled\:cursor-not-allowed:disabled{cursor:not-allowed}
+.active\:scale-\[0\.99\]:active{transform:scale(.99)}
+input[type=range].accent-amber-400{accent-color:var(--amber-400)}
+input[type=checkbox].accent-amber-400{accent-color:var(--amber-400)}
+
+/* ---------- Responsive (sm >= 640px, lg >= 1024px) ---------- */
+@media (min-width:640px){
+  .sm\:gap-3{gap:.75rem}
+  .sm\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sm\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .sm\:text-lg{font-size:1.125rem}
+  .sm\:text-sm{font-size:.875rem}
+}
+@media (min-width:1024px){
+  .lg\:col-span-5{grid-column:span 5 / span 5}
+  .lg\:col-span-7{grid-column:span 7 / span 7}
+  .lg\:grid-cols-12{grid-template-columns:repeat(12,minmax(0,1fr))}
+}

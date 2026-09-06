@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  auto-captions:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: auto-captions-service
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - BASE_URL=http://localhost:8000
+      - ASR_ENGINE=faster-whisper
+      - WHISPER_MODEL_SIZE=base
+      - WHISPER_DEVICE=auto
+      - WHISPER_COMPUTE_TYPE=default
+      - DEFAULT_LANGUAGE=es
+      - DEFAULT_TEMPLATE=hype_yellow
+      - DEFAULT_MAX_WORDS_PER_CUE=3
+      - DEFAULT_AUTO_EMOJI=true
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    volumes:
+      - ../storage:/app/storage
+      - ../watch:/app/watch
+      - ../app/templates:/app/app/templates
+    restart: unless-stopped
