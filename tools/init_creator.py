@@ -35,6 +35,14 @@ def init_creator():
     print(f"--> Creando espacio de trabajo para '{args.name}' ({args.brand})...")
     shutil.copytree(template_dir, target_dir)
 
+    # Asegurar explícitamente la creación de todos los directorios 01 a 05
+    (target_dir / "01_KNOWLEDGE_BASE").mkdir(parents=True, exist_ok=True)
+    (target_dir / "02_AVATAR_ASSETS" / "01_Character").mkdir(parents=True, exist_ok=True)
+    (target_dir / "02_AVATAR_ASSETS" / "02_Environments").mkdir(parents=True, exist_ok=True)
+    (target_dir / "03_INBOX_REFERENCES").mkdir(parents=True, exist_ok=True)
+    (target_dir / "04_IN_PRODUCTION").mkdir(parents=True, exist_ok=True)
+    (target_dir / "05_PROCESSED_DELIVERABLES").mkdir(parents=True, exist_ok=True)
+
     # Personalizar creator_profile.yaml
     profile_file = target_dir / "creator_profile.yaml"
     if profile_file.exists():
@@ -66,6 +74,14 @@ def init_creator():
 
     print(f"\n[OK] ¡Creador '{creator_folder_name}' inicializado con éxito!")
     print(f"Ubicación: {target_dir}")
+    print(f"\nDirectorios listos:")
+    print(f"  📁 01_KNOWLEDGE_BASE/")
+    print(f"  📁 02_AVATAR_ASSETS/ (01_Character, 02_Environments)")
+    print(f"  📁 03_INBOX_REFERENCES/")
+    print(f"  📁 04_IN_PRODUCTION/")
+    print(f"  📁 05_PROCESSED_DELIVERABLES/")
+    print(f"  📄 creator_profile.yaml")
+    print(f"  📄 PRODUCT_CATALOG.yaml")
     print(f"\nSiguientes pasos recomendados:")
     print(f"1. Generar fotos de referencia y guardarlas en: '{creator_folder_name}/02_AVATAR_ASSETS/01_Character/'")
     print(f"2. Ajustar el catálogo propio en: '{creator_folder_name}/PRODUCT_CATALOG.yaml'")
