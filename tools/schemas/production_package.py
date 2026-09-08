@@ -40,10 +40,11 @@ class ChunkItem(BaseModel):
     continuity_notes: str
 
 class PostCopy(BaseModel):
-    title: str
-    caption: str
-    manychat_keyword: str
-    hashtags: List[str]
+    cover_headline: str = Field(..., description="Titular magnético para la portada/thumbnail del video (máximo 6 a 7 palabras)")
+    title: str = Field(..., description="Título / Hook de post")
+    caption: str = Field(..., description="Cuerpo del post para Reels / TikTok / FB")
+    manychat_keyword: str = Field(..., description="Palabra clave disparadora de ManyChat")
+    hashtags: List[str] = Field(..., description="Lista de hashtags optimizados")
 
 class ProductionPackage(BaseModel):
     project_id: str

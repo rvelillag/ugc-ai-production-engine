@@ -93,8 +93,10 @@ def render_markdown(json_path: Path, output_md_path: Path = None):
 
     # Post Copy
     post = data.get("post_copy", {})
-    md.append("## 5. Post Copy & ManyChat Automation\n")
-    md.append(f"### **Título / Titular Orgánico:**\n{post.get('title')}\n")
+    md.append("## 5. Post Copy & Portada (ManyChat Automation)\n")
+    if post.get("cover_headline"):
+        md.append(f"> 🏷️ **HEADLINE DE PORTADA (Thumbnail — Máx 6-7 palabras):**\n> ### **\"{post.get('cover_headline')}\"**\n")
+    md.append(f"### **Título / Hook de Post:**\n{post.get('title')}\n")
     md.append(f"### **Caption Completo (Instagram Reels / TikTok / Facebook):**\n{post.get('caption')}\n")
     
     tags = " ".join(post.get("hashtags", []))
