@@ -1,133 +1,61 @@
 ---
 name: ugc-viral-video-generator
 description: >-
-  Proceso completo y repetible para replicar videos UGC virales de formato remedio o receta natural (25-30s) para Instagram y Facebook,
-  sustituyendo al creador original por un avatar propio consistente mediante la arquitectura de 5 beats, skeletons de producción (standard y chunked),
-  bloques universales de dirección, análisis de composición de hook, prompts de first frame, prompts de video/animación I2V y control de duración de clips (6s, 8s, 10s).
+  Proceso JSON-First riguroso y repetible para replicar videos UGC virales (25-30s) para Instagram y Facebook con fidelidad visual 1:1,
+  descomponiendo cada frame de referencia en capas técnicas (cámara, utilería, poses anatómicas X/Y y estado de piel), sustituyendo al personaje
+  con el Character DNA verbatim, adaptando al catálogo de producto propio (PRODUCT_CATALOG.yaml) y autogenerando el production_package_PROD_<ID>.json y prompts_and_script_PROD_<ID>.md.
 ---
 
-# Generación de Videos UGC Virales (Guion, First Frames, Video Motion Prompts & Timing)
+# Generación de Videos UGC Virales (Protocolo JSON-First con Fidelidad 1:1)
 
 ## Propósito
 
-Esta skill define el proceso completo, repetible y auditable para replicar videos UGC virales adaptando al avatar propio, manteniendo la arquitectura de guion (70% similitud), cámara y edición. Genera el paquete integral de producción: guion limpio para TTS, prompts de First Frame (Midjourney/Flux), prompts de Video/Animación (Kling/Veo3/Grok/Luma) con **Duración Recomendada por Clip (6s, 8s, 10s)** y regla de sub-chunking.
+Esta skill define el proceso estricto y auditable para replicar videos UGC virales sustituyendo al creador original por un avatar consistente, garantizando **fidelidad visual 1:1 con respecto a las capturas de referencia**. Genera primero la fuente técnica estructurada `production_package_PROD_<ID>.json` validada con Pydantic y compila automáticamente el documento maestro `prompts_and_script_PROD_<ID>.md`.
 
 ---
 
 ## 1. Inputs Requeridos Obligatorios (Input Gate)
 
-Antes de construir cualquier skeleton o prompt, el sistema consulta obligatoriamente:
+Antes de construir cualquier JSON o prompt, el sistema consulta obligatoriamente:
 
 1. **Fuente de Verdad del Avatar (Inmutable):** Desde `02_AVATAR_ASSETS/01_Character/*_CHARACTER_DNA.md`.
-   - Cargar edad, arquetipo psicológico (*Mirror + Convert*, etc.), rasgos físicos inmutables, el **Prompt Anchor Verbatim** y el **Audio & Voice Direction Anchor**.
-   - > [!CAUTION]
-     > Si el archivo `*_CHARACTER_DNA.md` no existe en `02_AVATAR_ASSETS/01_Character/`, detenerse inmediatamente y solicitar la ficha de identidad al usuario.
-2. **Insumos de Referencia:** Desde `04_IN_PRODUCTION/PROD_<ID>_<video>/01_Reference/` (`script_beats_<video>.txt` y screenshots `.jpg`).
-3. **Base de Conocimientos:** Desde `01_KNOWLEDGE_BASE/` (`PRODUCTION_WORKFLOW_SOP.md`, Playbooks).
+   - Cargar edad, rasgos físicos inmutables, el **Prompt Anchor Verbatim** y el **Audio & Voice Direction Anchor**.
+2. **Insumos de Referencia & Ficha de Beats:** Desde `04_IN_PRODUCTION/PROD_<ID>_<video>/01_Reference/` (`script_beats_<video>.txt` y capturas `.jpg`).
+3. **Catálogo de Producto Propio:** Desde `PRODUCT_CATALOG.yaml` para sustituir automáticamente marcas de terceros.
 4. **Historial de Vestuario:** Revisar el atuendo usado en la producción previa para rotar la paleta de color.
 
 ---
 
-## 2. Diagnóstico de Arquitectura & Traslación de Roles
+## 2. Metodología de Desglose Fotográfico en 5 Capas (Fidelidad 1:1)
 
-### 2.1 Formato de Personajes & Traslación de Arquetipo
-* **Formato Unipersonal:** El creador se graba solo y demuestra la acción/problema en su propio cuerpo.
-* **Formato Multi-Personaje (Host + Paciente/Amiga):**
-  * Si la referencia es **Clínica/Médica** (doctor con bata/guantes examinando a un paciente) y el Avatar es de arquetipo **Mirror + Convert**, se realiza una **traslación de contexto**:
-    * El avatar actúa como **Anfitriona de cocina compartiendo su descubrimiento con una amiga/invitada**.
-    * La amiga/invitada asume el rol de quien sufre el problema en el Día 1 y muestra la transformación en el Día 7.
+Cada beat se audita obligatoriamente contra su captura `.jpg` correspondiente (`01_` a `06_`):
 
-### 2.2 Arquitectura de 5 Beats & Regla de Sub-Chunking Temporal
-
-| Beat | Función | Rango de Duración | Límite Máximo de Palabras |
-|---|---|---|---|
-| **1. Hook** | Disrupción física + problema exagerado + promesa rápida | 0:00–0:06 (6s) | Máx. 15 palabras |
-| **2. Reframe** | Giro de autoridad/industria + revelación Día 7 | 0:06–0:12 (6s) | Máx. 15 palabras |
-| **3. Mechanism** | Preparación en mesada + receta exacta con medidas | 0:12–0:24 (12s total) | *Sub-Chunking Obligatorio (3A: 6s / 3B: 6s)* |
-| **4. Payoff** | Aplicación sensorial en piel + glow coreano | 0:24–0:32 (8s) | Máx. 20 palabras |
-| **5. CTA** | Llamado a comentar con follow-gate | 0:32–0:40 (8s) | Máx. 20 palabras |
-
-> [!IMPORTANT]
-> **REGLA DURA DE SUB-CHUNKING TEMPORAL:**
-> Las herramientas de generación de video IA operan en duraciones estándar de **6 segundos, 8 segundos o 10 segundos**.
-> * **Nivel 1 (6 segundos):** Hasta 15 palabras de locución (ritmo natural: ~2.5 palabras/segundo).
-> * **Nivel 2 (8 segundos):** 16 a 20 palabras de locución.
-> * **Nivel 3 (10 segundos):** 21 a 24 palabras de locución (máximo absoluto por clip).
-> * Si un beat supera las 24 palabras, **se divide obligatoriamente en Sub-Chunks (ej. Chunk 3A y Chunk 3B)**, cada uno con su propio First Frame y su propio Video Motion Prompt con su duración recomendada.
+1. **Capa 1: Cámara y Óptica:** Distancia focal (24mm, 28mm, 50mm, macro), tipo de plano (9:16 vertical, plano medio, plano detalle) y ángulo de cámara.
+2. **Capa 2: Primer Plano y Utilería (Props):** Objetos exactos en la mesa, mostrador, fregadero o en las manos de los sujetos (ej. cesta gris con cosméticos, frascos, borlas, tubos).
+3. **Capa 3: Poses Anatómicas y Orientación:**
+   * **Sujeto Izquierdo (Avatar):** Orientación de torso (perfil 3/4 hacia la derecha), ángulo de brazos, interacción de manos y dirección de la mirada.
+   * **Sujeto Derecho (Modelo/Amiga):** Orientación, postura de brazos, qué sostiene con las manos, expresión facial y síntoma exagerado.
+4. **Capa 4: Inyección del Character Sheet & DNA Verbatim:** Inserción íntegra de los descriptores físicos del avatar y vestuario asignado.
+5. **Capa 5: Limpieza Visual Absoluta:**
+   * **Cero Textos, Cero Overlays, Cero Subtítulos Quemados, Cero Marcas de Agua, Cero Logos de Redes Sociales.**
 
 ---
 
-## 3. Character Lock & Matriz de Rotación de Vestuario
+## 3. Matriz de Control Temporal & Sub-Chunking (6s, 8s, 10s)
 
-1. **Character Lock Verbatim:** Se extrae de `*_CHARACTER_DNA.md` y se inserta textualmente en cada prompt visual.
-2. **Audio & Voice Direction Anchor:** Se extrae de `*_CHARACTER_DNA.md` y se inserta textualmente en cada Video Motion Prompt.
-3. **Rotación de Vestuario:**
-   * La prenda superior rota de color en cada producción dentro de la paleta permitida de la marca (ej. Terracota Cálido, Verde Salvia, Azul Pizarra, Lino Beige, Gris Carbón).
-   * **Registro Obligatorio en el Encabezado:**
-     `Outfit Anterior: [Color/Tipo] → Outfit Asignado Actual: [Color/Tipo]`.
+> **Constante de Locución:** $2.2 \text{ a } 2.4 \text{ palabras por segundo}$ (con margen de respiración para evitar cortes de audio en Veo3/Kling/Grok).
 
----
-
-## 4. Universal Direction Blocks (Bloques Fijos)
-
-* **Skin Direction:** Describe piel real con micro-textura y poros visibles. En el Chunk 1 (Día 1) describe explícitamente el síntoma severo; en el Día 7 / Payoff describe piel uniforme, luminosa y recuperada.
-* **Application / Action Direction:** Gestos cotidianos, fluidos y naturales (verter, batir, remover, aplicar con suavidad), nunca robóticos.
-* **B-Roll Sequencing Block:** Ningún ingrediente aparece en cuadro antes de ser nombrado explícitamente. Cero tomas decorativas desvinculadas.
-* **UGC Realism Direction:** Encuadre 9:16 de smartphone, luz natural de ventana, micro-movimiento de cámara en mano (handheld jitter) y confidencia no publicitaria.
+* **6 segundos:** Hasta 15 palabras.
+* **8 segundos:** 16 a 20 palabras.
+* **10 segundos:** 21 a 24 palabras (máximo por clip).
 
 ---
 
-## 5. Regla de Exageración Forzada en el Hook (Parámetros Obligatorios)
+## 4. Pipeline de Generación (JSON-First -> Markdown)
 
-* El prompt de imagen del Chunk 1 **DEBE** emplear descriptores de alta intensidad y contraste:
-  * *Vocabulario Requerido:* `severe`, `prominent`, `high-contrast dark melasma patches`, `deep sun damage`, `noticeable puffy swelling`, `marked uneven discoloration`.
-  * *Términos Prohibidos en Hook:* `slight`, `subtle`, `mild`, `barely visible`.
-* El punto de contacto (dedo señalando la zona afectada) debe situarse en el tercio superior-medio en foco nítido.
-
----
-
-## 6. Producción de Skeletons (Estándar Obligatorio)
-
-Todo paquete de entrega debe contener:
-
-### 6.1 Standard Production Skeleton (Toma Única Continua 25-30s)
-Un solo bloque integral para plataformas que generan tomas largas completas.
-
-### 6.2 Chunked Production Skeleton (Chunks Operativos con Duración Recomendada)
-Cada chunk debe contener obligatoriamente:
-1. **Beat:** (Hook, Reframe, Mechanism 3A, Mechanism 3B, Payoff, CTA).
-2. **Word Count & Recommended Clip Duration:** Especificar `Word Count: [N] palabras` y `Recommended Duration: [6s / 8s / 10s]`.
-3. **Voiceover:** Texto limpio sin guiones largos (em dashes) ni negritas para TTS/ElevenLabs/Lipsync.
-4. **Visual Direction & Movimiento de Cámara:** Encuadre, gesticulación y dinámica de cámara.
-5. **Prompt de Imagen (First Frame en Midjourney/Flux/Imagen):** 9:16 vertical en prosa continua.
-6. **Prompt de Video / Animación (I2V en Kling/Veo3/Grok/Luma):**
-   * Incluye el `[AUDIO & VOICE DIRECTION ANCHOR]` de `*_CHARACTER_DNA.md`, físicas de movimiento, jitter de celular y lipsync.
-7. **Asset Tags:** (`@objeto`).
-8. **Continuity Notes & Bookend:** Simetría garantizada entre Chunk 1 y el Chunk final.
-
----
-
-## 7. Cut Points y Fallback Cuts
-
-* Documentar los puntos de corte naturales entre beats.
-* **Regla de Fallback:** El Hook (Chunk 1) es intocable. Si el Chunk de aplicación presenta fallos, se fusiona con el de mezcla mostrando la consistencia en el cuenco.
-
----
-
-## 8. Título + Caption con Follow-Gate
-
-* **Título:** Corto (bajo 10 palabras), con emoji y gancho de curiosidad/resultado.
-* **Caption:** 3-4 párrafos cortos: gancho de escepticismo personal, receta con medidas caseras exactas y llamado a la acción con **Follow-Gate** y palabra clave para automatización en ManyChat.
-
----
-
-## 9. Checklist Final de Calidad
-
-- [ ] `*_CHARACTER_DNA.md` consultado y aplicado verbatim (Visual + Audio Anchor).
-- [ ] Arquetipo de personaje correctamente traducido (sin bata médica si es Mirror+Convert).
-- [ ] Rotación de vestuario registrada respecto a la producción previa.
-- [ ] Descriptores de alta intensidad aplicados en el Hook (Exageración forzada).
-- [ ] Conteo de palabras y **Duración Recomendada (6s, 8s, 10s)** asignada por cada chunk.
-- [ ] Sub-chunking aplicado si algún beat excede 24 palabras / 10s.
-- [ ] Standard Production Skeleton + Chunked Skeletons con **First Frame Prompt** Y **Video Motion Prompt**.
-- [ ] Caption con follow-gate y keyword ManyChat listo.
+1. **Generar JSON Validado:** Crear `04_IN_PRODUCTION/PROD_<ID>_<nombre>/02_First_Frames/production_package_PROD_<ID>.json`.
+2. **Compilar Markdown:** Ejecutar el conversor oficial:
+   ```bash
+   python tools/render_package_markdown.py --json "04_IN_PRODUCTION/PROD_<ID>_<nombre>/02_First_Frames/production_package_PROD_<ID>.json"
+   ```
+3. El script creará automáticamente `prompts_and_script_PROD_<ID>.md` formateado con tablas y bloques de código listos para copiar.
