@@ -59,3 +59,41 @@ Cada beat se audita obligatoriamente contra su captura `.jpg` correspondiente (`
    python tools/render_package_markdown.py --json "04_IN_PRODUCTION/PROD_<ID>_<nombre>/02_First_Frames/production_package_PROD_<ID>.json"
    ```
 3. El script creará automáticamente `prompts_and_script_PROD_<ID>.md` formateado con tablas y bloques de código listos para copiar.
+
+---
+
+## 5. Política de Seguridad y Moderación en Guiones & CTAs (Anti-Filter Standard)
+
+Para prevenir bloqueos automáticos en generadores de voz/video (ElevenLabs, Kling, Veo3, Grok) y plataformas sociales (Meta/TikTok):
+
+* **Términos Sensibles a Evitar:**
+  * ❌ `age` (edad) $\rightarrow$ Activa filtros de privacidad, discriminación y protección de menores.
+  * ❌ `DM` (direct message / mensaje directo) $\rightarrow$ Activa filtros de spam y automatizaciones no deseadas.
+
+* **Fórmulas Aprobadas de Alta Conversión (Lipsync 10s Safe):**
+  1. **Enfoque en Tipo de Piel (Belleza/Skincare):**
+     > *"Comment [KEYWORD] and your skin type below for my complete routine. Make sure you follow so I can send you the guide!"*
+  2. **Enfoque en Objetivos:**
+     > *"Comment [KEYWORD] and your main skin goal below for my complete routine. Make sure you're following, or I can't share the guide with you!"*
+  3. **Enfoque Directo y Seguro:**
+     > *"Drop the word [KEYWORD] below for my complete routine. You must be following so I can send the guide your way!"*
+  4. **Enfoque Casual y Amigable:**
+     > *"Comment [KEYWORD] below to get my complete routine. Just make sure you follow so I have a way to send you the guide!"*
+
+---
+
+## 6. Estándar de Fidelidad Textual Literal & Desacoplamiento ManyChat
+
+1. **Fidelidad Textual Literal (Verbatim Scripting):**
+   - El guión del video debe ser **100% fiel al guión original del video base palabra por palabra**.
+   - Queda estrictamente prohibido parafrasear, resumir libremente o reinventar la redacción. Se deben conservar íntegras las expresiones emocionales, la cadencia y los ganchos retóricos del creador original (*"sliding off by lunch"*, *"it's not your fault"*, *"tested on 22-year-olds"*, *"looking 20 years younger"*).
+
+2. **Desacoplamiento de Marca y Venta (Venta en ManyChat, NO en el Video):**
+   - **El video no se basa ni menciona marcas comerciales específicas** (ni marcas de terceros ni venta agresiva en el diálogo del video).
+   - Los productos se mencionan de forma genérica/educativa (*"hydrating essence"*, *"grip primer"*, *"serum foundation"*).
+   - **La recomendación exacta de producto, enlaces y conversión se delegan al 100% a la automatización de ManyChat** cuando el usuario comenta la palabra clave.
+
+3. **Única Modificación Permitida en el Guión:**
+   - **Únicamente la línea del CTA final**, donde se adapta la palabra clave de ManyChat (ej. `LIFT`, `GLOW`) y se aplica la fórmula segura anti-filtros aprobada.
+
+
