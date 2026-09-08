@@ -77,6 +77,14 @@ SCRIPT POR BEATS Y MARCAS DE TIEMPO — <NOMBRE_VIDEO>.MP4
 =======================================================
 FORMATO: [Unipersonal / Multi-Personaje (Especialista + Paciente)]
 INTENSIDAD DEL PROBLEMA EN HOOK: [Sutil / Moderado / Exagerado]
+DIAGNÓSTICO DE ENTORNO / BACKGROUND:
+- Entorno de Referencia: [Descripción forense del fondo en el video original, ej: Tienda boutique de cosméticos con iluminación de retail y displays]
+- Assets de Entorno Disponibles del Creador: [Listar imágenes de 02_AVATAR_ASSETS/02_Environments/]
+- Opciones de Checkpoint:
+  1. Replicación 1:1 del Entorno de Referencia
+  2. Asset Canónico 1 (ej: Cocina 1.jpeg)
+  3. Asset Canónico 2 (ej: Cuarto.jpeg)
+  4. Custom / Personalizado
 
 [BEAT 1: HOOK]
 Timestamp: 0:00 - 0:06
