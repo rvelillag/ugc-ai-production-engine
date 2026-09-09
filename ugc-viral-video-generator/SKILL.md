@@ -96,4 +96,21 @@ Para prevenir bloqueos automáticos en generadores de voz/video (ElevenLabs, Kli
 3. **Única Modificación Permitida en el Guión:**
    - **Únicamente la línea del CTA final**, donde se adapta la palabra clave de ManyChat (ej. `LIFT`, `GLOW`) y se aplica la fórmula segura anti-filtros aprobada.
 
+---
+
+## 7. Desglose Dinámico de Etapas vs Chunks & Coreografía de Video (I2V)
+
+1. **Estructura Narrativa Inmutable (5 Etapas):**
+   - Hook, Reframe, Mechanism, Payoff, CTA siempre estructuran la psicología del video.
+
+2. **Relación Dinámica 1:N (Sin Límite Rígido de Chunks):**
+   - La cantidad total de chunks **no es un número fijo de 6**. Se calibra según la duración y densidad de cada etapa.
+   - Si una etapa como *Mechanism* requiere 20-25 segundos de texto, se divide naturalmente en 2 o 3 chunks de 8s-10s (ej. *Mechanism 3A*, *Mechanism 3B*, *Mechanism 3C*).
+
+3. **Coreografía de Movimiento Continuo (Transición Frame A $\rightarrow$ Frame B en un solo Clip):**
+   - Cuando una etapa contiene 2 momentos visuales en una misma toma de 8-10 segundos:
+     - El **First Frame Prompt (Midjourney/Flux)** define la composición de arranque exacta ($t=0s$, **Frame A**).
+     - El **Video Motion Prompt (Kling/Veo3/Grok)** describe explícitamente la coreografía y progresión continua de movimiento hacia la acción final (**Frame B**) y la sincronización de labios/locución de todo el clip.
+
+
 
