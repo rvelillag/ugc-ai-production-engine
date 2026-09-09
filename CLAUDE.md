@@ -29,10 +29,15 @@ When executing or assisting in a production run, follow these 4 canonical phases
 3. Run `python tools/audio_cadence_analyzer.py --video "01_Reference/[video].mp4"`.
 4. Output: `script_beats_[video].txt` with timestamped words and Words-Per-Second (WPS) calculation.
 
-### Fase 2: Extracción de Keyframes & Checkpoint 1 (ugc-video-beat-extractor)
+### Fase 2: Extracción de Keyframes & Checkpoint 1 Mandatorio (ugc-video-beat-extractor)
 1. Extract exact keyframe beats using ffmpeg (`01_beat1_hook.jpg` to `06_beat5_cta.jpg`).
 2. **Strict Governance:** Maximum 8 files in `01_Reference/`. Remove any temporary `sample_frame_*.jpg`.
-3. **Checkpoint 1 Alignment:** Confirm with user: Outfit, Location/Environment, ManyChat keyword, Cover Headline (<= 7 words).
+3. **MANDATORY CHECKPOINT 1 (Alineación Creativa y Escenario):**
+   Before proceeding to Phase 3 prompt generation, YOU MUST STOP and ask the user to confirm:
+   - **A. Escenario / Entorno (Setting & Location):** ¿Replicar 1:1 el escenario de la referencia original (ej. Salón de peluquería, lavacabezas negro, spa) o adaptarlo al espacio de la marca (ej. Baño minimalista moderno, tocador, cocina)?
+   - **B. Outfit & Estilismo del Avatar:** Ropa, colores y accesorios acordes a la escena (ej. Delantal de estilista, camiseta morada, pelo recogido).
+   - **C. ManyChat Keyword:** Palabra clave segura para la llamada a la acción (ej. HAIR, LIFT, GLOW, ROUTINE).
+   - **D. Cover Headline:** Titular gancho de curiosidad de máximo 7 palabras para la portada/miniatura.
 
 ### Fase 3: Generación JSON-First & Prompts 1:1 (ugc-viral-video-generator)
 1. **Dynamic Stage-to-Chunk Mapping:** The 5 canonical narrative stages (*Hook, Reframe, Mechanism, Payoff, CTA*) are preserved, but the number of chunks N is dynamic (N >= 5).
@@ -67,7 +72,8 @@ Before approving any project or deliverable, verify that `tools/ugc_harness.py` 
 
 ## Critical Constraints & Prohibitions
 
-1. **NO Hardcoded 6-Chunk Limit:** Stages can span multiple clips (e.g. Mechanism in 2 clips of 8-10s).
-2. **NO Censored Trigger Words:** Never use 'age' or 'DM' in video scripts. Use approved formulas: 'Comment [KEYWORD] below... Make sure you follow so I can send you the guide!'.
-3. **NO Unreferenced File Clutter:** Keep project directories clean according to the canonical folder structure.
-4. **NO Raw Unicode Crashes on Windows:** Always ensure UTF-8 output formatting in Python scripts (`sys.stdout.reconfigure(encoding='utf-8')`).
+1. **NO Skipping Checkpoint 1:** Always confirm Scene/Environment, Outfit, Keyword, and Cover Headline with user before generating prompts.
+2. **NO Hardcoded 6-Chunk Limit:** Stages can span multiple clips (e.g. Mechanism in 2 clips of 8-10s).
+3. **NO Censored Trigger Words:** Never use 'age' or 'DM' in video scripts. Use approved formulas: 'Comment [KEYWORD] below... Make sure you follow so I can send you the guide!'.
+4. **NO Unreferenced File Clutter:** Keep project directories clean according to the canonical folder structure.
+5. **NO Raw Unicode Crashes on Windows:** Always ensure UTF-8 output formatting in Python scripts.

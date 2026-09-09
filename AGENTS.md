@@ -14,6 +14,7 @@ The system operates across 4 core skills and automated tools in `tools/`:
 2. **Visual Keyframe Deconstruction (`ugc-video-beat-extractor`):**
    - Extract exact keyframes from reference video.
    - Strict 01_Reference/ directory hygiene (max 8 files).
+   - **MANDATORY CHECKPOINT 1:** Stop and confirm with user: (1) Escenario / Location (1:1 replica vs brand location), (2) Outfit & Style, (3) ManyChat Keyword, (4) Cover Headline (<= 7 words).
 
 3. **JSON-First Generation (`tools/schemas/production_package.py`):**
    - Must validate with Pydantic model `ProductionPackage`.
