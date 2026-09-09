@@ -1,0 +1,9 @@
+# UGC AI Production Engine Rules
+
+- Always adhere to the JSON-First architecture validated by `tools/schemas/production_package.py`.
+- Enforce speech cadence limit of <= 2.4 words per second per chunk.
+- Never use banned words ('age', 'DM') in video scripts or audio prompts.
+- Ensure all video dialogues are brand-decoupled (generic/educational); conversion is handled via ManyChat.
+- Keep `01_Reference/` clean (max 8 files: 1 video, keyframes 01-06, 1 script txt).
+- All final deliverables must contain strictly 4 files (.mp4, .srt, .jpg, .txt).
+- Always verify projects with `python tools/ugc_harness.py --project [PROJECT]`.
