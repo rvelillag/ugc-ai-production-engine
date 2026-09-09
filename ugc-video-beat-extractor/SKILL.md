@@ -53,17 +53,12 @@ transcript_data = ASREngine.transcribe(temp_wav, language="en")
 
 ---
 
-### 4. Extracción de Keyframes en Alta Resolución (FFmpeg)
-- Extraer los 6 fotogramas clave de cada beat usando el ejecutable resuelto por `FFmpegLocator`:
-
-```python
-from app.core.ffmpeg_utils import FFmpegLocator
-import subprocess
-
-ffmpeg_bin, _ = FFmpegLocator.get_binaries()
-# Extraer frames con calidad -q:v 2
-# 01_beat1_hook.jpg, 02_beat2_reframe.jpg, 03_beat3_ingredients.jpg...
-```
+### 4. Extracción de Keyframes Canónicos 1:1 (FFmpeg)
+- Extraer **exclusivamente** los fotogramas clave oficiales de cada beat (`01_beat1_hook.jpg`, `02_beat2_reframe.jpg`, etc.) en resolución nativa y alta calidad (`-q:v 2`).
+- **Gobernanza Estricta de `01_Reference/`:** Queda prohibido dejar archivos temporales de muestreo (`sample_frame_*.jpg`). La carpeta debe contener estrictamente:
+  1. `<nombre_video>.mp4` (video de referencia).
+  2. `01_beat1_hook.jpg` a `06_beat5_cta.jpg` (fotogramas canónicos 1:1).
+  3. `script_beats_<nombre_video>.txt` (desglose estructural de beats y diagnóstico).
 
 ---
 
