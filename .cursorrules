@@ -1,6 +1,7 @@
 # UGC AI Production Engine Rules
 
 - Always execute Mandatory Checkpoint 1 (Escenario/Location, Outfit, ManyChat Keyword, Cover Headline) before Phase 3.
+- Enforce the 70/30 Script Rule: 70% semantic/structural fidelity to viral reference + 30% paraphrasing to match avatar personality and tone.
 - Always adhere to the JSON-First architecture validated by `tools/schemas/production_package.py`.
 - Enforce speech cadence limit of <= 2.4 words per second per chunk.
 - Never use banned words ('age', 'DM') in video scripts or audio prompts.
