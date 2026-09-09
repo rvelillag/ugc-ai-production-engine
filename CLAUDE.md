@@ -39,12 +39,15 @@ When executing or assisting in a production run, follow these 4 canonical phases
    - **C. ManyChat Keyword:** Palabra clave segura para la llamada a la acción (ej. HAIR, LIFT, GLOW, ROUTINE).
    - **D. Cover Headline:** Titular gancho de curiosidad de máximo 7 palabras para la portada/miniatura.
 
-### Fase 3: Generación JSON-First & Prompts 1:1 (ugc-viral-video-generator)
-1. **Dynamic Stage-to-Chunk Mapping:** The 5 canonical narrative stages (*Hook, Reframe, Mechanism, Payoff, CTA*) are preserved, but the number of chunks N is dynamic (N >= 5).
-2. **Cadence Constraint:** Every chunk dialogue must respect WPS <= 2.4 (words <= duration_seconds * 2.4).
-3. **Forensic First Frame Prompts:** Inject avatar DNA reference (`creator_profile.json`) into 1:1 replications of reference keyframe composition, lighting, camera angle, micro-expressions, and props.
-4. **I2V Motion Choreography:** Every `video_motion_prompt` describes continuous cinematic motion from Frame A (t=0s) to Frame B (t=X s) with natural lipsync and handheld camera.
-5. Validate using Pydantic model (`tools/schemas/production_package.py`) and render `prompts_and_script_[ID].md`.
+### Fase 3: Generación JSON-First & Adaptación 70/30 del Guion (ugc-viral-video-generator)
+1. **Regla del 70/30 en el Guion (Fidelidad Semántica + Tono de Personaje):**
+   - **70% Núcleo Semántico y Estructural:** Conservar 100% de la idea fuerza, gancho de curiosidad, secuencia de dolor -> mecanismo -> beneficio -> CTA del video viral de referencia.
+   - **30% Parafraseo y Personalidad del Avatar:** Reescribir y parafrasear el diálogo para adaptarlo de forma natural y fluida a la voz, energía, tono y personalidad única del Avatar/Creador (según `CHARACTER_DNA.md`), evitando traducciones literales o robóticas.
+2. **Dynamic Stage-to-Chunk Mapping:** The 5 canonical narrative stages (*Hook, Reframe, Mechanism, Payoff, CTA*) are preserved, but the number of chunks N is dynamic (N >= 5).
+3. **Cadence Constraint:** Every chunk dialogue must respect WPS <= 2.4 (words <= duration_seconds * 2.4).
+4. **Forensic First Frame Prompts:** Inject avatar DNA reference (`creator_profile.json`) into 1:1 replications of reference keyframe composition, lighting, camera angle, micro-expressions, and props.
+5. **I2V Motion Choreography:** Every `video_motion_prompt` describes continuous cinematic motion from Frame A (t=0s) to Frame B (t=X s) with natural lipsync and handheld camera.
+6. Validate using Pydantic model (`tools/schemas/production_package.py`) and render `prompts_and_script_[ID].md`.
 
 ### Fase 4: QA Governance & Ensamblaje Canónico (auto-captions-service + ugc_harness.py)
 1. Operator generates raw clips `1.mp4` to `N.mp4` in `03_Raw_Clips/`.
@@ -73,7 +76,8 @@ Before approving any project or deliverable, verify that `tools/ugc_harness.py` 
 ## Critical Constraints & Prohibitions
 
 1. **NO Skipping Checkpoint 1:** Always confirm Scene/Environment, Outfit, Keyword, and Cover Headline with user before generating prompts.
-2. **NO Hardcoded 6-Chunk Limit:** Stages can span multiple clips (e.g. Mechanism in 2 clips of 8-10s).
-3. **NO Censored Trigger Words:** Never use 'age' or 'DM' in video scripts. Use approved formulas: 'Comment [KEYWORD] below... Make sure you follow so I can send you the guide!'.
-4. **NO Unreferenced File Clutter:** Keep project directories clean according to the canonical folder structure.
-5. **NO Raw Unicode Crashes on Windows:** Always ensure UTF-8 output formatting in Python scripts.
+2. **70/30 Script Rule:** Always paraphrase dialogue to match the avatar's personality while keeping 70% of the viral reference core message.
+3. **NO Hardcoded 6-Chunk Limit:** Stages can span multiple clips (e.g. Mechanism in 2 clips of 8-10s).
+4. **NO Censored Trigger Words:** Never use 'age' or 'DM' in video scripts. Use approved formulas: 'Comment [KEYWORD] below... Make sure you follow so I can send you the guide!'.
+5. **NO Unreferenced File Clutter:** Keep project directories clean according to the canonical folder structure.
+6. **NO Raw Unicode Crashes on Windows:** Always ensure UTF-8 output formatting in Python scripts.

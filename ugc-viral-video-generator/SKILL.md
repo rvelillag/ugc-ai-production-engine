@@ -82,19 +82,20 @@ Para prevenir bloqueos automáticos en generadores de voz/video (ElevenLabs, Kli
 
 ---
 
-## 6. Estándar de Fidelidad Textual Literal & Desacoplamiento ManyChat
+## 6. Estándar de Guión 70/30 (Fidelidad Semántica + Adaptación al Personaje) & Desacoplamiento ManyChat
 
-1. **Fidelidad Textual Literal (Verbatim Scripting):**
-   - El guión del video debe ser **100% fiel al guión original del video base palabra por palabra**.
-   - Queda estrictamente prohibido parafrasear, resumir libremente o reinventar la redacción. Se deben conservar íntegras las expresiones emocionales, la cadencia y los ganchos retóricos del creador original (*"sliding off by lunch"*, *"it's not your fault"*, *"tested on 22-year-olds"*, *"looking 20 years younger"*).
+1. **La Regla 70/30 en el Guión:**
+   - **70% Fidelidad Semántica y Estructural:** Conserva el 100% de la carga emocional, el gancho de curiosidad, los puntos de dolor, las revelaciones, el mecanismo explicativo y la secuencia lógica del video viral de referencia.
+   - **30% Parafraseo y Adaptación al Avatar:** El diálogo se parafrasea y adapta para reflejar la voz, el tono, la naturalidad y la personalidad única del Avatar/Personaje (según `CHARACTER_DNA.md`), evitando traducciones rígidas, robóticas o literales que no encajen con su estilo de comunicación.
+   - **Cadencia Rigurosa:** Todo el texto parafraseado debe encajar estrictamente dentro de la constante de locución ($\le 2.4$ palabras por segundo).
 
 2. **Desacoplamiento de Marca y Venta (Venta en ManyChat, NO en el Video):**
-   - **El video no se basa ni menciona marcas comerciales específicas** (ni marcas de terceros ni venta agresiva en el diálogo del video).
-   - Los productos se mencionan de forma genérica/educativa (*"hydrating essence"*, *"grip primer"*, *"serum foundation"*).
+   - **El video no menciona marcas comerciales específicas** (ni marcas de terceros ni venta directa agresiva en el diálogo del video).
+   - Los ingredientes, problemas y productos se mencionan de forma genérica/educativa (*"bicarbonato con tu champú"*, *"hydrating essence"*, *"grip primer"*, *"serum foundation"*).
    - **La recomendación exacta de producto, enlaces y conversión se delegan al 100% a la automatización de ManyChat** cuando el usuario comenta la palabra clave.
 
-3. **Única Modificación Permitida en el Guión:**
-   - **Únicamente la línea del CTA final**, donde se adapta la palabra clave de ManyChat (ej. `LIFT`, `GLOW`) y se aplica la fórmula segura anti-filtros aprobada.
+3. **CTA Seguro y Anti-Filtros:**
+   - Se adapta la palabra clave de ManyChat (ej. `LIFT`, `GLOW`, `HAIR`) aplicando las fórmulas seguras anti-filtros aprobadas (sin usar palabras censuradas como `age` o `DM`).
 
 ---
 

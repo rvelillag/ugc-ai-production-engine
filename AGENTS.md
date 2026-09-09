@@ -18,6 +18,7 @@ The system operates across 4 core skills and automated tools in `tools/`:
 
 3. **JSON-First Generation (`tools/schemas/production_package.py`):**
    - Must validate with Pydantic model `ProductionPackage`.
+   - **70/30 Script Rule:** 70% semantic core from reference video + 30% persona/tone paraphrasing to match character identity.
    - Dynamic chunk mapping (5 canonical stages: Hook, Reframe, Mechanism, Payoff, CTA across N clips).
    - Render markdown using `tools/render_package_markdown.py`.
    - Moderation safety: Zero instances of 'age' or 'DM'.
