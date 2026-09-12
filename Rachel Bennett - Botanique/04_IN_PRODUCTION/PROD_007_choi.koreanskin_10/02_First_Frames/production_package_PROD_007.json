@@ -1,0 +1,276 @@
+{
+  "project_id": "PROD_007",
+  "reference_video": "choi.koreanskin_10.mp4",
+  "reference_duration_s": 111.96,
+  "topic": "Common Makeup Mistakes that Age Mature Skin (50+) vs The Botanical Hydration Secret",
+  "brand": "Botanique Paris",
+  "avatar_name": "Rachel Bennett",
+  "avatar_age": 47,
+  "avatar_archetype": "Mirror + Convert",
+  "wardrobe_previous": "Top de punto acanalado Azul Pizarra Suave",
+  "wardrobe_assigned": "Top de punto suave en Beige Avena Natural (Oatmeal Beige) con aretes pequeños dorados",
+  "audio_voice_direction_anchor": "[AUDIO & VOICE DIRECTION ANCHOR]:\nVoice Profile: Natural, clear, slightly warm and grounded 47-year-old American female speaking voice. Conversational pacing with authentic speech breathing pauses. Retail cosmetics store acoustics with realistic subtle ambient presence, zero background music, zero studio reverb. Clear, crisp English pronunciation with natural lip synchronization matching the exact spoken script.",
+  "standard_skeleton_25_30s": "Create a realistic candid 9:16 vertical UGC video for Instagram Reels.\nCREATOR: Rachel Bennett, an authentic 47-year-old Caucasian woman with shoulder-length medium brown hair showing natural subtle gray roots in a loose casual low ponytail, realistic skin texture with visible natural pores and fine forehead lines, bright awake eyes, wearing a soft oatmeal-beige knit top and discrete small gold stud earrings.\nSETTING: A brightly lit modern cosmetics department store / beauty boutique with black-and-white striped columns, sleek makeup display shelves with soft backlighting, and warm circular ceiling spotlights.\nCAMERA STYLE: Handheld smartphone camera with natural subtle breathing jitter at eye level. Strictly zero on-screen text overlays, zero graphics, zero social media icons, zero watermarks.\nSEQUENCE OF ACTIONS:\n1. (0:00-0:06) Two 50-year-old twin sisters sit side-by-side in matching peach zipped jackets; the left twin has severe dark puffy under-eye circles and crepey skin, while the right twin has glowing radiant skin. Rachel Bennett stands behind them in the center with a surprised open-mouth expression, pointing directly at the left twin's dark under-eye bag.\n2. (0:06-0:12) Rachel holds up a dark cosmetic pencil toward the camera, explaining that products tested on young skin make mature faces look tired.\n3. (0:12-0:18) Rachel holds a frosted bottle of milky botanical essence forward, showing the elastic cushion it creates so foundation never slides off.\n4. (0:18-0:24) Rachel demonstrates a lightweight botanical smoothing base and upper lash lift technique.\n5. (0:24-0:32) Close-up payoff of the friend smiling radiantly, showing plump, glass-smooth, uncreased skin while Rachel presents the beige serum foundation tube.\n6. (0:32-0:40) Rachel and her friend stand together in medium shot, Rachel speaking warmly to camera with an inviting gesture to comment and follow.\nUGC REALISM: Everyday unfiltered video quality, authentic retail environment acoustics, real facial expressions, zero on-screen text.\nTOTAL DURATION: 40 seconds.",
+  "chunks": [
+    {
+      "chunk_id": 1,
+      "beat_name": "Hook (Posición 1:1 — Comparativa de Gemelas Lado a Lado)",
+      "recommended_duration_s": 10,
+      "word_count": 21,
+      "voiceover_clean_tts": "If your makeup makes you look old and tired like her twin does, stop using powder blush and dark pencils.",
+      "visual_direction": "Plano medio vertical 9:16 a nivel de ojos idéntico a la referencia. Al frente, dos mujeres gemelas idénticas de 50 años sentadas lado a lado vistiendo chaquetas deportivas color melocotón a juego y collares de cadena dorada. La gemela izquierda presenta ojeras muy oscuras, bolsas hinchadas severas y piel flácida en alto contraste. La gemela derecha luce piel tersa, luminosa y descansada. Rachel Bennett en el centro detrás de ambas, con el torso visible entre ellas, mira a la cámara con la boca abierta en expresión de asombro ('O'), señalando con su dedo índice derecho la bolsa bajo el ojo de la gemela izquierda. Fondo de tienda de cosméticos tipo Sephora con columnas rayadas en blanco y negro, estanterías iluminadas de maquillaje y luces de techo de retail. Sin textos ni íconos.",
+      "composition_audit": {
+        "camera_shot_type": "Vertical 9:16 medium shot, eye level, 28mm smartphone lens, candid UGC framing",
+        "foreground_props": "Two identical twin women seated side-by-side in foreground filling lower two-thirds of frame, wearing matching peach-coral zipped jackets and gold chain necklaces",
+        "left_subject": {
+          "name": "Rachel Bennett (Host)",
+          "character_id": "rachel_bennett_47yo",
+          "orientation": "Standing centered in background directly between and behind the two seated twins, facing camera directly",
+          "pose": "Head and upper torso centered behind twins, mouth open in shocked exaggerated surprise ('O' shape), right arm reaching forward pointing index finger directly at the left twin's dark puffy eye bag",
+          "hands_interaction": "Right index finger pointing sharply at left twin's under-eye puffiness",
+          "gaze_direction": "Eyes wide open looking straight into the camera lens with surprised expression",
+          "outfit": "Soft oatmeal-beige knit top, small discrete gold stud earrings"
+        },
+        "right_subject": {
+          "role": "Identical Twin Models 50yo (Split State)",
+          "orientation": "Two identical twin women sitting side-by-side facing forward at camera",
+          "pose": "Left twin looking slightly downcast/tired; right twin looking radiant and confident straight ahead; both wearing matching peach zip-up jackets and gold chain necklaces with sleek pulled-back hair",
+          "hands_interaction": "Hands resting in lap out of frame",
+          "facial_expression": "Left twin has tired drooping expression; right twin has subtle glowing confident smile",
+          "skin_condition_exaggerated": "Left twin: Severe, prominent, exaggerated dark under-eye circles, heavy swollen puffy bags, deep nasolabial creases, visibly crepey skin. Right twin: Flawless, lifted, rested glass-like smooth skin with radiant natural glow."
+        },
+        "environment_background": "Brightly lit modern cosmetics department store / beauty retail boutique, black-and-white vertically striped columns, sleek makeup display shelves with illuminated cosmetic products, circular ceiling spotlights in background",
+        "lighting_style": "Bright commercial retail boutique lighting with soft overhead spotlights, authentic real skin micro-texture, visible pores, zero text, zero overlays, zero watermarks, 8k photorealistic"
+      },
+      "midjourney_prompt_9_16": "A candid 9:16 vertical smartphone UGC video first frame inside a brightly lit cosmetics beauty department store. In the foreground are two identical 50-year-old twin sisters sitting side-by-side facing the camera, wearing matching peach-coral zip-up athletic jackets and gold chain necklaces with sleek pulled-back hair. The left twin has severe, exaggerated dark under-eye circles, prominent swollen puffy eye bags, deep nasolabial creases, and tired crepey skin in high contrast. The right twin has flawless, lifted, smooth, radiant glass skin with a healthy youthful glow. In the center background directly between and behind the two twins stands Rachel Bennett, an authentic 47-year-old Caucasian woman with shoulder-length medium brown hair showing natural subtle gray roots in a loose low ponytail, wearing a soft oatmeal-beige knit top and small gold stud earrings. Rachel has her mouth wide open in shocked, exaggerated surprise ('O' mouth) and is pointing her right index finger directly at the swollen dark under-eye bag of the left twin. In the background are black-and-white striped retail columns, illuminated cosmetic product display shelves, and circular ceiling spotlights of a beauty store. Clean image with absolutely zero text, zero overlays, zero graphics, zero social media icons, zero watermarks. Realistic skin micro-texture, visible natural pores, candid smartphone camera still, photorealistic 8k.",
+      "video_motion_prompt_i2v": "9:16 vertical UGC video, 10 seconds duration. Seamless continuation from First Frame inside the cosmetics department store. Rachel Bennett in her oatmeal-beige knit top stands centered behind the two twin sisters, reacting with authentic expressive surprise while pointing her index finger at the left twin's puffy dark under-eye bag, speaking directly to camera. The right twin smiles calmly while the left twin looks relatably concerned. Subtle handheld smartphone jitter, retail boutique lighting with black-and-white striped background column. Strictly zero on-screen text, zero subtitles, zero icons, zero watermarks. [AUDIO & VOICE DIRECTION ANCHOR]: Natural, clear, slightly warm 47-year-old American female speaking voice, conversational pacing, natural lipsync matching the spoken script: \"If your makeup makes you look old and tired like her twin does, stop using powder blush and dark pencils.\" Realistic motion, photorealistic 4k.",
+      "asset_tags": [
+        "@rachel_bennett_47yo",
+        "@gemelas_peach_jackets",
+        "@top_oatmeal_beige",
+        "@dedo_indice_ojeras",
+        "@tienda_cosmeticos_sephora"
+      ],
+      "continuity_notes": "Apertura exacta 1:1 con la referencia. Dos gemelas al frente con chaquetas melocotón, Rachel detrás en el centro señalando con la boca abierta en asombro, dentro de la tienda de cosméticos."
+    },
+    {
+      "chunk_id": 2,
+      "beat_name": "Reframe (Posición 1:1 — Lápiz Oscuro en Primer Plano)",
+      "recommended_duration_s": 8,
+      "word_count": 18,
+      "voiceover_clean_tts": "Heavy products tested on twenty-year-olds were never made for mature skin and will only settle into creases.",
+      "visual_direction": "Plano medio vertical 9:16 idéntico a la referencia. Las dos gemelas permanecen sentadas al frente en la tienda de cosméticos. Rachel Bennett en el centro detrás sostiene un lápiz cosmético oscuro verticalmente entre sus dedos hacia la cámara en primer plano, con expresión explicativa y de advertencia. Sin textos.",
+      "composition_audit": {
+        "camera_shot_type": "Vertical 9:16 medium shot, eye level",
+        "foreground_props": "Dark cosmetic pencil held vertically forward toward camera lens in center foreground",
+        "left_subject": {
+          "name": "Rachel Bennett (Host)",
+          "character_id": "rachel_bennett_47yo",
+          "orientation": "Standing centered behind twins, facing camera directly",
+          "pose": "Holding dark pencil vertically between fingers held forward toward camera lens, speaking with an emphatic, knowing, conversational tone",
+          "hands_interaction": "Holding cosmetic pencil forward toward lens",
+          "gaze_direction": "Directly into camera lens",
+          "outfit": "Soft oatmeal-beige knit top, small gold stud earrings"
+        },
+        "right_subject": {
+          "role": "Twin Models 50yo",
+          "orientation": "Seated in foreground facing camera",
+          "pose": "Both twins listening attentively, shoulders relaxed",
+          "hands_interaction": "Resting naturally",
+          "facial_expression": "Attentive, listening to Rachel",
+          "skin_condition_exaggerated": "Visual contrast between left and right twin skin still clearly evident"
+        },
+        "environment_background": "Bright cosmetics department store interior with illuminated makeup display stands and black-and-white pillar",
+        "lighting_style": "Crisp beauty retail lighting, pencil in sharp center focus, realistic skin pores, zero text, 8k"
+      },
+      "midjourney_prompt_9_16": "A candid 9:16 vertical social media video first frame inside a brightly lit beauty cosmetics retail store. The two 50-year-old twin sisters in matching peach zip-up jackets sit in the lower foreground listening attentively. In the center background directly between them stands Rachel Bennett, the authentic 47-year-old woman with medium brown hair with subtle gray roots in a loose low ponytail, wearing her soft oatmeal-beige knit top. Rachel holds a slender dark cosmetic pencil vertically between her fingers, presenting it forward toward the camera lens with an emphatic, knowing expression. In the background are cosmetics display shelves and a black-and-white striped store column. Clean frame with absolutely zero text, zero overlays, zero graphics, zero social media icons, zero watermarks. Realistic skin micro-texture, visible pores, candid handheld smartphone camera shot, photorealistic 8k.",
+      "video_motion_prompt_i2v": "9:16 vertical UGC video, 8 seconds duration. Continuation from Reframe First Frame in the cosmetics store. Rachel Bennett holds the cosmetic pencil forward and speaks directly into the smartphone camera with an unhurried, reassuring explanation. The twins in foreground listen. Handheld micro-movement, bright retail ambient lighting. Strictly zero on-screen text, zero subtitles, zero watermarks. [AUDIO & VOICE DIRECTION ANCHOR]: Warm 47-year-old American female voice, grounded tone, natural lipsync: \"Heavy products tested on twenty-year-olds were never made for mature skin and will only settle into creases.\" Natural motion, 4k.",
+      "asset_tags": [
+        "@rachel_bennett_47yo",
+        "@gemelas_peach_jackets",
+        "@lapiz_cosmetico",
+        "@top_oatmeal_beige",
+        "@tienda_cosmeticos_sephora"
+      ],
+      "continuity_notes": "Continuidad directa del Chunk 1. Misma tienda, misma ropa, misma posición."
+    },
+    {
+      "chunk_id": 3,
+      "beat_name": "Mechanism 3A (Posición 1:1 — Presentación de Esencia Láctea)",
+      "recommended_duration_s": 8,
+      "word_count": 18,
+      "voiceover_clean_tts": "First, press a rich milky botanical essence into the skin so your base has real bounce to grip.",
+      "visual_direction": "Plano medio corto vertical 9:16 idéntico a la referencia en la tienda de belleza. Rachel a la izquierda sostiene un frasco cilíndrico blanco mate de esencia láctea botánica (Botanique Paris) hacia la lente con una sonrisa abierta. A la derecha, la amiga con chaqueta melocotón sonríe con alegría y anticipación.",
+      "composition_audit": {
+        "camera_shot_type": "Vertical 9:16 medium close-up, eye level",
+        "foreground_props": "Sleek minimalist white cylindrical bottle of milky skincare essence held forward in sharp focus",
+        "left_subject": {
+          "name": "Rachel Bennett",
+          "character_id": "rachel_bennett_47yo",
+          "orientation": "Standing on left facing camera",
+          "pose": "Holding minimalist white cylindrical essence bottle forward in right hand, presenting it to camera with an engaging enthusiastic smile",
+          "hands_interaction": "Holding essence bottle forward",
+          "gaze_direction": "Directly into camera lens",
+          "outfit": "Soft oatmeal-beige knit top"
+        },
+        "right_subject": {
+          "role": "Friend / Model 50yo in Peach Jacket",
+          "orientation": "Standing close on right, head angled toward Rachel and camera",
+          "pose": "Relaxed stance, shoulders down",
+          "hands_interaction": "Resting naturally",
+          "facial_expression": "Smiling with genuine warmth, relief and anticipation",
+          "skin_condition_exaggerated": "Skin looking fresh and receptive to hydration"
+        },
+        "environment_background": "Bright modern cosmetics department store background with soft blurred beauty displays and warm retail lights",
+        "lighting_style": "Flattering retail store lighting, product in sharp focus, realistic skin texture, zero text, 8k"
+      },
+      "midjourney_prompt_9_16": "A candid 9:16 vertical UGC first frame beauty shot inside a modern brightly lit cosmetics department store. On the left, Rachel Bennett, the authentic 47-year-old woman with shoulder-length medium brown hair and gray roots in a loose low ponytail, wearing her soft oatmeal-beige knit top, holds a sleek minimalist white cylindrical bottle of milky botanical skincare essence forward in her hand, presenting it directly to the smartphone camera lens with an engaging, enthusiastic smile. On the right side, the 50-year-old female friend in her peach-coral zip-up athletic jacket and gold chain necklace smiles warmly with genuine interest and anticipation. Background shows softly blurred cosmetic counters and beauty store lighting, real skin texture with visible pores. Completely clean image with zero text, zero labels overlay, zero social media icons, zero watermarks, photorealistic 8k.",
+      "video_motion_prompt_i2v": "9:16 vertical UGC video, 8 seconds duration. Rachel Bennett holds the sleek milky essence bottle forward toward the camera in the beauty store, speaking warmly with conversational excitement. Her friend in the peach jacket smiles with anticipation. Zero on-screen text, zero icons, zero captions. [AUDIO & VOICE DIRECTION ANCHOR]: 47-year-old American female voice, conversational pacing, natural lipsync: \"First, press a rich milky botanical essence into the skin so your base has real bounce to grip.\" Fluid natural motion, 4k.",
+      "asset_tags": [
+        "@rachel_bennett_47yo",
+        "@amiga_peach_jacket",
+        "@botella_esencia_blanca",
+        "@top_oatmeal_beige",
+        "@tienda_cosmeticos_sephora"
+      ],
+      "continuity_notes": "Presentación del producto de hidratación profunda (Milky Botanical Glow Essence) en la tienda."
+    },
+    {
+      "chunk_id": 4,
+      "beat_name": "Mechanism 3B (Posición 1:1 — Primer Ligero y Pestañas Levantadas)",
+      "recommended_duration_s": 8,
+      "word_count": 19,
+      "voiceover_clean_tts": "Second, use a featherlight grip primer and lift only the upper lashes to instantly open the eyes.",
+      "visual_direction": "Plano medio corto vertical 9:16 idéntico a la referencia en la tienda de belleza. Rachel a la izquierda sostiene un tubo compacto de gel primer botánico transparente/ligero y gesticula explicando la técnica de ligereza. La amiga con chaqueta melocotón sonríe mirando a cámara.",
+      "composition_audit": {
+        "camera_shot_type": "Vertical 9:16 medium close-up beauty shot",
+        "foreground_props": "Lightweight botanical primer tube held in center foreground",
+        "left_subject": {
+          "name": "Rachel Bennett",
+          "character_id": "rachel_bennett_47yo",
+          "orientation": "Facing camera",
+          "pose": "Holding small sleek primer tube in hand, gesturing with fingers to emphasize lightness and upper eye lift",
+          "hands_interaction": "Holding primer tube and gesturing with hand",
+          "gaze_direction": "Directly into camera lens",
+          "outfit": "Soft oatmeal-beige knit top"
+        },
+        "right_subject": {
+          "role": "Friend in Peach Jacket",
+          "orientation": "Facing camera on screen-right",
+          "pose": "Standing beside Rachel with shoulders relaxed, eyes open and awake",
+          "hands_interaction": "Hands at rest",
+          "facial_expression": "Subtle, knowing smile directly to camera",
+          "skin_condition_exaggerated": "Eyes looking awake, natural smooth skin"
+        },
+        "environment_background": "Bright cosmetics boutique background with subtle illuminated display stands",
+        "lighting_style": "Soft diffused retail lighting, crisp detailed focus, zero text, zero logos, 8k"
+      },
+      "midjourney_prompt_9_16": "A candid 9:16 vertical UGC beauty first frame shot inside a brightly lit cosmetics boutique. On the left side, Rachel Bennett in her soft oatmeal-beige knit top holds a sleek clear squeeze tube of lightweight botanical primer between her fingers, gesturing gently with her other hand toward the camera with an instructive, friendly smile. Beside her on the right, the 50-year-old woman in her peach zip-up jacket looks directly toward the camera with lifted, awake, bright eyes and a warm subtle smile. Background shows soft retail makeup counters, highly detailed skin micro-texture, visible fine facial lines, clean image with zero text, zero overlays, zero social media icons, zero watermarks, photorealistic 8k.",
+      "video_motion_prompt_i2v": "9:16 vertical UGC video, 8 seconds duration. Rachel Bennett holds the primer tube and explains the lightweight prep technique with clarity and warmth in the cosmetics store. Her friend beside her smiles in agreement with lifted awake eyes. Zero on-screen text, zero subtitles, zero watermarks. [AUDIO & VOICE DIRECTION ANCHOR]: Warm 47-year-old female voice, unhurried pacing, natural lipsync: \"Second, use a featherlight grip primer and lift only the upper lashes to instantly open the eyes.\" Realistic motion, 4k.",
+      "asset_tags": [
+        "@rachel_bennett_47yo",
+        "@amiga_peach_jacket",
+        "@tubo_primer_ligero",
+        "@top_oatmeal_beige",
+        "@tienda_cosmeticos_sephora"
+      ],
+      "continuity_notes": "Explicación de la base ligera y apertura de mirada."
+    },
+    {
+      "chunk_id": 5,
+      "beat_name": "Payoff (Posición 1:1 — Base Serum y Piel Radiante sin Grietas)",
+      "recommended_duration_s": 10,
+      "word_count": 21,
+      "voiceover_clean_tts": "Finish with a youth-restoring serum foundation that blurs fine lines and stays fresh for twelve full hours.",
+      "visual_direction": "Plano medio corto vertical 9:16 idéntico a la referencia en la tienda de belleza. Rachel a la izquierda sostiene un elegante tubo beige de base serum botánica (Botanique Paris) y lo muestra sonriendo con entusiasmo. La mujer con chaqueta melocotón a la derecha sonríe con radiante confianza mostrando su piel lisa, descansada y luminosa.",
+      "composition_audit": {
+        "camera_shot_type": "Vertical 9:16 medium close-up beauty portrait",
+        "foreground_props": "Sleek beige squeeze tube of botanical serum foundation held in hand in sharp focus",
+        "left_subject": {
+          "name": "Rachel Bennett",
+          "character_id": "rachel_bennett_47yo",
+          "orientation": "Facing camera, smiling proudly",
+          "pose": "Holding sleek beige squeeze tube of botanical serum foundation in one hand, smiling with authentic excitement toward camera",
+          "hands_interaction": "Holding and presenting serum foundation tube",
+          "gaze_direction": "Looking into camera lens",
+          "outfit": "Soft oatmeal-beige knit top"
+        },
+        "right_subject": {
+          "role": "Friend in Peach Jacket (Radiant Transformation)",
+          "orientation": "Facing camera, head tilted slightly to catch flattering light",
+          "pose": "Smiling with radiant confidence toward the camera, skin looking completely transformed and youthful",
+          "hands_interaction": "Relaxed pose",
+          "facial_expression": "Joyful, confident, well-rested glow with relaxed eyes",
+          "skin_condition_exaggerated": "Radiant, glass-smooth, plump rested skin with healthy natural dewy sheen, zero creasing, zero cakey separation, fine lines softly blurred"
+        },
+        "environment_background": "Bright cosmetics boutique setting with flattering soft retail lighting and blurred background displays",
+        "lighting_style": "Flattering retail boutique light highlighting natural dewy glow, realistic skin pores, zero text, 8k"
+      },
+      "midjourney_prompt_9_16": "A candid 9:16 vertical beauty UGC portrait first frame inside a brightly lit cosmetics boutique. On the left side, Rachel Bennett in her soft oatmeal-beige knit top holds a sleek beige squeeze tube of botanical serum foundation in one hand, presenting it with an excited, proud smile toward the camera. On the right side, the 50-year-old woman in her peach zip-up jacket and gold necklace smiles with radiant confidence toward the camera, showcasing fresh, plump, rested glass-like skin with zero creasing, zero cakey texture, and an authentic youthful dewy glow. Background shows soft cosmetic retail shelves. Clean frame with absolutely zero text, zero overlays, zero graphics, zero social media icons, zero watermarks. Ultra-realistic skin micro-texture, visible authentic pores, photorealistic 8k.",
+      "video_motion_prompt_i2v": "9:16 vertical beauty UGC video, 10 seconds duration. Rachel Bennett holds the serum foundation tube and speaks enthusiastically into the camera, gesturing toward her friend inside the beauty store. The friend in the peach jacket smiles radiantly into the lens, admiring her smooth glowing skin. Bright flattering retail light. Zero on-screen text, zero captions, zero watermarks. [AUDIO & VOICE DIRECTION ANCHOR]: 47-year-old American female voice, joyful and grounded: \"Finish with a youth-restoring serum foundation that blurs fine lines and stays fresh for twelve full hours.\" Fluid natural motion, 4k.",
+      "asset_tags": [
+        "@rachel_bennett_47yo",
+        "@amiga_peach_jacket_glow",
+        "@tubo_base_serum",
+        "@top_oatmeal_beige",
+        "@tienda_cosmeticos_sephora"
+      ],
+      "continuity_notes": "Payoff visual de máxima transformación (Age-Defying Botanical Serum Foundation)."
+    },
+    {
+      "chunk_id": 6,
+      "beat_name": "CTA (Posición 1:1 — Cierre con Follow-Gate y ManyChat)",
+      "recommended_duration_s": 10,
+      "word_count": 20,
+      "voiceover_clean_tts": "Comment LIFT and your skin type below for my complete routine! Make sure you follow so I can send you the guide!",
+      "visual_direction": "Plano medio vertical 9:16 idéntico a la referencia. Rachel a la izquierda junta sus manos frente a su pecho en un gesto cálido y cercano hablando directamente a la lente con una sonrisa cómplice. La amiga con chaqueta melocotón sonríe a su lado dentro de la tienda de cosméticos.",
+      "composition_audit": {
+        "camera_shot_type": "Vertical 9:16 medium shot",
+        "foreground_props": "Clean framing in beauty department store aisle",
+        "left_subject": {
+          "name": "Rachel Bennett",
+          "character_id": "rachel_bennett_47yo",
+          "orientation": "Facing camera directly",
+          "pose": "Clasps both hands together in front of her chest in a warm, welcoming, friendly gesture, smiling genuinely into the lens",
+          "hands_interaction": "Clasped hands in front of chest",
+          "gaze_direction": "Directly into camera lens",
+          "outfit": "Soft oatmeal-beige knit top"
+        },
+        "right_subject": {
+          "role": "Friend in Peach Jacket",
+          "orientation": "Beside Rachel facing camera",
+          "pose": "Standing beside Rachel with shoulders relaxed, smiling warmly and cheerfully",
+          "hands_interaction": "Relaxed pose",
+          "facial_expression": "Friendly, cheerful, approachable smile",
+          "skin_condition_exaggerated": "Glowing rested skin with natural radiance"
+        },
+        "environment_background": "Bright cosmetics department store interior with illuminated makeup display stands and soft store lights",
+        "lighting_style": "Flattering retail ambient light, realistic skin texture, zero text, zero overlays, 8k"
+      },
+      "midjourney_prompt_9_16": "A candid 9:16 vertical UGC portrait of two women speaking warmly into the smartphone camera inside a modern cosmetics department store. On the left, Rachel Bennett, the authentic 47-year-old woman with shoulder-length medium brown hair showing subtle gray roots in a loose low ponytail and wearing her soft oatmeal-beige knit top, clasps her hands together in front of her with a warm, welcoming, approachable smile. Beside her on the right, the 50-year-old friend in her peach zip-up jacket with radiant glowing skin smiles cheerfully into the lens. In the background are soft illuminated makeup display stands and beauty store pillars. Completely clean image with zero text, zero captions, zero social media icons, zero watermarks, photorealistic 8k.",
+      "video_motion_prompt_i2v": "9:16 vertical video, 10 seconds duration. Rachel Bennett speaks directly into the smartphone camera with a friendly, inviting confession, smiling warmly with clasped hands in the beauty store aisle. Her friend beside her smiles warmly in agreement. Soft oatmeal-beige knit top, authentic retail lighting. Strictly zero on-screen text, zero subtitles, zero watermarks. [AUDIO & VOICE DIRECTION ANCHOR]: Natural 47-year-old American female voice, conversational pacing, natural lipsync: \"Comment LIFT and your skin type below for my complete routine! Make sure you follow so I can send you the guide!\" Authentic facial expressions, 4k.",
+      "asset_tags": [
+        "@rachel_bennett_47yo",
+        "@amiga_peach_jacket_glow",
+        "@top_oatmeal_beige",
+        "@tienda_cosmeticos_sephora"
+      ],
+      "continuity_notes": "Cierre simétrico y natural en dos personas con Follow-Gate en tienda."
+    }
+  ],
+  "post_copy": {
+    "cover_headline": "Stop using powder blush after 50!",
+    "title": "Stop using powder blush and dark pencils after 50 ❌ (Do THIS instead)",
+    "caption": "I used to think my makeup was failing me until I realized I was using products tested on 20-year-olds with zero fine lines. 🤦‍♀️\n\nWhen you're over 50, dry powders and heavy dark pencils settle into creases and drag your features down. The real secret is creating an elastic hydration grip with a botanical milky essence before applying a featherlight serum base.\n\nHere is the exact anti-aging prep order:\n1️⃣ Press a dewy milky essence into clean skin with warm open palms.\n2️⃣ Apply a featherlight grip primer on high points.\n3️⃣ Lift only the upper lashes to instantly open the eyes.\n4️⃣ Finish with an age-defying botanical serum foundation that won't oxidize.\n\n💬 Comment \"LIFT\" and your SKIN TYPE below for my complete mature skin prep routine! Make sure you follow so I can send you the guide!\n\n⚠️ Note: Make sure you're following @botaniqueparis so my message can go through to your inbox!",
+    "manychat_keyword": "LIFT",
+    "hashtags": [
+      "#MatureSkinCare",
+      "#Over50Skincare",
+      "#AntiAgingRoutine",
+      "#SkinPrepOrder",
+      "#BotaniqueParis",
+      "#GlassSkinOver50",
+      "#FlawlessBase"
+    ]
+  }
+}

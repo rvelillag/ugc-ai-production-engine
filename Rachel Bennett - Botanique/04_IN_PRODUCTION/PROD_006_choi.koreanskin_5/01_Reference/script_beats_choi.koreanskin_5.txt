@@ -1,0 +1,46 @@
+=======================================================
+SCRIPT POR BEATS Y MARCAS DE TIEMPO — CHOI.KOREANSKIN_5.MP4
+=======================================================
+FORMATO: Multi-Personaje (Especialista/Host + Paciente/Modelo 50+)
+INTENSIDAD DEL PROBLEMA EN HOOK: Moderado / Exagerado (Piel madura envejecida y apagada por orden incorrecto de maquillaje)
+DURACIÓN TOTAL: 123.53s
+CANAL DE ORIGEN: choi.koreanskin
+
+[BEAT 1: HOOK]
+Timestamp: 0:00 - 0:10
+Voiceover: "You can use expensive foundation, top rated setting powder or premium concealer and still look old, tired, and ugly with your makeup. But nobody ever told you it's not about how much you use or how expensive the products are."
+Acción física y encuadre: Primer plano / plano medio. La modelo de 50+ mira a cámara mientras la anfitriona examina su rostro y señala cómo el maquillaje cargado resalta arrugas y textura apelmazada.
+Screenshots / Keyframes: 01_beat1_hook.jpg
+
+[BEAT 2: REFRAME]
+Timestamp: 0:10 - 0:29
+Voiceover: "It's about the right products in the right order. That order itself is what can age you the most, especially if you're a woman over 50. Let me show you how you can do it right and how it may take years off your face. And the last step is the one you have to never skip, watch till the end."
+Acción física y encuadre: Explicación directa a cámara con dinamismo. Se plantea la tesis del orden correcto para rejuvenecer el rostro maduro.
+Screenshots / Keyframes: 02_beat2_reframe.jpg
+
+[BEAT 3: MECHANISM - PASO A PASO & APLICACIÓN]
+Timestamp: 0:29 - 0:86
+Voiceover: 
+- Paso 1 (0:29-0:45): "So what should I use first, Choi? First hydration before anything else. If you're over 50 and you skip this step entirely, don't wonder your makeup separates later in the day. Road glazing milk pressed into the skin first gives just enough bounce so the rest actually has something to hold on to."
+- Paso 2 (0:45-0:58): "Okay, so next would be foundation, right? No, next one is Nick's poor filler primer. The mistake is always applying more on thin skin because it may age you real quick. This one helps brighten under the eyes without creasing or looking dry."
+- Paso 3 (0:58-0:71): "After primer comes concealer, right? Yes, but never use heavy one after 50. The under eyes and less is the whole secret. Just a tap of Maybelline instant age rewind in the inner corner. Radiant, almost never heavy so it may brighten without creasing."
+- Paso 4 (0:71-0:86): "Now, what about the lashes? Mascara is another thing most women use wrong. Heavy, clumpy formulas should drag your eyes down and make you look exhausted. Use Maybelline sky high mascara on the upper lashes only because it can almost instantly opens the whole eye up so you look awake."
+Acción física y encuadre: Demostración práctica en primer plano. La anfitriona aplica cada producto con toques ligeros sobre la modelo explicando el porqué de cada capa.
+Screenshots / Keyframes: 03_beat3_hydration.jpg, 04_beat3_primer_concealer.jpg
+
+[BEAT 4: PAYOFF - RESULTADO & PRODUCTO ESTRELLA]
+Timestamp: 0:86 - 1:47 (86s - 107s)
+Voiceover: "So now what is the last step? The most important one. This is the thing that may decide whether everything before it works or falls apart. There is one foundation made for mature skin. It helps to blur fine lines. Smooth texture looks natural, not heavy, almost impossible to oxidize. Loved by hundreds of women. It is called Lux and I put the Amazon link in my bio in the comments."
+Acción física y encuadre: Transformación visible completa. El rostro luce radiante, fresco, hidratado y sin líneas marcadas ni efecto acartonado.
+Screenshots / Keyframes: 05_beat4_payoff.jpg
+
+[BEAT 5: CTA CON FOLLOW-GATE]
+Timestamp: 1:47 - 2:03 (107s - 123s)
+Voiceover: "Check the button above my name or search Lux on Amazon. If you comment youthful and your age, I will send you one more secret step for mature skin that may help your makeup last 12 hours or more without going dry or cakey. Make sure you are following me or I cannot reach you."
+Acción física y encuadre: Host y modelo sonriendo con complicidad. Llamado a la acción directo con follow-gate y keyword interactiva.
+Screenshots / Keyframes: 06_beat5_cta.jpg
+
+=======================================================
+SCRIPT COMPLETO CONTINUO (VOICEOVER ORIGINAL LITERAL)
+=======================================================
+"You can use expensive foundation, top rated setting powder or premium concealer and still look old, tired, and ugly with your makeup. But nobody ever told you it's not about how much you use or how expensive the products are. It's about the right products in the right order. That order itself is what can age you the most, especially if you're a woman over 50. Let me show you how you can do it right and how it may take years off your face. And the last step is the one you have to never skip, watch till the end. So what should I use first, Choi? First hydration before anything else. If you're over 50 and you skip this step entirely, don't wonder your makeup separates later in the day. Road glazing milk pressed into the skin first gives just enough bounce so the rest actually has something to hold on to. Okay, so next would be foundation, right? No, next one is Nick's poor filler primer. The mistake is always applying more on thin skin because it may age you real quick. This one helps brighten under the eyes without creasing or looking dry. After primer comes concealer, right? Yes, but never use heavy one after 50. The under eyes and less is the whole secret. Just a tap of Maybelline instant age rewind in the inner corner. Radiant, almost never heavy so it may brighten without creasing. Now, what about the lashes? Mascara is another thing most women use wrong. Heavy, clumpy formulas should drag your eyes down and make you look exhausted. Use Maybelline sky high mascara on the upper lashes only because it can almost instantly opens the whole eye up so you look awake. So now what is the last step? The most important one. This is the thing that may decide whether everything before it works or falls apart. There is one foundation made for mature skin. It helps to blur fine lines. Smooth texture looks natural, not heavy, almost impossible to oxidize. Loved by hundreds of women. It is called Lux and I put the Amazon link in my bio in the comments. Check the button above my name or search Lux on Amazon. If you comment youthful and your age, I will send you one more secret step for mature skin that may help your makeup last 12 hours or more without going dry or cakey. Make sure you are following me or I cannot reach you."

@@ -1,0 +1,818 @@
+{
+  "language": "en",
+  "words": [
+    {
+      "word": "If",
+      "start": 0.59,
+      "end": 1.07,
+      "score": 0.53
+    },
+    {
+      "word": "your",
+      "start": 1.07,
+      "end": 1.21,
+      "score": 0.948
+    },
+    {
+      "word": "makeup",
+      "start": 1.21,
+      "end": 1.51,
+      "score": 0.888
+    },
+    {
+      "word": "makes",
+      "start": 1.51,
+      "end": 1.75,
+      "score": 0.959
+    },
+    {
+      "word": "you",
+      "start": 1.75,
+      "end": 1.97,
+      "score": 0.988
+    },
+    {
+      "word": "look",
+      "start": 1.97,
+      "end": 2.17,
+      "score": 0.994
+    },
+    {
+      "word": "old",
+      "start": 2.17,
+      "end": 2.53,
+      "score": 0.979
+    },
+    {
+      "word": "and",
+      "start": 2.53,
+      "end": 2.81,
+      "score": 0.912
+    },
+    {
+      "word": "tired,",
+      "start": 2.81,
+      "end": 3.19,
+      "score": 0.973
+    },
+    {
+      "word": "like",
+      "start": 3.55,
+      "end": 3.83,
+      "score": 0.988
+    },
+    {
+      "word": "her",
+      "start": 3.83,
+      "end": 4.01,
+      "score": 0.969
+    },
+    {
+      "word": "twin",
+      "start": 4.01,
+      "end": 4.29,
+      "score": 0.525
+    },
+    {
+      "word": "does,",
+      "start": 4.29,
+      "end": 4.67,
+      "score": 0.93
+    },
+    {
+      "word": "stop",
+      "start": 5.19,
+      "end": 5.33,
+      "score": 0.979
+    },
+    {
+      "word": "using",
+      "start": 5.33,
+      "end": 5.63,
+      "score": 0.998
+    },
+    {
+      "word": "powder",
+      "start": 5.63,
+      "end": 6.01,
+      "score": 0.94
+    },
+    {
+      "word": "blush",
+      "start": 6.01,
+      "end": 6.27,
+      "score": 0.974
+    },
+    {
+      "word": "and",
+      "start": 6.27,
+      "end": 6.65,
+      "score": 0.973
+    },
+    {
+      "word": "dark",
+      "start": 6.65,
+      "end": 6.89,
+      "score": 0.996
+    },
+    {
+      "word": "pencils.",
+      "start": 6.89,
+      "end": 7.37,
+      "score": 0.974
+    },
+    {
+      "word": "Heavy",
+      "start": 8.01,
+      "end": 8.23,
+      "score": 0.824
+    },
+    {
+      "word": "products",
+      "start": 8.23,
+      "end": 8.75,
+      "score": 0.992
+    },
+    {
+      "word": "tested",
+      "start": 8.75,
+      "end": 9.31,
+      "score": 0.92
+    },
+    {
+      "word": "on",
+      "start": 9.31,
+      "end": 9.51,
+      "score": 0.995
+    },
+    {
+      "word": "20",
+      "start": 9.51,
+      "end": 9.89,
+      "score": 0.958
+    },
+    {
+      "word": "-year",
+      "start": 9.89,
+      "end": 10.07,
+      "score": 0.804
+    },
+    {
+      "word": "-olds",
+      "start": 10.07,
+      "end": 10.47,
+      "score": 0.893
+    },
+    {
+      "word": "were",
+      "start": 10.47,
+      "end": 11.07,
+      "score": 0.876
+    },
+    {
+      "word": "never",
+      "start": 11.07,
+      "end": 11.41,
+      "score": 0.997
+    },
+    {
+      "word": "made",
+      "start": 11.41,
+      "end": 11.75,
+      "score": 0.994
+    },
+    {
+      "word": "for",
+      "start": 11.75,
+      "end": 11.99,
+      "score": 0.915
+    },
+    {
+      "word": "mature",
+      "start": 11.99,
+      "end": 12.27,
+      "score": 0.96
+    },
+    {
+      "word": "skin,",
+      "start": 12.27,
+      "end": 12.71,
+      "score": 0.997
+    },
+    {
+      "word": "and",
+      "start": 13.09,
+      "end": 13.61,
+      "score": 0.936
+    },
+    {
+      "word": "will",
+      "start": 13.61,
+      "end": 13.77,
+      "score": 0.94
+    },
+    {
+      "word": "only",
+      "start": 13.77,
+      "end": 14.17,
+      "score": 0.997
+    },
+    {
+      "word": "age",
+      "start": 14.17,
+      "end": 14.49,
+      "score": 0.992
+    },
+    {
+      "word": "your",
+      "start": 14.49,
+      "end": 14.75,
+      "score": 0.996
+    },
+    {
+      "word": "face.",
+      "start": 14.75,
+      "end": 15.17,
+      "score": 0.999
+    },
+    {
+      "word": "You",
+      "start": 16.01,
+      "end": 16.19,
+      "score": 0.818
+    },
+    {
+      "word": "guys,",
+      "start": 16.19,
+      "end": 16.37,
+      "score": 0.984
+    },
+    {
+      "word": "I",
+      "start": 16.53,
+      "end": 16.61,
+      "score": 0.994
+    },
+    {
+      "word": "found",
+      "start": 16.61,
+      "end": 16.83,
+      "score": 0.994
+    },
+    {
+      "word": "the",
+      "start": 16.83,
+      "end": 17.01,
+      "score": 0.986
+    },
+    {
+      "word": "Holy",
+      "start": 17.01,
+      "end": 17.25,
+      "score": 0.556
+    },
+    {
+      "word": "Grail",
+      "start": 17.25,
+      "end": 17.71,
+      "score": 0.9
+    },
+    {
+      "word": "for",
+      "start": 17.71,
+      "end": 17.89,
+      "score": 0.932
+    },
+    {
+      "word": "mature",
+      "start": 17.89,
+      "end": 18.13,
+      "score": 0.961
+    },
+    {
+      "word": "skin.",
+      "start": 18.13,
+      "end": 18.59,
+      "score": 0.998
+    },
+    {
+      "word": "Look",
+      "start": 18.77,
+      "end": 18.89,
+      "score": 0.994
+    },
+    {
+      "word": "at",
+      "start": 18.89,
+      "end": 18.97,
+      "score": 0.997
+    },
+    {
+      "word": "this",
+      "start": 18.97,
+      "end": 19.15,
+      "score": 0.996
+    },
+    {
+      "word": "texture,",
+      "start": 19.15,
+      "end": 19.49,
+      "score": 0.984
+    },
+    {
+      "word": "it's",
+      "start": 19.59,
+      "end": 19.71,
+      "score": 0.989
+    },
+    {
+      "word": "so",
+      "start": 19.71,
+      "end": 19.89,
+      "score": 0.998
+    },
+    {
+      "word": "hydrating,",
+      "start": 19.89,
+      "end": 20.45,
+      "score": 0.995
+    },
+    {
+      "word": "and",
+      "start": 20.61,
+      "end": 20.85,
+      "score": 0.99
+    },
+    {
+      "word": "my",
+      "start": 20.85,
+      "end": 20.97,
+      "score": 0.998
+    },
+    {
+      "word": "friend",
+      "start": 20.97,
+      "end": 21.21,
+      "score": 0.998
+    },
+    {
+      "word": "here",
+      "start": 21.21,
+      "end": 21.37,
+      "score": 0.981
+    },
+    {
+      "word": "is",
+      "start": 21.37,
+      "end": 21.49,
+      "score": 0.739
+    },
+    {
+      "word": "already",
+      "start": 21.49,
+      "end": 21.71,
+      "score": 0.996
+    },
+    {
+      "word": "obsessed",
+      "start": 21.71,
+      "end": 21.97,
+      "score": 0.998
+    },
+    {
+      "word": "with",
+      "start": 21.97,
+      "end": 22.21,
+      "score": 0.999
+    },
+    {
+      "word": "it",
+      "start": 22.21,
+      "end": 22.33,
+      "score": 0.999
+    },
+    {
+      "word": "too.",
+      "start": 22.33,
+      "end": 22.53,
+      "score": 0.423
+    },
+    {
+      "word": "Let's",
+      "start": 22.67,
+      "end": 22.81,
+      "score": 0.994
+    },
+    {
+      "word": "try",
+      "start": 22.81,
+      "end": 22.95,
+      "score": 0.999
+    },
+    {
+      "word": "a",
+      "start": 22.95,
+      "end": 23.05,
+      "score": 0.97
+    },
+    {
+      "word": "drop",
+      "start": 23.05,
+      "end": 23.19,
+      "score": 0.985
+    },
+    {
+      "word": "on",
+      "start": 23.19,
+      "end": 23.37,
+      "score": 0.995
+    },
+    {
+      "word": "your",
+      "start": 23.37,
+      "end": 23.49,
+      "score": 0.997
+    },
+    {
+      "word": "hand.",
+      "start": 23.49,
+      "end": 23.81,
+      "score": 0.993
+    },
+    {
+      "word": "The",
+      "start": 23.81,
+      "end": 24.01,
+      "score": 0.04
+    },
+    {
+      "word": "second,",
+      "start": 24.01,
+      "end": 24.35,
+      "score": 0.751
+    },
+    {
+      "word": "use",
+      "start": 24.83,
+      "end": 24.99,
+      "score": 0.989
+    },
+    {
+      "word": "a",
+      "start": 24.99,
+      "end": 25.17,
+      "score": 0.975
+    },
+    {
+      "word": "feather",
+      "start": 25.17,
+      "end": 25.43,
+      "score": 0.963
+    },
+    {
+      "word": "-like",
+      "start": 25.43,
+      "end": 25.71,
+      "score": 0.791
+    },
+    {
+      "word": "grip",
+      "start": 25.71,
+      "end": 25.99,
+      "score": 0.968
+    },
+    {
+      "word": "primer",
+      "start": 25.99,
+      "end": 26.47,
+      "score": 0.999
+    },
+    {
+      "word": "and",
+      "start": 26.47,
+      "end": 27.03,
+      "score": 0.882
+    },
+    {
+      "word": "lift",
+      "start": 27.03,
+      "end": 27.29,
+      "score": 0.995
+    },
+    {
+      "word": "only",
+      "start": 27.29,
+      "end": 27.87,
+      "score": 0.98
+    },
+    {
+      "word": "the",
+      "start": 27.87,
+      "end": 28.13,
+      "score": 0.999
+    },
+    {
+      "word": "upper",
+      "start": 28.13,
+      "end": 28.41,
+      "score": 0.995
+    },
+    {
+      "word": "lashes",
+      "start": 28.41,
+      "end": 28.87,
+      "score": 0.941
+    },
+    {
+      "word": "to",
+      "start": 28.87,
+      "end": 29.49,
+      "score": 0.976
+    },
+    {
+      "word": "instantly",
+      "start": 29.49,
+      "end": 30.05,
+      "score": 0.996
+    },
+    {
+      "word": "open",
+      "start": 30.05,
+      "end": 30.41,
+      "score": 0.998
+    },
+    {
+      "word": "the",
+      "start": 30.41,
+      "end": 30.61,
+      "score": 0.998
+    },
+    {
+      "word": "eyes.",
+      "start": 30.61,
+      "end": 30.97,
+      "score": 0.997
+    },
+    {
+      "word": "Finish",
+      "start": 32.4,
+      "end": 32.7,
+      "score": 0.966
+    },
+    {
+      "word": "with",
+      "start": 32.7,
+      "end": 32.94,
+      "score": 0.997
+    },
+    {
+      "word": "an",
+      "start": 32.94,
+      "end": 33.1,
+      "score": 0.995
+    },
+    {
+      "word": "age",
+      "start": 33.1,
+      "end": 33.38,
+      "score": 0.697
+    },
+    {
+      "word": "-defying",
+      "start": 33.38,
+      "end": 33.88,
+      "score": 0.973
+    },
+    {
+      "word": "serum",
+      "start": 33.88,
+      "end": 34.34,
+      "score": 0.95
+    },
+    {
+      "word": "foundation",
+      "start": 34.34,
+      "end": 34.88,
+      "score": 0.997
+    },
+    {
+      "word": "that",
+      "start": 34.88,
+      "end": 35.6,
+      "score": 0.99
+    },
+    {
+      "word": "blurs",
+      "start": 35.6,
+      "end": 36.04,
+      "score": 0.953
+    },
+    {
+      "word": "fine",
+      "start": 36.04,
+      "end": 36.36,
+      "score": 0.987
+    },
+    {
+      "word": "lines",
+      "start": 36.36,
+      "end": 36.68,
+      "score": 0.997
+    },
+    {
+      "word": "and",
+      "start": 36.68,
+      "end": 37.3,
+      "score": 0.982
+    },
+    {
+      "word": "stays",
+      "start": 37.3,
+      "end": 37.58,
+      "score": 0.997
+    },
+    {
+      "word": "fresh",
+      "start": 37.58,
+      "end": 38.0,
+      "score": 0.999
+    },
+    {
+      "word": "for",
+      "start": 38.0,
+      "end": 38.34,
+      "score": 0.998
+    },
+    {
+      "word": "12",
+      "start": 38.34,
+      "end": 38.8,
+      "score": 0.905
+    },
+    {
+      "word": "full",
+      "start": 38.8,
+      "end": 39.12,
+      "score": 0.965
+    },
+    {
+      "word": "hours.",
+      "start": 39.12,
+      "end": 39.62,
+      "score": 0.986
+    },
+    {
+      "word": "Comment,",
+      "start": 40.12,
+      "end": 40.48,
+      "score": 0.955
+    },
+    {
+      "word": "lift,",
+      "start": 40.68,
+      "end": 40.9,
+      "score": 0.949
+    },
+    {
+      "word": "and",
+      "start": 41.16,
+      "end": 41.22,
+      "score": 0.998
+    },
+    {
+      "word": "your",
+      "start": 41.22,
+      "end": 41.36,
+      "score": 0.994
+    },
+    {
+      "word": "main",
+      "start": 41.36,
+      "end": 41.6,
+      "score": 0.92
+    },
+    {
+      "word": "skin",
+      "start": 41.6,
+      "end": 41.94,
+      "score": 0.991
+    },
+    {
+      "word": "goal",
+      "start": 41.94,
+      "end": 42.24,
+      "score": 0.43
+    },
+    {
+      "word": "below",
+      "start": 42.24,
+      "end": 42.62,
+      "score": 0.988
+    },
+    {
+      "word": "for",
+      "start": 42.62,
+      "end": 43.28,
+      "score": 0.691
+    },
+    {
+      "word": "my",
+      "start": 43.28,
+      "end": 43.46,
+      "score": 0.998
+    },
+    {
+      "word": "complete",
+      "start": 43.46,
+      "end": 43.88,
+      "score": 0.979
+    },
+    {
+      "word": "routine.",
+      "start": 43.88,
+      "end": 44.58,
+      "score": 0.998
+    },
+    {
+      "word": "Make",
+      "start": 45.0,
+      "end": 45.14,
+      "score": 0.995
+    },
+    {
+      "word": "sure",
+      "start": 45.14,
+      "end": 45.34,
+      "score": 0.999
+    },
+    {
+      "word": "you're",
+      "start": 45.34,
+      "end": 45.5,
+      "score": 0.981
+    },
+    {
+      "word": "following",
+      "start": 45.5,
+      "end": 45.92,
+      "score": 0.999
+    },
+    {
+      "word": "or",
+      "start": 45.92,
+      "end": 46.28,
+      "score": 0.488
+    },
+    {
+      "word": "I",
+      "start": 46.28,
+      "end": 46.4,
+      "score": 0.988
+    },
+    {
+      "word": "can't",
+      "start": 46.4,
+      "end": 46.72,
+      "score": 0.998
+    },
+    {
+      "word": "share",
+      "start": 46.72,
+      "end": 46.88,
+      "score": 0.999
+    },
+    {
+      "word": "the",
+      "start": 46.88,
+      "end": 47.04,
+      "score": 0.994
+    },
+    {
+      "word": "guide",
+      "start": 47.04,
+      "end": 47.24,
+      "score": 0.994
+    },
+    {
+      "word": "with",
+      "start": 47.24,
+      "end": 47.46,
+      "score": 0.996
+    },
+    {
+      "word": "you.",
+      "start": 47.46,
+      "end": 47.68,
+      "score": 0.999
+    }
+  ],
+  "video_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 24.0,
+    "duration": 48.041016,
+    "has_audio": true,
+    "audio_codec": "aac",
+    "video_codec": "h264"
+  }
+}

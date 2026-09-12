@@ -1,0 +1,62 @@
+=======================================================
+SCRIPT POR BEATS Y ESTRUCTURA NARRATIVA — ELAINEVANHAUSEN_2.MP4
+=======================================================
+FORMATO: Especialista / Estilista en Salón de Belleza (Demostración de Tratamiento en Lavacabezas)
+INTENSIDAD DEL PROBLEMA EN HOOK: Alto Impacto (Huevo crudo con yema vertido sobre cabello fino/debilitado en lavacabezas)
+DURACIÓN TOTAL: 26.00s
+CANAL DE ORIGEN: elainevanhausen
+TOTAL PALABRAS: 94
+CADENCIA ACÚSTICA: 3.64 WPS (218 WPM) — ⚡ Hyper-Fast Hook (Pacing acelerado)
+TONO DETECTADO: Confidential Discovery / Insider Secret + Empathetic Authority
+
+=======================================================
+DESGLOSE ESTRUCTURAL BEAT POR BEAT (1:1 CON KEYFRAMES)
+=======================================================
+
+[BEAT 1: HOOK — DETENCIÓN DEL SCROLL CON HUEVO CRUDO]
+* Timestamp: 0:00 - 0:04 (4s)
+* Rol Narrativo: Gancho visual disruptivo y de choque (huevo fresco sobre cabello fino).
+* Voiceover Original: "Pour a fresh egg on your thinning hair."
+* Encuadre & Ángulo: Plano picado vertical 9:16 sobre el lavamanos cerámico negro.
+* Acción Física: La estilista vierte/aplica un huevo fresco con yema líquida amarilla y clara sobre la raíz del cabello húmedo de la clienta en el lavacabezas, mirando a cámara con expresión de revelación secreta.
+* Keyframe Asociado: 01_beat1_hook.jpg
+
+[BEAT 2: TRABAJAR EL HUEVO EN EL CUERO CABELLUDO]
+* Timestamp: 0:04 - 0:07 (3s)
+* Rol Narrativo: Técnica física de absorción proteica en folículos.
+* Voiceover Original: "Work the egg through every strand and into the scalp."
+* Encuadre & Ángulo: Plano picado medio corto sobre el lavacabezas.
+* Acción Física: Masajea y distribuye la yema y clara por cada mechón y sobre el cuero cabelludo con ambas manos, hablando con autoridad.
+* Keyframe Asociado: 02_beat2_work_egg.jpg
+
+[BEAT 3: REFRAME & RECETA — MIEL PURA]
+* Timestamp: 0:07 - 0:10 (3s)
+* Rol Narrativo: Segundo ingrediente activo (humectación y nutrientes).
+* Voiceover Original: "Now pour honey over it. Massage it in completely."
+* Encuadre & Ángulo: Plano picado sobre el lavacabezas.
+* Acción Física: Vierte un chorro espeso de miel dorada sobre el cuero cabelludo y lo masajea a fondo.
+* Keyframe Asociado: 03_beat3_honey.jpg
+
+[BEAT 4: SELLADO & CONDICIONADOR]
+* Timestamp: 0:10 - 0:14 (4s)
+* Rol Narrativo: Emulsión final y sellador de hidratación.
+* Voiceover Original: "Finish with conditioner. Work it all through together."
+* Encuadre & Ángulo: Plano picado medio sobre el lavamanos.
+* Acción Física: Vierte acondicionador blanco cremoso directamente desde una botella sobre la raíz y emulsiona todo junto con las manos.
+* Keyframe Asociado: 04_beat4_conditioner.jpg
+
+[BEAT 5: MECANISMO & TIEMPO (20 MINUTOS)]
+* Timestamp: 0:14 - 0:19 (5s)
+* Rol Narrativo: Justificación biológica (proteína pura + hidratación) y regla de los 20 minutos.
+* Voiceover Original: "Leave it sitting on your hair for 20 full minutes then rinse it out completely. Egg, honey and conditioner. Pure protein and moisture, straight to the root."
+* Encuadre & Ángulo: Plano medio sobre el lavamanos / salón.
+* Acción Física: Explica a cámara gesticulando el protocolo de 20 minutos y la inyección de proteína directa al folículo.
+* Keyframe Asociado: 05_beat5_mechanism.jpg
+
+[BEAT 6: CTA — MANYCHAT KEYWORD & SEGUIR]
+* Timestamp: 0:19 - 0:26 (7s)
+* Rol Narrativo: Llamada a la acción de alta conversión para ManyChat.
+* Voiceover Original: "I'm giving you my hair secrets every single day. Comment HAIR and I'll send you my free guide, but you've got to be following me honey, or it won't reach you."
+* Encuadre & Ángulo: Plano medio vertical 9:16 en el salón boutique / portal dorado.
+* Acción Física: De pie sin delantal, sonriendo ampliamente a cámara e invitando a comentar HAIR y seguir la cuenta.
+* Keyframe Asociado: 06_beat6_cta.jpg

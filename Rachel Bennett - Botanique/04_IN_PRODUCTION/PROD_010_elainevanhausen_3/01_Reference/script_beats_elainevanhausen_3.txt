@@ -1,0 +1,62 @@
+=======================================================
+SCRIPT POR BEATS Y ESTRUCTURA NARRATIVA — ELAINEVANHAUSEN_3.MP4
+=======================================================
+FORMATO: Especialista / Estilista en Salón de Belleza (Demostración en Lavacabezas + Tocador)
+INTENSIDAD DEL PROBLEMA EN HOOK: Alto Impacto (Aceite mineral vertido directamente sobre raya media abierta/despoblada)
+DURACIÓN TOTAL: 42.49s
+CANAL DE ORIGEN: elainevanhausen
+TOTAL PALABRAS: 158
+CADENCIA ACÚSTICA: 3.74 WPS (224 WPM) — ⚡ Hyper-Fast Hook (Pacing acelerado con alta urgencia)
+TONO DETECTADO: High-Alert Urgency + Insider Secret + Empathetic Authority
+
+=======================================================
+DESGLOSE ESTRUCTURAL BEAT POR BEAT (1:1 CON KEYFRAMES)
+=======================================================
+
+[BEAT 1: HOOK — ACEITE EN LA RAYA MEDIA DEL CABELLO]
+* Timestamp: 0:00 - 0:08 (8s)
+* Rol Narrativo: Gancho visual de choque sobre caída y raya despoblada.
+* Voiceover Original: "Okay, you're all going to think I lost my mind, but pour baby oil right onto that thinning middle part and watch what happens."
+* Encuadre & Ángulo: Plano picado vertical 9:16 sobre el lavamanos cerámico negro.
+* Acción Física: Rachel se inclina sobre el lavacabezas vertiendo un chorro transparente de aceite mineral directamente sobre la raya media del cabello mojado de la clienta, sonriendo a cámara con complicidad.
+* Keyframe Asociado: 01_beat1_hook.jpg
+
+[BEAT 2: PROTOCOLO DE RAÍZ A PUNTAS & 20 MINUTOS]
+* Timestamp: 0:08 - 0:15 (7s)
+* Rol Narrativo: Aplicación física y promesa de ahorro.
+* Voiceover Original: "Work it from the roots down to the tips, let it sit 20 minutes, then rinse it out. You're literally going to throw away every expensive product sitting on your bathroom shelf."
+* Encuadre & Ángulo: Plano picado medio sobre el lavamanos.
+* Acción Física: Distribuye el aceite por todos los mechones húmedos hasta las puntas con ambas manos.
+* Keyframe Asociado: 02_beat2_roots_to_tips.jpg
+
+[BEAT 3: MECANISMO — SELLADO DE CUTÍCULA Y RETENCIÓN DE HUMEDAD]
+* Timestamp: 0:15 - 0:22 (7s)
+* Rol Narrativo: Justificación física (oclusión de hidratación y prevención de quiebre).
+* Voiceover Original: "The mineral oil locks moisture into every strand and seals the cuticle so your hair stops drying out and breaking off."
+* Encuadre & Ángulo: Primer plano sobre el lavacabezas con cabello brillante saturado.
+* Acción Física: Masajea y muestra la textura elástica y sellada del cabello.
+* Keyframe Asociado: 03_beat3_mechanism.jpg
+
+[BEAT 4: COMPARATIVA DE VALOR — TRATAMIENTO DE $40 VS $3]
+* Timestamp: 0:22 - 0:28 (6s)
+* Rol Narrativo: Desmitificación de precios de salón vs activos puros.
+* Voiceover Original: "Ladies, you're spending $40 on a fancy hair oil treatment when a simple bottle does it way better for three bucks."
+* Encuadre & Ángulo: Plano medio vertical 9:16 en el tocador de nogal acanalado.
+* Acción Física: De pie sosteniendo la botella de aceite en una mano y gesticulando con la otra con expresión enfática de complicidad.
+* Keyframe Asociado: 04_beat4_bottle_comparison.jpg
+
+[BEAT 5: REFRAME DEL CORTISOL — LA CAUSA RAÍZ INTERNA]
+* Timestamp: 0:28 - 0:35 (7s)
+* Rol Narrativo: Giro crucial al mecanismo biológico profundo (estrés/cortisol asfixiando folículos).
+* Voiceover Original: "But if you've been stressed for years, your cortisol has been wrecking your follicles and putting them into shedding overdrive. No oil alone is fixing that."
+* Encuadre & Ángulo: Plano medio vertical 9:16 en el salón de belleza.
+* Acción Física: Explicación seria, empática y de autoridad experta con las manos abiertas.
+* Keyframe Asociado: 05_beat5_cortisol_reframe.jpg
+
+[BEAT 6: CTA — MANYCHAT KEYWORD & GUÍA COMPLETA]
+* Timestamp: 0:35 - 0:42 (7s)
+* Rol Narrativo: Conversión y llamada a la acción hacia la guía botánica.
+* Voiceover Original: "If you want the actual routine I recommend to all my clients, comment HAIR and I'll send you the guide! Make sure you follow so it reaches you!"
+* Encuadre & Ángulo: Plano medio vertical 9:16 sentada en el sillón de estilista del salón o junto al portal de arco dorado.
+* Acción Física: Sonrisa radiante y acogedora invitando a comentar HAIR y seguir la cuenta.
+* Keyframe Asociado: 06_beat6_cta.jpg

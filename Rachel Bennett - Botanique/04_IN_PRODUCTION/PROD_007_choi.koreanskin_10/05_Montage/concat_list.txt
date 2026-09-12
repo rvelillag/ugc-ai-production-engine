@@ -1,0 +1,6 @@
+file 'c:/Users/Asus/Downloads/DTC/Rachel Bennett - Botanique/04_IN_PRODUCTION/PROD_007_choi.koreanskin_10/03_Raw_Clips/1.mp4'
+file 'c:/Users/Asus/Downloads/DTC/Rachel Bennett - Botanique/04_IN_PRODUCTION/PROD_007_choi.koreanskin_10/03_Raw_Clips/2.mp4'
+file 'c:/Users/Asus/Downloads/DTC/Rachel Bennett - Botanique/04_IN_PRODUCTION/PROD_007_choi.koreanskin_10/03_Raw_Clips/3.mp4'
+file 'c:/Users/Asus/Downloads/DTC/Rachel Bennett - Botanique/04_IN_PRODUCTION/PROD_007_choi.koreanskin_10/03_Raw_Clips/4.mp4'
+file 'c:/Users/Asus/Downloads/DTC/Rachel Bennett - Botanique/04_IN_PRODUCTION/PROD_007_choi.koreanskin_10/03_Raw_Clips/5.mp4'
+file 'c:/Users/Asus/Downloads/DTC/Rachel Bennett - Botanique/04_IN_PRODUCTION/PROD_007_choi.koreanskin_10/03_Raw_Clips/6.mp4'

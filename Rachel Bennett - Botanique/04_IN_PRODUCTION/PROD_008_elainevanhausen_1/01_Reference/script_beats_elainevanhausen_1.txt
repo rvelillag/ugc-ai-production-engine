@@ -1,0 +1,72 @@
+=======================================================
+SCRIPT POR BEATS Y ESTRUCTURA NARRATIVA — ELAINEVANHAUSEN_1.MP4
+=======================================================
+FORMATO: Especialista / Estilista en Salón de Belleza (Demostración sobre Modelo en Lavacabezas + Mesa)
+INTENSIDAD DEL PROBLEMA EN HOOK: Exagerado (Pila densa de polvo de bicarbonato sobre raíz de cabello mojado + boca en 'O' de asombro)
+DURACIÓN TOTAL: 37.22s
+CANAL DE ORIGEN: elainevanhausen
+TOTAL PALABRAS: 116
+CADENCIA ACÚSTICA: 3.15 WPS (189 WPM) — ⚡ Hyper-Fast Hook (Alta Retención, pausas 0.41s)
+TONO DETECTADO: Confidential Discovery / Insider Secret + Empathetic Authority
+
+DIAGNÓSTICO DE ENTORNO / BACKGROUND:
+- Entorno de Referencia: Salón de belleza de lujo con lavamanos cerámico negro, paredes azul marino, espejos dorados y fachada exterior con toldo azul marino.
+- Assets Disponibles: Cocina 1.jpeg (Encimera de granito), Cuarto.jpeg (Tocador con espejo).
+- Decisión Checkpoint 1: Replicación 1:1 del Salón de Belleza.
+
+=======================================================
+DESGLOSE ESTRUCTURAL BEAT POR BEAT (1:1 CON KEYFRAMES)
+=======================================================
+
+[BEAT 1: HOOK — DETENCIÓN DEL SCROLL & REVELACIÓN SHOCK]
+* Timestamp: 0:00 - 0:06 (6s)
+* Rol Narrativo: Gancho visual disruptivo de alto contraste para detener el scroll.
+* Voiceover Original: "Just put baking soda on your hair and you will not believe what happens."
+* Encuadre & Ángulo: Plano picado vertical 9:16 mirando directamente hacia el lavamanos cerámico negro.
+* Acción Física: Rachel vestida de estilista se inclina sobre el lavacabezas con la boca abierta en 'O' de asombro/secreto, sosteniendo la caja amarilla de bicarbonato inclinada hacia la cámara mientras una pila de polvo blanco cubre la raíz del cabello mojado de la clienta.
+* Keyframe Asociado: 01_beat1_hook.jpg
+
+[BEAT 2: REFRAME & RECETA — PROPORCIONES EXACTAS]
+* Timestamp: 0:06 - 0:13 (7s)
+* Rol Narrativo: Cambio de creencia y fórmula natural (receta de 2 ingredientes).
+* Voiceover Original: "Mix one tablespoon of baking soda with two tablespoons of coconut oil until it forms a paste."
+* Encuadre & Ángulo: Plano medio vertical 9:16 a nivel de ojos detrás de una mesa de madera de salón.
+* Acción Física: Rachel de pie detrás de la mesa sostiene una cuchara sopera de metal suspendida sobre un cuenco de vidrio con polvo blanco, junto a la caja de bicarbonato y un frasco de aceite de coco orgánico, sonriendo a cámara.
+* Keyframe Asociado: 02_beat2_reframe.jpg
+
+[BEAT 3: APLICACIÓN & TIEMPO — PROTOCOLO DE 20 MINUTOS]
+* Timestamp: 0:13 - 0:18 (5s)
+* Rol Narrativo: Instrucción física directa y regla de aplicación en raíces.
+* Voiceover Original: "Apply it and leave it for 20 minutes."
+* Encuadre & Ángulo: Plano picado medio vertical 9:16 sobre el lavamanos negro de salón.
+* Acción Física: Rachel apoya su mano derecha en la nuca/cabello de la clienta en el lavacabezas y eleva su mano izquierda con la palma abierta y dedos separados hacia la cámara en gesto de tiempo/alto.
+* Keyframe Asociado: 03_beat3_application.jpg
+
+[BEAT 4: MECHANISM — LIMPIEZA DE FOLÍCULOS Y RESIDUOS]
+* Timestamp: 0:18 - 0:25 (7s)
+* Rol Narrativo: Justificación biológica/científica de por qué funciona el tratamiento.
+* Voiceover Original: "The coconut oil restores your hair strands and the baking soda clears the follicles and build up that has been there for years."
+* Encuadre & Ángulo: Primer plano picado medio sobre el lavacabezas.
+* Acción Física: Rachel masajea activamente el cuero cabelludo y cabello húmedo de la clienta con ambas manos, mirando fijamente a la cámara con autoridad experta.
+* Keyframe Asociado: 04_beat3_mechanism.jpg
+
+[BEAT 5: PAYOFF & VERSATILIDAD — RESULTADO EN CUERO CABELLUDO, BORDES Y CEJAS]
+* Timestamp: 0:25 - 0:31 (6s)
+* Rol Narrativo: Expansión de beneficios y prueba de valor acumulado.
+* Voiceover Original: "You can use this on your scalp, edges and even eyebrows. Do this once a week and I promise you will thank me. I'm giving you my hair secrets every single day."
+* Encuadre & Ángulo: Plano medio vertical 9:16 detrás de la mesa de madera.
+* Acción Física: Rachel de pie detrás de la mesa con el cuenco de pasta cremosa batida y cuchara de madera dentro, gesticulando con entusiasmo hacia la cámara.
+* Keyframe Asociado: 05_beat4_payoff.jpg
+
+[BEAT 6: CTA — CONVERSIÓN CON FOLLOW-GATE]
+* Timestamp: 0:31 - 0:37 (6s)
+* Rol Narrativo: Llamada a la acción con incentivo de guía gratuita y barrera de seguimiento (Follow-Gate).
+* Voiceover Original: "Comment HAIR and I'll send you my free guide but you've got to be following me honey or it won't reach you."
+* Encuadre & Ángulo: Plano medio exterior soleado vertical 9:16 frente a la fachada del salón bajo el toldo azul marino.
+* Acción Física: Rachel en camisa morada y pantalón negro (sin delantal), sonriendo abiertamente al sol invitando a comentar la palabra clave.
+* Keyframe Asociado: 06_beat5_cta.jpg
+
+=======================================================
+SCRIPT COMPLETO CONTINUO (VOICEOVER ORIGINAL LITERAL)
+=======================================================
+"Just put baking soda on your hair and you will not believe what happens. Mix one tablespoon of baking soda with two tablespoons of coconut oil until it forms a paste. Apply it and leave it for 20 minutes. The coconut oil restores your hair strands and the baking soda clears the follicles and build up that has been there for years. You can use this on your scalp, edges and even eyebrows. Do this once a week and I promise you will thank me. I'm giving you my hair secrets every single day. Comment HAIR and I'll send you my free guide but you've got to be following me honey or it won't reach you."
