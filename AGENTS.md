@@ -19,6 +19,9 @@ The system operates across 4 core skills and automated tools in `tools/`:
 
 3. **Dynamic Prompt Architecture & Grouping (`tools/schemas/production_package.py`):**
    - Must validate with Pydantic model `ProductionPackage`.
+   - **Environment Decoupling & Stop-Scroll Hook Hyper-Exaggeration:**
+     * **Location:** Always render the avatar inside the brand's designated canonical environment (e.g., luxury minimalist kitchen/vanity, Calacatta marble, warm plaster walls), NEVER blindly clone generic reference backgrounds.
+     * **Hook Stop-Scroll Trigger (First Frame):** The disruptive visual trigger from the reference MUST be placed on the brand setting and **hyper-exaggerated to a colossal scale** (e.g., massive anatomical models filling 50% of the frame with 24mm forced perspective, extreme macro symptoms, dynamic pouring streams) equal to or exceeding the original viral intensity.
    - **Scene / Prompt Grouping Rules (Veo3 / Kling <= 10s Limit):**
      * **Same Scene / Framing (Duration <= 10s):** Consolidate micro-beats into ONE single prompt with explicit internal timeline choreographies:
        `SEQUENCE OF ACTIONS: (0:00-0:03) Action A... (0:03-0:08) Action B...`
@@ -35,5 +38,6 @@ The system operates across 4 core skills and automated tools in `tools/`:
 ## Tool Execution Commands
 - Cadence & Beat Extractor: `python tools/scene_keyframe_extractor.py --video "[PATH]"`
 - Cadence Analyzer: `python tools/audio_cadence_analyzer.py --video "[PATH]"`
+- Video Assembly & Silence Trimming: `python tools/assemble_project.py --project [PROJECT_NAME]`
 - QA Harness: `python tools/ugc_harness.py --project [PROJECT] [--deliverable [DELIVERABLE]]`
 - Caption Assembly: `python auto-captions-service/main.py --input-dir "[DIR]" --output-dir "[DIR]"`

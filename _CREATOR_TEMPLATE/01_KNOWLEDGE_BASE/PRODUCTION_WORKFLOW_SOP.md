@@ -26,5 +26,5 @@ Este espacio de trabajo contiene la estructura estándar oficial para la ingesta
    * **Única Modificación:** La frase final del CTA para insertar la palabra clave segura de ManyChat (ej. `LIFT`, `GLOW`) evitando términos bloqueados como `age` o `DM`.
    * **Generación JSON y Markdown:** Autogeneración de `production_package_PROD_<ID>.json` y `prompts_and_script_PROD_<ID>.md`.
 4. **Fase 4 (Producción Audiovisual):** Generar los First Frames (Midjourney/Flux) y animar los clips (Veo3/Kling/Grok) en `03_Raw_Clips/`.
-5. **Fase 5 (Montaje y Subtitulado Dinámico):** Concatenar los clips y quemar subtítulos oficiales (`capcut_italic_yellow` a 18% de margen seguro) con `auto-captions-service`.
-6. **Fase 6 (Entrega Canónica):** Exportar a `05_PROCESSED_DELIVERABLES/<ID>/` los 4 archivos limpios (`.mp4`, `.srt`, `Cover.jpg` y `post_copy_title_and_caption.txt`).
+5. **Fase 5 (Recorte de Silencios, Montaje y Subtitulado Dinámico):** Recortar silencios muertos con Whisper y unir clips con subtítulos oficiales (`capcut_italic_yellow` a 18% de margen seguro) ejecutando `python tools/assemble_project.py --project PROD_<ID>_<nombre>`.
+6. **Fase 6 (Entrega Canónica & QA 6/6):** Exportar a `05_PROCESSED_DELIVERABLES/<ID>/` los 4 archivos limpios (`.mp4`, `.srt`, `Cover.jpg` y `post_copy_title_and_caption.txt`) y auditar con `python tools/ugc_harness.py --project PROD_<ID>_<nombre>`.

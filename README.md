@@ -8,6 +8,7 @@ Un sistema integral, modular y escalable para la producción automatizada de vid
 
 * **Arquitectura de 5 Beats Calibrada:** Hook con problema visual exagerado, Reframe de giro narrativo, Mechanism en dos sub-chunks (3A/3B), Payoff de transformación y CTA con Follow-Gate.
 * **Extracción Técnica de Beats:** Transcripción palabra por palabra con Whisper ASR y extracción automática de fotogramas clave con FFmpeg.
+* **Recorte Inteligente de Silencios (*Smart Silence Trimming*):** Detección automática de pausas muertas entre clips de IA mediante Whisper, eliminando silencios iniciales y finales para garantizar un ritmo publicitario continuo y ágil.
 * **Sustitución Automática de Marcas Terceras:** Mapeo inteligente hacia tu catálogo de producto propio (`PRODUCT_CATALOG.yaml`).
 * **Subtitulado Dinámico CapCut (`capcut_italic_yellow`):** Estilo cursiva negrita en minúsculas, palabra activa en Amarillo Neón (`#FFE500`), palabras inactivas en Blanco Puro y margen seguro al **18% de altura** (libre de botones de Reels/TikTok).
 * **Multi-Creador Plug & Play:** Crea nuevos personajes en 1 minuto usando el wizard guiado.

@@ -26,16 +26,21 @@ Antes de construir cualquier JSON o prompt, el sistema consulta obligatoriamente
 
 ---
 
-## 2. Metodología de Desglose Fotográfico en 5 Capas (Fidelidad 1:1)
+## 2. Metodología de Desglose Fotográfico en 5 Capas & Regla de Desacoplamiento de Escenario
 
+### A. Regla Dorada: Escenario Propio vs. Disparador Stop-Scroll Replicado / Exagerado
+* **El Escenario / Location NO se clona de la referencia:** El entorno siempre se adapta al **escenario canónico de la marca / avatar** (`02_AVATAR_ASSETS/02_Environments/` o el confirmado en Checkpoint 1, ej: Cocina/Tocador minimalista de lujo, isla de mármol Calacatta, paredes de yeso beige cálido, iluminación luminosa difusa).
+* **El Disparador Visual de Hook (Stop-Scroll Trigger) SI se traslada con Hiper-Exageración:** Se extrae el componente visual insólito o disruptivo del video de referencia y se coloca sobre el escenario de la marca, **haciéndolo igual o más exagerado / de mayor escala y tensión visual que en la referencia original** (ej. maquetas anatómicas colosales que ocupan el 50% del encuadre en 24mm con perspectiva forzada, síntomas macro extremos, vertido dinámico de fluidos, expresiones de asombro de alta retención).
+
+### B. Desglose en 5 Capas Técnicas:
 Cada beat se audita obligatoriamente contra su captura `.jpg` correspondiente (`01_` a `06_`):
 
-1. **Capa 1: Cámara y Óptica:** Distancia focal (24mm, 28mm, 50mm, macro), tipo de plano (9:16 vertical, plano medio, plano detalle) y ángulo de cámara.
-2. **Capa 2: Primer Plano y Utilería (Props):** Objetos exactos en la mesa, mostrador, fregadero o en las manos de los sujetos (ej. cesta gris con cosméticos, frascos, borlas, tubos).
+1. **Capa 1: Cámara y Óptica:** Distancia focal (24mm ultra-wide para perspectiva forzada en hooks, 28mm, 35mm, 50mm, macro), tipo de plano (9:16 vertical, plano medio, plano detalle) y ángulo de cámara.
+2. **Capa 2: Primer Plano, Props y Disparadores Stop-Scroll:** Objetos exactos y utilería de choque en la mesa/isla de mármol o en las manos del avatar (maqueta colosal de boca/lengua, frascos estéticos, ingredientes, vertido activo).
 3. **Capa 3: Poses Anatómicas y Orientación:**
-   * **Sujeto Izquierdo (Avatar):** Orientación de torso (perfil 3/4 hacia la derecha), ángulo de brazos, interacción de manos y dirección de la mirada.
-   * **Sujeto Derecho (Modelo/Amiga):** Orientación, postura de brazos, qué sostiene con las manos, expresión facial y síntoma exagerado.
-4. **Capa 4: Inyección del Character Sheet & DNA Verbatim:** Inserción íntegra de los descriptores físicos del avatar y vestuario asignado.
+   * **Sujeto Izquierdo (Avatar):** Orientación de torso, ángulo de brazos, interacción física con los props y dirección fija de la mirada hacia el lente del smartphone.
+   * **Sujeto Derecho (si aplica):** Orientación, postura de brazos, qué sostiene y síntoma exagerado.
+4. **Capa 4: Inyección del Character Sheet & DNA Verbatim:** Inserción íntegra de los descriptores físicos del avatar (`CHARACTER_DNA.md`), peinado inmutable y vestuario asignado.
 5. **Capa 5: Limpieza Visual Absoluta:**
    * **Cero Textos, Cero Overlays, Cero Subtítulos Quemados, Cero Marcas de Agua, Cero Logos de Redes Sociales.**
 

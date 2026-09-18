@@ -55,6 +55,88 @@ def option_create_avatar(base_dir: Path):
     subprocess.run(cmd)
     input("\nPresiona ENTER para continuar...")
 
+def option_assemble_project(base_dir: Path):
+    clear_screen()
+    print("========================================================")
+    print("  ENSAMBLAJE AUTOMATICO + RECORTE INTELIGENTE DE SILENCIOS")
+    print("========================================================\n")
+    creators = list_creators(base_dir)
+    all_prods = []
+    for c in creators:
+        prod_dir = c / "04_IN_PRODUCTION"
+        if prod_dir.exists():
+            for p in prod_dir.iterdir():
+                if p.is_dir():
+                    all_prods.append((c.name, p.name, p))
+
+    if not all_prods:
+        print("No se encontraron proyectos en producción (04_IN_PRODUCTION).")
+        input("\nPresiona ENTER para volver..."); return
+
+    print("Proyectos disponibles para ensamblar:")
+    for idx, (cname, pname, _) in enumerate(all_prods, 1):
+        print(f" [{idx}] {pname} ({cname})")
+
+    choice = input(f"\nSelecciona el proyecto (1-{len(all_prods)}) o ingresa el nombre: ").strip()
+    target_prod = None
+    if choice.isdigit() and 1 <= int(choice) <= len(all_prods):
+        target_prod = all_prods[int(choice) - 1][1]
+    elif choice:
+        target_prod = choice
+
+    if not target_prod:
+        input("\nOpción inválida. Presiona ENTER para volver..."); return
+
+    print(f"\n--> Iniciando ensamblaje de {target_prod} con Smart Silence Trimming...")
+    cmd = [
+        sys.executable,
+        str(base_dir / "tools" / "assemble_project.py"),
+        "--project", target_prod
+    ]
+    subprocess.run(cmd)
+    input("\nPresiona ENTER para continuar...")
+
+def option_audit_qa(base_dir: Path):
+    clear_screen()
+    print("========================================================")
+    print("        AUDITORIA DE CALIDAD QA HARNESS (6 GATES)")
+    print("========================================================\n")
+    creators = list_creators(base_dir)
+    all_prods = []
+    for c in creators:
+        prod_dir = c / "04_IN_PRODUCTION"
+        if prod_dir.exists():
+            for p in prod_dir.iterdir():
+                if p.is_dir():
+                    all_prods.append((c.name, p.name, p))
+
+    if not all_prods:
+        print("No se encontraron proyectos en producción (04_IN_PRODUCTION).")
+        input("\nPresiona ENTER para volver..."); return
+
+    print("Proyectos disponibles para auditar:")
+    for idx, (cname, pname, _) in enumerate(all_prods, 1):
+        print(f" [{idx}] {pname} ({cname})")
+
+    choice = input(f"\nSelecciona el proyecto (1-{len(all_prods)}) o ingresa el nombre: ").strip()
+    target_prod = None
+    if choice.isdigit() and 1 <= int(choice) <= len(all_prods):
+        target_prod = all_prods[int(choice) - 1][1]
+    elif choice:
+        target_prod = choice
+
+    if not target_prod:
+        input("\nOpción inválida. Presiona ENTER para volver..."); return
+
+    print(f"\n--> Ejecutando QA Harness para {target_prod}...")
+    cmd = [
+        sys.executable,
+        str(base_dir / "tools" / "ugc_harness.py"),
+        "--project", target_prod
+    ]
+    subprocess.run(cmd)
+    input("\nPresiona ENTER para continuar...")
+
 def option_list_status(base_dir: Path):
     clear_screen()
     print("========================================================")
@@ -88,22 +170,30 @@ def main():
         print("       UGC PRODUCTION STUDIO — CENTRO DE CONTROL")
         print("========================================================")
         print(" [1] Crear un nuevo Avatar / Creador")
-        print(" [2] Ver estado de Creadores y Proyectos")
-        print(" [3] Abrir carpeta de Plantilla Maestra (_CREATOR_TEMPLATE)")
-        print(" [4] Abrir carpeta del Creador de Referencia (Sofia Torres)")
-        print(" [5] Salir")
+        print(" [2] Ensamblar Video (Smart Silence Trimming + Subtitulado)")
+        print(" [3] Auditar Proyecto con QA Harness (6 Gates)")
+        print(" [4] Ver estado de Creadores y Proyectos")
+        print(" [5] Abrir carpeta de Plantilla Maestra (_CREATOR_TEMPLATE)")
+        print(" [6] Abrir carpeta del Creador (Sofia Torres)")
+        print(" [7] Salir")
         print("========================================================")
-        choice = input("Selecciona una opcion (1-5): ").strip()
+        choice = input("Selecciona una opcion (1-7): ").strip()
 
         if choice == "1":
             option_create_avatar(base_dir)
         elif choice == "2":
-            option_list_status(base_dir)
+            option_assemble_project(base_dir)
         elif choice == "3":
-            os.startfile(str(base_dir / "_CREATOR_TEMPLATE"))
+            option_audit_qa(base_dir)
         elif choice == "4":
-            os.startfile(str(base_dir / "Sofia Torres - GlowLab"))
+            option_list_status(base_dir)
         elif choice == "5":
+            if os.name == "nt":
+                os.startfile(str(base_dir / "_CREATOR_TEMPLATE"))
+        elif choice == "6":
+            if os.name == "nt":
+                os.startfile(str(base_dir / "Sofia Torres - GlowLab"))
+        elif choice == "7":
             print("\n¡Hasta luego!")
             break
 

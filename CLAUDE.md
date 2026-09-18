@@ -13,8 +13,8 @@ python tools/scene_keyframe_extractor.py --video "[PATH_TO_REFERENCE_VIDEO]"
 # 2. Run QA Harness Audit (Fase 4 & Continuous QA)
 python tools/ugc_harness.py --project "[PROJECT_FOLDER_NAME]" [--deliverable "[DELIVERABLE_ID]"]
 
-# 3. Assemble final video + subtitles (viral yellow highlight style)
-python scratch/assemble_prod[ID].py
+# 3. Assemble final video + smart silence trimming + subtitles (viral yellow highlight style)
+python tools/assemble_project.py --project "[PROJECT_FOLDER_NAME]"
 ```
 
 ---
@@ -51,17 +51,20 @@ When executing or assisting in a production run, follow these 4 canonical phases
    - **D. Cover Headline:** Titular gancho de curiosidad de máximo 7 palabras para la portada/miniatura.
 
 ### Fase 3: Generación JSON-First & Prompts Dinámicos (ugc-viral-video-generator)
-1. **Regla del 70/30 en el Guion:**
+1. **Regla de Escenario Propio vs. Disparador Stop-Scroll Replicado / Hiper-Exagerado:**
+   - **Escenario / Location de Marca:** El entorno de fondo NUNCA se clona a ciegas de la referencia; se sitúa siempre en el escenario acordado para la marca/avatar (ej. cocina/tocador minimalista de lujo, mármol Calacatta, paredes beige cálido).
+   - **Disparador Stop-Scroll (Hook First Frame):** Se traslada el elemento visual insólito, bizarro o de alto impacto de la referencia sobre el escenario de la marca, **haciéndolo igual o más exagerado / de escala colosal** (ej. maquetas anatómicas gigantes que ocupan el 50% inferior del encuadre en 24mm con perspectiva forzada, síntomas macro extremos, vertidos continuos de fluidos) para congelar el scroll al instante.
+2. **Regla del 70/30 en el Guion:**
    - **70% Núcleo Semántico y Gancho Viral:** Conservar 100% de la fuerza del hook y la estructura psicológica de dolor -> mecanismo -> beneficio -> CTA.
    - **30% Parafraseo y Personalidad del Avatar:** Adaptar la voz a la identidad del creador (`CHARACTER_DNA.md`).
-2. **Reglas de Agrupación de Prompts (Límite Veo3 / Kling <= 10s):**
+3. **Reglas de Agrupación de Prompts (Límite Veo3 / Kling <= 10s):**
    - **Misma Escena / Encuadre Continuo (Duración <= 10s):** Se agrupan múltiples sub-beats en UN SOLO PROMPT con secuencia de acciones especificada en el timeline:
      `SEQUENCE OF ACTIONS: (0:00-0:03) Action A... (0:03-0:08) Action B...`
    - **Cambio de Escena / Ángulo O Duración > 10s:** Se divide en prompts separados con sus respectivos First Frames.
-3. **Cadence Constraint:** Every chunk dialogue must respect WPS <= 2.4.
-4. **Forensic First Frame Prompts (9:16 vertical):** Replicate composition, lighting, camera angle, micro-expressions, and props.
-5. **Video Motion Prompts (I2V):** Describe continuous cinematic motion with natural lipsync and handheld camera.
-6. Validate with Pydantic model (`tools/schemas/production_package.py`) and render `prompts_and_script_[ID].md`.
+4. **Cadence Constraint:** Every chunk dialogue must respect WPS <= 2.4.
+5. **Forensic First Frame Prompts (9:16 vertical):** Replicate composition, lighting, camera angle, micro-expressions, and props with hyper-exaggerated hook elements.
+6. **Video Motion Prompts (I2V):** Describe continuous cinematic motion with natural lipsync and handheld camera.
+7. Validate with Pydantic model (`tools/schemas/production_package.py`) and render `prompts_and_script_[ID].md`.
 
 ### Fase 4: QA Governance & Ensamblaje Canónico (auto-captions-service + ugc_harness.py)
 1. Operator places generated raw clips `1.mp4` to `N.mp4` in `03_Raw_Clips/`.

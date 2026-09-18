@@ -305,12 +305,21 @@ class UGCHarness:
         deliv_id = deliverable_name or prod_folder_name.split("_")[1]
         deliverables_dir = base_brand_dir / "05_PROCESSED_DELIVERABLES" / deliv_id
 
+        expected_chunks = 6
+        if json_path and json_path.exists():
+            try:
+                with open(json_path, "r", encoding="utf-8") as f:
+                    pkg_data = json.load(f)
+                    expected_chunks = len(pkg_data.get("chunks", [])) or 6
+            except Exception:
+                expected_chunks = 6
+
         all_gates = []
         # Gates 1 to 4
         all_gates.extend(cls.audit_package_json(json_path))
         
         # Gate 5
-        all_gates.append(cls.audit_raw_clips(raw_clips_dir))
+        all_gates.append(cls.audit_raw_clips(raw_clips_dir, expected_count=expected_chunks))
         
         # Gate 6
         all_gates.append(cls.audit_deliverables(deliverables_dir, deliv_id))

@@ -1,4 +1,4 @@
-﻿import sys, os, re
+import sys, os, re
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
@@ -32,20 +32,10 @@ def generate_cover_advanced(
     font_path = "C:/Windows/Fonts/impact.ttf"
     if not os.path.exists(font_path):
         font_path = "C:/Windows/Fonts/ariblk.ttf"
-    
-    # Dynamic font sizing based on headline length
+
     words = headline.strip().split()
-    if len(words) <= 3:
-        font_size = int(target_height * 0.058) # ~110px
-    elif len(words) <= 5:
-        font_size = int(target_height * 0.052) # ~100px
-    else:
-        font_size = int(target_height * 0.046) # ~88px
 
-    font = ImageFont.truetype(font_path, font_size)
-    dummy_draw = ImageDraw.Draw(img)
-
-    # Smart line splitting (max 2-3 words per line for high visual weight)
+    # Smart line splitting (max 2-3 words per line for high visual impact)
     lines = []
     if len(words) <= 3:
         lines = [headline.upper()]
@@ -57,82 +47,106 @@ def generate_cover_advanced(
         mid = len(words) // 2
         lines = [" ".join(words[:mid]).upper(), " ".join(words[mid:]).upper()]
 
-    # Trigger words that get neon yellow highlight
-    trigger_words = [
-        "STOP", "NEVER", "BABY OIL", "OIL", "BAKING SODA", "EGG", "RAW EGG",
-        "THINNING", "BALD", "ROOTS", "REGROW", "SECRET", "RUINING", "SHOCKING",
-        "TRICK", "MISTAKE", "HAIR LOSS", "DENSITY", "CORTISOL", "FASTER", "DO THIS"
-    ]
+    # Dynamic font scaling to guarantee text + generous padding never overflows screen boundaries
+    max_allowed_width = int(target_width * 0.84) # 84% safe screen width
+    stroke_w = 4
 
-    # Calculate bounding boxes
-    line_bboxes = [dummy_draw.textbbox((0, 0), l, font=font) for l in lines]
-    line_widths = [bb[2] - bb[0] for bb in line_bboxes]
-    line_heights = [bb[3] - bb[1] for bb in line_bboxes]
-    
-    line_spacing = int(font_size * 0.22)
-    total_text_height = sum(line_heights) + (len(lines) - 1) * line_spacing
-    max_line_width = max(line_widths)
+    font_size = 96
+    while font_size >= 40:
+        font = ImageFont.truetype(font_path, font_size)
+        pad_x = int(font_size * 0.40)
+        dummy_img = Image.new("RGBA", (10, 10), (0, 0, 0, 0))
+        dummy_draw = ImageDraw.Draw(dummy_img)
 
-    # Position in center (42% vertical for Instagram Reels grid safe preview)
-    start_y = int(target_height * 0.42 - total_text_height / 2)
+        fits = True
+        for line in lines:
+            bb = dummy_draw.textbbox((0, 0), line, font=font, stroke_width=stroke_w)
+            w = bb[2] - bb[0]
+            if w + (2 * pad_x) > max_allowed_width:
+                fits = False
+                break
+        if fits:
+            break
+        font_size -= 2
 
-    # Draw individual high-contrast sticker badges per line (MrBeast / Hormozi style)
+    font = ImageFont.truetype(font_path, font_size)
+    pad_x = int(font_size * 0.40)
+    pad_y = int(font_size * 0.26)
+    line_gap = int(font_size * 0.20)
+
+    dummy_img = Image.new("RGBA", (10, 10), (0, 0, 0, 0))
+    dummy_draw = ImageDraw.Draw(dummy_img)
+
+    line_metrics = []
+    total_height = 0
+    for line in lines:
+        bb = dummy_draw.textbbox((0, 0), line, font=font, stroke_width=stroke_w)
+        x0, y0, x1, y1 = bb
+        w = x1 - x0
+        h = y1 - y0
+        box_h = h + (2 * pad_y)
+        box_w = w + (2 * pad_x)
+        line_metrics.append({
+            "line": line,
+            "x0": x0,
+            "y0": y0,
+            "w": w,
+            "h": h,
+            "box_w": box_w,
+            "box_h": box_h
+        })
+        total_height += box_h
+
+    total_height += (len(lines) - 1) * line_gap
+
+    # Position in center (40% vertical for Instagram Reels grid safe preview)
+    start_box_y = int(target_height * 0.40 - total_height / 2)
+    center_x = target_width // 2
+
     overlay = Image.new("RGBA", (target_width, target_height), (0, 0, 0, 0))
     overlay_draw = ImageDraw.Draw(overlay)
-    
-    pad_x = int(font_size * 0.35)
-    pad_y = int(font_size * 0.16)
 
-    curr_y = start_y
-    for i, line in enumerate(lines):
-        lw = line_widths[i]
-        lh = line_heights[i]
-        lx = (target_width - lw) // 2
+    curr_box_y = start_box_y
+    for idx, lm in enumerate(line_metrics):
+        box_x0 = center_x - lm["box_w"] // 2
+        box_x1 = center_x + lm["box_w"] // 2
+        box_y0 = curr_box_y
+        box_y1 = curr_box_y + lm["box_h"]
 
-        box = [
-            lx - pad_x,
-            curr_y - pad_y,
-            lx + lw + pad_x,
-            curr_y + lh + pad_y + 4
-        ]
-        
-        # Black sticker background with slight angle or solid presence
+        is_first = (idx == 0)
+        border_color = (255, 229, 0, 255) if is_first else (255, 255, 255, 220)
+
+        # High-contrast rounded rectangle sticker badge
         overlay_draw.rounded_rectangle(
-            box,
-            radius=16,
+            [box_x0, box_y0, box_x1, box_y1],
+            radius=18,
             fill=(0, 0, 0, 235),
-            outline=(255, 229, 0, 255) if i == 0 else (255, 255, 255, 200),
-            width=3
+            outline=border_color,
+            width=4
         )
-        curr_y += lh + line_spacing
 
-    img = Image.alpha_composite(img, overlay)
-    draw = ImageDraw.Draw(img)
+        # Exact mathematical offset to center glyph bounding box inside the rectangle
+        text_x = box_x0 + pad_x - lm["x0"]
+        text_y = box_y0 + pad_y - lm["y0"]
 
-    # Render text with rich colors & outline
-    curr_y = start_y
-    for i, line in enumerate(lines):
-        lw = line_widths[i]
-        lh = line_heights[i]
-        lx = (target_width - lw) // 2
-
-        # Check if line has trigger keywords
-        is_highlight = any(tw in line for tw in trigger_words) or (i == 0 and len(lines) > 1)
-        text_color = (255, 229, 0, 255) if is_highlight else (255, 255, 255, 255)
+        text_color = (255, 229, 0, 255) if is_first else (255, 255, 255, 255)
 
         # Drop shadow
-        draw.text((lx + 4, curr_y + 4), line, font=font, fill=(0, 0, 0, 255))
-        
-        # Stroke + Fill
-        draw.text(
-            (lx, curr_y),
-            line,
+        overlay_draw.text((text_x + 3, text_y + 3), lm["line"], font=font, fill=(0, 0, 0, 200))
+
+        # Main text with stroke
+        overlay_draw.text(
+            (text_x, text_y),
+            lm["line"],
             font=font,
             fill=text_color,
-            stroke_width=3,
+            stroke_width=stroke_w,
             stroke_fill=(0, 0, 0, 255)
         )
-        curr_y += lh + line_spacing
+
+        curr_box_y += lm["box_h"] + line_gap
+
+    img = Image.alpha_composite(img, overlay)
 
     # Save
     output_image_path.parent.mkdir(parents=True, exist_ok=True)

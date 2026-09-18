@@ -102,13 +102,18 @@ El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
 
 ---
 
-### FASE 5: Montaje y Subtítulos Dinámicos (`auto-captions-service`)
-1. Concatenar los clips validados de `03_Raw_Clips/` en `04_IN_PRODUCTION/.../05_Montage/`.
-2. **Aplicar Estándar de Subtítulos Oficial (`capcut_italic_yellow`):**
-   * Estilo Italic Bold en minúsculas, palabra activa en Amarillo Neón (`#FFE500`), palabras inactivas en Blanco (`#FFFFFF`), contorno negro de 4.5px.
-   * **Zona Segura Inferior (Reels/TikTok Safe Zone):** Margen inferior fijo al **18% de la altura** (`vertical_margin_pct: 18.0%`) para garantizar que el texto nunca quede tapado por la barra de audio/caption inferior ni por los botones laterales de Instagram o TikTok.
-3. Generar el archivo maestro `.mp4` con subtítulos quemados en alta calidad.
-4. Las capturas de QA para validación de subtítulos (`caption_preview_*.jpg`) deben residir **exclusivamente como archivos temporales en `05_Montage/`** y nunca en la carpeta de entregables.
+### FASE 5: Recorte Inteligente de Silencios, Montaje y Subtítulos Dinámicos (`tools/assemble_project.py` + `auto-captions-service`)
+1. **Recorte Inteligente de Silencios (Smart Silence Trimming Obligatorio):**
+   * Antes de concatenar, se auditan con Whisper las marcas de tiempo exactas del primer y último instante de locución en cada clip crudo (`1.mp4` a `N.mp4`).
+   * Se recortan automáticamente todos los silencios muertos iniciales y finales dejando únicamente un margen natural de respiración ($\approx 0.12\text{s}$ inicio, $\approx 0.22\text{s}$ fin) para evitar baches incómodos y garantizar un ritmo publicitario fluido y de alta retención.
+2. **Concatenación y Subtitulado Dinámico Oficial (`viral_yellow_highlight` / `capcut_italic_yellow`):**
+   * Estilo en minúsculas/mayúsculas con palabra activa en Amarillo Neón (`#FFE500`), palabras inactivas en Blanco (`#FFFFFF`), contorno negro.
+   * **Zona Segura Inferior (Reels/TikTok Safe Zone):** Margen inferior fijo al **18% de la altura** (`vertical_margin_pct: 18.0%`) para garantizar que el texto nunca quede tapado por la interfaz o botones de Instagram y TikTok.
+3. **Ejecución Unificada Automatizada:**
+   ```bash
+   python tools/assemble_project.py --project PROD_<ID>_<nombre>
+   ```
+4. Genera el archivo maestro `.mp4` con subtítulos quemados, archivo `.srt`, portada de alto impacto `Cover.jpg` y exportación canónica inmediata a `05_PROCESSED_DELIVERABLES/`.
 
 ---
 
