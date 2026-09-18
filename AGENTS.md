@@ -22,9 +22,14 @@ The system operates across 4 core skills and automated tools in `tools/`:
    - **Environment Decoupling & Stop-Scroll Hook Hyper-Exaggeration:**
      * **Location:** Always render the avatar inside the brand's designated canonical environment (e.g., luxury minimalist kitchen/vanity, Calacatta marble, warm plaster walls), NEVER blindly clone generic reference backgrounds.
      * **Hook Stop-Scroll Trigger (First Frame):** The disruptive visual trigger from the reference MUST be placed on the brand setting and **hyper-exaggerated to a colossal scale** (e.g., massive anatomical models filling 50% of the frame with 24mm forced perspective, extreme macro symptoms, dynamic pouring streams) equal to or exceeding the original viral intensity.
+   - **Canonical Video Motion Prompt (I2V) Architecture:**
+     * Every video prompt MUST follow the 4-part standardized structure:
+       1. **Header Lock:** `Hyper-realistic vertical 9:16 smartphone UGC video. Use the canonical [ENVIRONMENT]. [AVATAR IDENTITY, AGE, CLOTHING]. Preserve her identity, clothing, lighting, environment, table position, props and camera style throughout the entire clip.`
+       2. **Timeline Action & Spoken Dialogue (`*ACTION:*`):** Broken into timestamped sub-second segments (`0–3s:`, `3–8s:`, etc.) combining camera framing, physical action with props, gaze direction, and exact quoted dialogue (`says: "..."` / `while continuing: "..."`).
+       3. **Realism Anchor:** `Natural realistic hand movements. No cuts. No exaggerated acting.`
+       4. **Acoustic & Foley Layer (`*SFX:*`):** `*SFX:* [quiet room tone / ambiance, subtle surface contact, realistic prop handling sounds].`
    - **Scene / Prompt Grouping Rules (Veo3 / Kling <= 10s Limit):**
-     * **Same Scene / Framing (Duration <= 10s):** Consolidate micro-beats into ONE single prompt with explicit internal timeline choreographies:
-       `SEQUENCE OF ACTIONS: (0:00-0:03) Action A... (0:03-0:08) Action B...`
+     * **Same Scene / Framing (Duration <= 10s):** Consolidate micro-beats into ONE single prompt with explicit internal timeline choreographies (`0–3s: ... 3–8s: ...`).
      * **Scene Change OR Duration > 10s:** Split into separate distinct prompts with individual First Frames.
    - **70/30 Script Rule:** 70% semantic core / viral hook from reference video + 30% persona/tone paraphrasing to match character identity.
    - Dynamic chunk mapping (5 canonical stages: Hook, Reframe, Mechanism, Payoff, CTA across N clips).

@@ -104,19 +104,30 @@ Para prevenir bloqueos automáticos en generadores de voz/video (ElevenLabs, Kli
 
 ---
 
-## 7. Desglose Dinámico de Etapas vs Chunks & Coreografía de Video (I2V)
+## 8. Estructura Canónica de Prompts de Video (I2V Motion con Timeline Forense y SFX)
 
-1. **Estructura Narrativa Inmutable (5 Etapas):**
-   - Hook, Reframe, Mechanism, Payoff, CTA siempre estructuran la psicología del video.
+Para garantizar sincronización de labios exacta, correlación 1:1 entre acciones y diálogos, y físicas de movimiento realistas en generadores de video (Veo3, Kling, Hailuo, Grok), **todos los Video Motion Prompts deben seguir estrictamente esta arquitectura de 4 bloques**:
 
-2. **Relación Dinámica 1:N (Sin Límite Rígido de Chunks):**
-   - La cantidad total de chunks **no es un número fijo de 6**. Se calibra según la duración y densidad de cada etapa.
-   - Si una etapa como *Mechanism* requiere 20-25 segundos de texto, se divide naturalmente en 2 o 3 chunks de 8s-10s (ej. *Mechanism 3A*, *Mechanism 3B*, *Mechanism 3C*).
+### Plantilla Maestra de Video Motion Prompt:
+```text
+Hyper-realistic vertical 9:16 smartphone UGC video. Use the canonical [DETALLES DE ENTORNO/ESCENARIO CANÓNICO]. [IDENTIDAD DEL AVATAR, EDAD, VESTUARIO EXACTO]. Preserve her identity, clothing, lighting, environment, table position, props and camera style throughout the entire clip.
 
-3. **Coreografía de Movimiento Continuo (Transición Frame A $\rightarrow$ Frame B en un solo Clip):**
-   - Cuando una etapa contiene 2 momentos visuales en una misma toma de 8-10 segundos:
-     - El **First Frame Prompt (Midjourney/Flux)** define la composición de arranque exacta ($t=0s$, **Frame A**).
-     - El **Video Motion Prompt (Kling/Veo3/Grok)** describe explícitamente la coreografía y progresión continua de movimiento hacia la acción final (**Frame B**) y la sincronización de labios/locución de todo el clip.
+*ACTION:*
+0–3s: [Tipo de encuadre / plano]. [Acción física y gesticulación con props]. She looks directly into the smartphone camera and says: "[TEXTO EXACTO DE DIÁLOGO DEL SEGMENTO 1]"
+
+3–8s: [Acción física continua con props / demostración]. She [gesto] while continuing: "[TEXTO EXACTO DE DIÁLOGO DEL SEGMENTO 2]"
+
+Natural realistic hand movements. No cuts. No exaggerated acting.
+
+*SFX:* [ambience del entorno, sonido físico sutil de contacto con mesa/superficie, sonido natural de manipulación de props e ingredientes].
+```
+
+### Reglas Clave de Redacción de Video Prompts:
+1. **Header de Consistencia Inmutable:** Define la relación de aspecto 9:16, escenario canónico y el candado de continuidad (*"Preserve her identity, clothing, lighting, environment, table position, props and camera style throughout the entire clip"*).
+2. **Bloques `*ACTION:*` con Timestamps de Milisegundo:** Cada segundo de duración ($0\text{–}3\text{s}$, $3\text{–}8\text{s}$, etc.) tiene su acción física correspondiente y su fragmento de diálogo explícito entrecomillado (`says: "..."`, `while continuing: "..."`).
+3. **Restricción de Realismo Cinematográfico:** Obligatorio incluir `"Natural realistic hand movements. No cuts. No exaggerated acting."` para evitar sobreactuación o cortes artificiales de cámara.
+4. **Capa Acústica y Foley (`*SFX:*`):** Define el ruido de fondo del entorno doméstico/estudio y los sonidos dieléctricos reales de los objetos al ser manipulados (líquidos, vidrio, madera, cerámica).
+
 
 
 

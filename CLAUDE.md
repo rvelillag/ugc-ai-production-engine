@@ -63,7 +63,11 @@ When executing or assisting in a production run, follow these 4 canonical phases
    - **Cambio de Escena / Ángulo O Duración > 10s:** Se divide en prompts separados con sus respectivos First Frames.
 4. **Cadence Constraint:** Every chunk dialogue must respect WPS <= 2.4.
 5. **Forensic First Frame Prompts (9:16 vertical):** Replicate composition, lighting, camera angle, micro-expressions, and props with hyper-exaggerated hook elements.
-6. **Video Motion Prompts (I2V):** Describe continuous cinematic motion with natural lipsync and handheld camera.
+6. **Estructura Canónica de Video Motion Prompts (I2V con Timeline Forense y SFX):**
+   - **Header de Bloqueo Inmutable:** 9:16 vertical, escenario canónico, identidad/edad/ropa y candado de continuidad.
+   - **Bloques `*ACTION:*` con Timestamps de Milisegundo:** Segmentos temporales exactos (`0–3s:`, `3–8s:`, etc.) con plano de cámara, interacción física con props, dirección de mirada y diálogo literal entrecomillado (`says: "..."` / `while continuing: "..."`).
+   - **Restricción de Realismo:** `"Natural realistic hand movements. No cuts. No exaggerated acting."`
+   - **Capa Acústica y Foley (`*SFX:*`):** Ambiance de la sala, contacto con superficies y sonidos de manipulación de objetos.
 7. Validate with Pydantic model (`tools/schemas/production_package.py`) and render `prompts_and_script_[ID].md`.
 
 ### Fase 4: QA Governance & Ensamblaje Canónico (auto-captions-service + ugc_harness.py)

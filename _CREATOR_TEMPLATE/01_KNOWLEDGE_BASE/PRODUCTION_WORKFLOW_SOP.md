@@ -20,10 +20,10 @@ Este espacio de trabajo contiene la estructura estándar oficial para la ingesta
 
 1. **Fase 1 (Ingesta):** Colocar el video de referencia `.mp4` en `03_INBOX_REFERENCES/<cuenta>/`.
 2. **Fase 2 (Extracción & Diagnóstico):** Ejecutar `ugc-video-beat-extractor` para obtener timestamps, frames clave 1:1, transcribir con Whisper y presentar el Checkpoint de Entorno.
-3. **Fase 3 (Generación JSON-First & Guion Literal Verbatim):**
-   * **Fidelidad Textual Literal 1:1:** El guión hablado es **100% fiel al video viral de referencia (palabra por palabra)**, conservando la cadencia, ganchos y frases retóricas del creador original (*"sliding off by lunch"*, *"it's not your fault"*, *"tested on 22-year-olds"*).
-   * **Cero Marcas en el Video (Desacoplamiento ManyChat):** El video educa de forma genérica (*"hydrating essence"*, *"grip primer"*, *"serum foundation"*). La venta y la recomendación de marca específica se delegan al 100% a ManyChat cuando el usuario comenta la palabra clave.
-   * **Única Modificación:** La frase final del CTA para insertar la palabra clave segura de ManyChat (ej. `LIFT`, `GLOW`) evitando términos bloqueados como `age` o `DM`.
+3. **Fase 3 (Generación JSON-First & Prompts Estructurados):**
+   * **Estándar de Guión 70/30:** 70% fidelidad semántica/gancho viral de la referencia + 30% adaptación y personalidad del avatar (`*_CHARACTER_DNA.md`), con cadencia $\le 2.4$ WPS.
+   * **Cero Marcas en el Video (Desacoplamiento ManyChat):** El video educa de forma genérica (*"hydrating essence"*, *"grip primer"*, *"serum foundation"*). La venta y recomendación de marca específica se delegan al 100% a ManyChat cuando el usuario comenta la palabra clave.
+   * **Estructura Canónica de Video Prompts (4 Bloques):** (1) Header de consistencia 9:16 + entorno canónico, (2) Bloques `*ACTION:*` con timeline de sub-segundos y diálogos entrecomillados, (3) Restricción de realismo (`"Natural realistic hand movements. No cuts. No exaggerated acting."`), y (4) Capa acústica y Foley (`*SFX:*`).
    * **Generación JSON y Markdown:** Autogeneración de `production_package_PROD_<ID>.json` y `prompts_and_script_PROD_<ID>.md`.
 4. **Fase 4 (Producción Audiovisual):** Generar los First Frames (Midjourney/Flux) y animar los clips (Veo3/Kling/Grok) en `03_Raw_Clips/`.
 5. **Fase 5 (Recorte de Silencios, Montaje y Subtitulado Dinámico):** Recortar silencios muertos con Whisper y unir clips con subtítulos oficiales (`capcut_italic_yellow` a 18% de margen seguro) ejecutando `python tools/assemble_project.py --project PROD_<ID>_<nombre>`.
