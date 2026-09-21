@@ -15,8 +15,8 @@ from app.core.ffmpeg_utils import FFmpegLocator
 from app.core.pipeline import CaptionPipeline
 from tools.cover_generator import generate_cover_advanced
 
-def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_padding_start: float = 0.12, silence_padding_end: float = 0.22):
-    ffmpeg_bin, _ = FFmpegLocator.get_binaries()
+def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_padding_start: float = 0.12, silence_padding_end: float = 0.22, language: str = "auto"):
+    ffmpeg_bin, ffprobe_bin = FFmpegLocator.get_binaries()
     project_path = Path(project_path_str)
     
     if not project_path.is_absolute():
@@ -66,7 +66,7 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
     trimmed_clips = []
 
     for idx, clip in enumerate(raw_clips, 1):
-        cmd_dur = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(clip)]
+        cmd_dur = [ffprobe_bin, "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(clip)]
         dur = float(subprocess.check_output(cmd_dur, text=True).strip())
 
         segments, info = whisper_model.transcribe(str(clip), word_timestamps=True)
@@ -95,8 +95,8 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
         cmd_cut = [
             ffmpeg_bin, "-y",
             "-ss", f"{start_trim:.3f}",
-            "-to", f"{end_trim:.3f}",
             "-i", str(clip),
+            "-t", f"{end_trim - start_trim:.3f}",
             "-c:v", "libx264",
             "-preset", "fast",
             "-crf", "18",
@@ -133,7 +133,7 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
     # 4. Auto-Captions Pipeline (viral_yellow_highlight)
     print("\nStage 3: Burning synchronized dynamic viral captions...")
     pipeline = CaptionPipeline(job_dir=job_dir)
-    asr_data = pipeline.process_stage_asr(input_video_path=concat_video_path, language="en")
+    asr_data = pipeline.process_stage_asr(input_video_path=concat_video_path, language=language)
     words = asr_data.get("words", [])
 
     render_result = pipeline.process_stage_render(
@@ -225,5 +225,6 @@ Caption:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Assemble raw clips with Smart Silence Trimming into canonical deliverable.")
     parser.add_argument("--project", required=True, help="Project directory name or path (e.g., PROD_012_cuenta_a_6)")
+    parser.add_argument("--language", default="auto", help="Caption language code (es, en, ...) or 'auto' to detect")
     args = parser.parse_args()
-    assemble_project(args.project)
+    assemble_project(args.project, language=args.language)
