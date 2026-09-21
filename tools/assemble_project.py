@@ -47,7 +47,8 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
     trimmed_dir = job_dir / "trimmed_clips"
     trimmed_dir.mkdir(parents=True, exist_ok=True)
 
-    deliv_brand_folder = brand_dir / "05_PROCESSED_DELIVERABLES" / f"Avatar{deliv_id}"
+    avatar_first_name = brand_dir.name.split(" - ")[0].split()[0] if " - " in brand_dir.name else "Deliverable"
+    deliv_brand_folder = brand_dir / "05_PROCESSED_DELIVERABLES" / f"{avatar_first_name}{deliv_id}"
     deliv_numeric_folder = brand_dir / "05_PROCESSED_DELIVERABLES" / deliv_id
     deliv_brand_folder.mkdir(parents=True, exist_ok=True)
     deliv_numeric_folder.mkdir(parents=True, exist_ok=True)
@@ -206,10 +207,10 @@ Caption:
     shutil.copy(cover_badge_path, montage_dir / "Cover.jpg")
 
     # Brand Deliv
-    shutil.copy(output_burned_video, deliv_brand_folder / f"Avatar{deliv_id}_Final_1080x1920.mp4")
+    shutil.copy(output_burned_video, deliv_brand_folder / f"{avatar_first_name}{deliv_id}_Final_1080x1920.mp4")
     if output_srt and output_srt.exists():
-        shutil.copy(output_srt, deliv_brand_folder / f"Avatar{deliv_id}_Subtitles.srt")
-    shutil.copy(cover_badge_path, deliv_brand_folder / f"Avatar{deliv_id}_Cover.jpg")
+        shutil.copy(output_srt, deliv_brand_folder / f"{avatar_first_name}{deliv_id}_Subtitles.srt")
+    shutil.copy(cover_badge_path, deliv_brand_folder / f"{avatar_first_name}{deliv_id}_Cover.jpg")
     with open(deliv_brand_folder / "post_copy_title_and_caption.txt", "w", encoding="utf-8") as f:
         f.write(copy_content)
 

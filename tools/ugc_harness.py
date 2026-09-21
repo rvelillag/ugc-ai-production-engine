@@ -359,9 +359,9 @@ class UGCHarness:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="UGC Production & QA Harness")
     parser.add_argument("--json", help="Path to production_package_PROD_XXX.json to audit Gates 1-4")
-    parser.add_argument("--project", help="Name of project folder in 04_IN_PRODUCTION (e.g. PROD_007_cuenta_c_10)")
-    parser.add_argument("--brand", default="Sofia Torres - GlowLab", help="Brand directory name")
-    parser.add_argument("--deliverable", help="Deliverable folder name (e.g. Avatar007)")
+    parser.add_argument("--project", help="Name of project folder in 04_IN_PRODUCTION (e.g. PROD_012_cuenta_a_6)")
+    parser.add_argument("--brand", default=None, help="Brand directory name (optional, auto-detected if omitted)")
+    parser.add_argument("--deliverable", help="Deliverable folder name (optional, auto-detected if omitted)")
     args = parser.parse_args()
 
     harness = UGCHarness()
@@ -376,7 +376,17 @@ if __name__ == "__main__":
         }
         harness.print_scorecard(report)
     elif args.project:
-        brand_path = base_dtc / args.brand
+        if args.brand:
+            brand_path = base_dtc / args.brand
+        else:
+            # Auto-detect brand directory containing this project
+            found = list(base_dtc.glob(f"*/04_IN_PRODUCTION/{args.project}"))
+            if found:
+                brand_path = found[0].parent.parent
+            else:
+                candidates = [d for d in base_dtc.iterdir() if d.is_dir() and (d / "04_IN_PRODUCTION").exists()]
+                brand_path = candidates[0] if candidates else base_dtc
+
         report = harness.run_full_project_audit(brand_path, args.project, args.deliverable)
         harness.print_scorecard(report)
     else:

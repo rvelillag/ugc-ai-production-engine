@@ -174,7 +174,7 @@ def main():
         print(" [3] Auditar Proyecto con QA Harness (6 Gates)")
         print(" [4] Ver estado de Creadores y Proyectos")
         print(" [5] Abrir carpeta de Plantilla Maestra (_CREATOR_TEMPLATE)")
-        print(" [6] Abrir carpeta del Creador (Sofia Torres)")
+        print(" [6] Abrir carpeta de un Creador / Avatar")
         print(" [7] Salir")
         print("========================================================")
         choice = input("Selecciona una opcion (1-7): ").strip()
@@ -191,8 +191,21 @@ def main():
             if os.name == "nt":
                 os.startfile(str(base_dir / "_CREATOR_TEMPLATE"))
         elif choice == "6":
-            if os.name == "nt":
-                os.startfile(str(base_dir / "Sofia Torres - GlowLab"))
+            creators = [d for d in base_dir.iterdir() if d.is_dir() and d.name != "_CREATOR_TEMPLATE" and (d / "01_KNOWLEDGE_BASE").exists()]
+            if not creators:
+                print("\nNo se encontraron carpetas de Creadores creadas.")
+                input("Presiona ENTER...")
+            elif len(creators) == 1:
+                if os.name == "nt":
+                    os.startfile(str(creators[0]))
+            else:
+                print("\nCreadores disponibles:")
+                for i, c in enumerate(creators, 1):
+                    print(f" [{i}] {c.name}")
+                c_idx = input(f"Selecciona creador (1-{len(creators)}): ").strip()
+                if c_idx.isdigit() and 1 <= int(c_idx) <= len(creators):
+                    if os.name == "nt":
+                        os.startfile(str(creators[int(c_idx) - 1]))
         elif choice == "7":
             print("\n¡Hasta luego!")
             break
