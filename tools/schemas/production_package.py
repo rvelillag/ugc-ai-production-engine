@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 from pydantic import BaseModel, Field
 
 class LeftSubjectAudit(BaseModel):
@@ -26,6 +26,14 @@ class FrameCompositionAudit(BaseModel):
     environment_background: str = Field(..., description="Fondo y escenario (ej: Cozy domestic kitchen with soft morning window daylight)")
     lighting_style: str = Field(..., description="Estilo de iluminación y textura (ej: Soft natural morning daylight, realistic skin pores, zero text)")
 
+class ActionStep(BaseModel):
+    t0: float = Field(..., ge=0, description="Inicio del paso dentro del clip (s)")
+    t1: float = Field(..., description="Fin del paso dentro del clip (s)")
+    ledger_row: str = Field(..., description="Id de la fila del ledger de referencia que replica")
+    action: str = Field(..., min_length=1, description="Acción física exacta (misma que la referencia)")
+    props: List[str] = Field(default_factory=list)
+    dialogue: str = ""
+
 class ChunkItem(BaseModel):
     chunk_id: int
     beat_name: str
@@ -38,6 +46,11 @@ class ChunkItem(BaseModel):
     video_motion_prompt_i2v: str
     asset_tags: List[str]
     continuity_notes: str
+    ledger_rows: List[str] = Field(default_factory=list, description="Ids del ledger que cubre este chunk")
+    ref_window: Optional[Tuple[float, float]] = Field(None, description="Ventana [t0, t1] de la referencia que reemplaza")
+    action_timeline: List[ActionStep] = Field(default_factory=list)
+    voiceover_reference: str = Field("", description="Diálogo original literal del segmento")
+    sfx: str = Field("", description="Capa acústica/Foley del clip")
 
 class PostCopy(BaseModel):
     cover_headline: str = Field(..., description="Titular magnético para la portada/thumbnail del video (máximo 6 a 7 palabras)")
