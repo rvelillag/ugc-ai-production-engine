@@ -29,9 +29,19 @@ def generate_cover_advanced(
     img = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
 
     # Font setup - Impact or Arial Black
-    font_path = "C:/Windows/Fonts/impact.ttf"
-    if not os.path.exists(font_path):
-        font_path = "C:/Windows/Fonts/ariblk.ttf"
+    font_candidates = [
+        "C:/Windows/Fonts/impact.ttf",
+        "C:/Windows/Fonts/ariblk.ttf",
+        "C:/Windows/Fonts/arialbd.ttf",
+        "/System/Library/Fonts/Supplemental/Impact.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    ]
+    font_path = next((p for p in font_candidates if os.path.exists(p)), None)
+    if font_path is None:
+        raise FileNotFoundError(
+            "No se encontró ninguna fuente bold (Impact/Arial Black/Arial Bold/DejaVu Bold). "
+            "Instala una o añade su ruta a font_candidates en cover_generator.py."
+        )
 
     words = headline.strip().split()
 

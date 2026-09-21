@@ -65,4 +65,7 @@ watch/
 # Avatar / Brand Workspaces & Deliverables (Agnostic Engine Isolation)
 # All active avatar/creator workspaces are local-only runtime instances
 * - */
-Sofia Torres - GlowLab/
+
+
+# Nested legacy engine copy (untracked gitlink, no .gitmodules)
+ugc-ai-production-engine/
