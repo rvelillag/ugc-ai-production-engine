@@ -393,6 +393,8 @@ class UGCHarness:
 
     LENGTH_TOLERANCE = 0.10
     MIN_CONTENT_OVERLAP = 0.50
+    MIN_DIALOGUE_FIDELITY = 0.85
+    TIME_TOLERANCE_S = 0.05
     STOPWORDS = set(
         "a an the and or but of to in on at for with your you i my me it its is are was be this that "
         "these those just so then than as if by from into up out not no do does did have has had will "
@@ -460,9 +462,6 @@ class UGCHarness:
             details
         )
 
-    MIN_DIALOGUE_FIDELITY = 0.85
-    TIME_TOLERANCE_S = 0.05
-
     @staticmethod
     def ledger_active(project_dir: Path) -> bool:
         """True si el proyecto usa ledger de referencia (archivo presente o hash registrado en checkpoint1.json)."""
@@ -481,14 +480,18 @@ class UGCHarness:
         try:
             ledger = load_ledger(Path(project_dir) / "01_Reference" / LEDGER_FILE)
             chunks = json.loads(Path(json_path).read_text(encoding="utf-8")).get("chunks", [])
+            if not isinstance(chunks, list):
+                raise ValueError("'chunks' no es una lista")
         except Exception as e:
             return HarnessGateResult("GATE_7", name, False, f"No se pudo leer el ledger o el paquete: {e}")
         errors, details = [], []
         for row in ledger.rows:
             if row.is_cta or not tokenize(row.dialogue_verbatim):
                 continue
-            gen = " ".join(s.get("dialogue", "") for ch in chunks for s in ch.get("action_timeline", [])
-                           if s.get("ledger_row") == row.id)
+            gen = " ".join(
+                str(s.get("dialogue") or "")
+                for ch in chunks if isinstance(ch, dict) and isinstance(ch.get("action_timeline"), list)
+                for s in ch["action_timeline"] if isinstance(s, dict) and s.get("ledger_row") == row.id)
             score = fidelity(row.dialogue_verbatim, gen)
             details.append(f"{row.id}: {score:.2f} de las palabras conservadas (mínimo {UGCHarness.MIN_DIALOGUE_FIDELITY:.2f})")
             if score < UGCHarness.MIN_DIALOGUE_FIDELITY:
@@ -522,42 +525,66 @@ class UGCHarness:
 
         order = {r.id: n for n, r in enumerate(ledger.rows)}
         covered, last_order = set(), -1
-        for ch in pkg.get("chunks", []):
-            cid = ch.get("chunk_id")
-            rows, steps = ch.get("ledger_rows", []), ch.get("action_timeline", [])
-            if not rows or not steps:
-                errors.append(f"Chunk {cid}: falta ledger_rows o action_timeline.")
+        chunk_list = pkg.get("chunks", []) if isinstance(pkg, dict) else []
+        if not isinstance(chunk_list, list):
+            errors.append("'chunks' no es una lista.")
+            chunk_list = []
+        for ch in chunk_list:
+            if not isinstance(ch, dict):
+                errors.append("Chunk con datos malformados (no es un objeto).")
                 continue
-            for rid in rows:
-                if rid not in order:
-                    errors.append(f"Chunk {cid}: ledger_rows contiene '{rid}', que no existe en el ledger.")
-            prompt = ch.get("video_motion_prompt_i2v", "")
-            prev_t1, step_rows = 0.0, set()
-            for s in steps:
-                t0, t1, rid = s.get("t0", 0), s.get("t1", 0), s.get("ledger_row")
-                if t1 <= t0:
-                    errors.append(f"Chunk {cid}: paso {rid} con t1 <= t0.")
-                if abs(t0 - prev_t1) > tol:
-                    errors.append(f"Chunk {cid}: hueco o solape en el timeline ({prev_t1:g}s -> {t0:g}s).")
-                prev_t1 = t1
-                if rid not in rows or rid not in order:
-                    errors.append(f"Chunk {cid}: el paso '{rid}' no está en los ledger_rows del chunk/ledger.")
+            cid = ch.get("chunk_id")
+            try:
+                rows, steps = ch.get("ledger_rows", []), ch.get("action_timeline", [])
+                if not rows or not steps:
+                    errors.append(f"Chunk {cid}: falta ledger_rows o action_timeline.")
                     continue
-                step_rows.add(rid)
-                covered.add(rid)
-                if order[rid] < last_order:
-                    errors.append(f"Chunk {cid}: pasos fuera de orden respecto al ledger ({rid}).")
-                last_order = max(last_order, order[rid])
-                if not str(s.get("action", "")).strip():
-                    errors.append(f"Chunk {cid}: paso {rid} sin acción.")
-                if time_marker(t0, t1) not in prompt:
-                    errors.append(f"Chunk {cid}: el prompt no contiene el marcador {time_marker(t0, t1)} (recompila con tools/prompt_compiler.py).")
-                if s.get("dialogue") and s["dialogue"] not in prompt:
-                    errors.append(f"Chunk {cid}: el prompt no contiene el diálogo del paso {rid}.")
-            if prev_t1 > ch.get("recommended_duration_s", 0) + tol:
-                errors.append(f"Chunk {cid}: el timeline termina en {prev_t1:g}s, más allá de la duración del clip.")
-            for rid in set(rows) - step_rows:
-                errors.append(f"Chunk {cid}: la fila {rid} está en ledger_rows pero ningún paso la replica.")
+                if not isinstance(rows, list) or not isinstance(steps, list):
+                    errors.append(f"Chunk {cid}: datos malformados (ledger_rows y action_timeline deben ser listas).")
+                    continue
+                is_num = lambda v: isinstance(v, (int, float)) and not isinstance(v, bool)
+                dur = ch.get("recommended_duration_s")
+                if not is_num(dur):
+                    errors.append(f"Chunk {cid}: recommended_duration_s ausente o no numérico.")
+                    continue
+                for rid in rows:
+                    if rid not in order:
+                        errors.append(f"Chunk {cid}: ledger_rows contiene '{rid}', que no existe en el ledger.")
+                prompt = str(ch.get("video_motion_prompt_i2v") or "")
+                prev_t1, step_rows = 0.0, set()
+                for s in steps:
+                    if not isinstance(s, dict):
+                        errors.append(f"Chunk {cid}: paso con datos malformados (no es un objeto).")
+                        continue
+                    t0, t1, rid = s.get("t0"), s.get("t1"), s.get("ledger_row")
+                    if not (is_num(t0) and is_num(t1)):
+                        errors.append(f"Chunk {cid}: paso {rid} sin t0/t1 numéricos.")
+                        continue
+                    if t1 <= t0:
+                        errors.append(f"Chunk {cid}: paso {rid} con t1 <= t0.")
+                    if abs(t0 - prev_t1) > tol:
+                        errors.append(f"Chunk {cid}: hueco o solape en el timeline ({prev_t1:g}s -> {t0:g}s).")
+                    prev_t1 = t1
+                    if rid not in rows or rid not in order:
+                        errors.append(f"Chunk {cid}: el paso '{rid}' no está en los ledger_rows del chunk/ledger.")
+                        continue
+                    step_rows.add(rid)
+                    covered.add(rid)
+                    if order[rid] < last_order:
+                        errors.append(f"Chunk {cid}: pasos fuera de orden respecto al ledger ({rid}).")
+                    last_order = max(last_order, order[rid])
+                    if not str(s.get("action", "")).strip():
+                        errors.append(f"Chunk {cid}: paso {rid} sin acción.")
+                    if time_marker(t0, t1) not in prompt:
+                        errors.append(f"Chunk {cid}: el prompt no contiene el marcador {time_marker(t0, t1)} (recompila con tools/prompt_compiler.py).")
+                    if s.get("dialogue") and str(s["dialogue"]) not in prompt:
+                        errors.append(f"Chunk {cid}: el prompt no contiene el diálogo del paso {rid}.")
+                if prev_t1 > dur + tol:
+                    errors.append(f"Chunk {cid}: el timeline termina en {prev_t1:g}s, más allá de la duración del clip.")
+                for rid in set(rows) - step_rows:
+                    errors.append(f"Chunk {cid}: la fila {rid} está en ledger_rows pero ningún paso la replica.")
+            except (TypeError, ValueError, AttributeError, KeyError) as e:
+                errors.append(f"Chunk {cid}: datos malformados ({e}).")
 
         missing = [r.id for r in ledger.rows if r.id not in covered]
         if missing:
@@ -618,8 +645,12 @@ class UGCHarness:
             # Gate 6
             all_gates.append(cls.audit_deliverables(deliverables_dir, deliv_id))
 
-        # Gate 7 (regla 70/30: extensión y sentido de la referencia)
-        all_gates.append(cls.audit_reference_fidelity(json_path, prod_dir / "01_Reference"))
+        # Gate 7 (+ Gate 8 con ledger): fidelidad a la referencia
+        if cls.ledger_active(prod_dir):
+            all_gates.append(cls.audit_ledger_dialogue(json_path, prod_dir))
+            all_gates.append(cls.audit_action_coverage(json_path, prod_dir))
+        else:
+            all_gates.append(cls.audit_reference_fidelity(json_path, prod_dir / "01_Reference"))
 
         total_gates = len(all_gates)
         passed_gates = sum(1 for g in all_gates if g.passed)

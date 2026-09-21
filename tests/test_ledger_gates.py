@@ -243,3 +243,78 @@ def test_record_gates_certifies_with_or_without_gate8(tmp_path):
     p3 = tmp_path / "c"
     p3.mkdir()
     assert record_gates(p3, seven + [{"gate_id": "GATE_8", "passed": False}])["phase"] != "certificado"
+
+
+def test_gate8_malformed_data_does_not_raise(tmp_path):
+    pj, proj = _setup(tmp_path)
+    pkg = json.loads(pj.read_text(encoding="utf-8"))
+    del pkg["chunks"][0]["action_timeline"][0]["t0"]
+    pj.write_text(json.dumps(pkg), encoding="utf-8")
+    r = UGCHarness.audit_action_coverage(pj, proj)
+    assert not r.passed and any("t0" in d for d in r.details)
+
+    ch2 = _ledger_chunk()
+    ch2["action_timeline"][0]["t0"] = "0"
+    ch2["chunk_id"] = None
+    pkg = json.loads(pj.read_text(encoding="utf-8"))
+    pkg["chunks"] = [ch2, "junk", {"chunk_id": 3, "ledger_rows": "r01", "action_timeline": [None, 5]}]
+    pkg["chunks"].append({"chunk_id": 4, "ledger_rows": ["r01"], "action_timeline": [{"t0": 0, "t1": 1, "ledger_row": "r01"}],
+                          "recommended_duration_s": None})
+    pj.write_text(json.dumps(pkg), encoding="utf-8")
+    assert not UGCHarness.audit_action_coverage(pj, proj).passed
+
+
+def test_gate8_fails_when_t1_not_after_t0(tmp_path):
+    ch = _ledger_chunk()
+    ch["action_timeline"][0]["t1"] = 0
+    pj, proj = _setup(tmp_path, chunks=[ch])
+    assert not UGCHarness.audit_action_coverage(pj, proj).passed
+
+
+def test_gate8_fails_on_blank_action(tmp_path):
+    ch = _ledger_chunk()
+    ch["action_timeline"][0]["action"] = "  "
+    pj, proj = _setup(tmp_path, chunks=[ch])
+    r = UGCHarness.audit_action_coverage(pj, proj)
+    assert not r.passed and any("sin acci" in d for d in r.details)
+
+
+def test_gate7_ledger_none_dialogue_does_not_raise(tmp_path):
+    pj, proj = _setup(tmp_path)
+    pkg = json.loads(pj.read_text(encoding="utf-8"))
+    pkg["chunks"][0]["action_timeline"][0]["dialogue"] = None
+    pkg["chunks"].append("junk")
+    pj.write_text(json.dumps(pkg), encoding="utf-8")
+    r = UGCHarness.audit_ledger_dialogue(pj, proj)
+    assert not r.passed
+
+
+def _brand_project(tmp_path, with_ledger):
+    brand = tmp_path / "Brand"
+    proj = brand / "04_IN_PRODUCTION" / "PROD_001_test"
+    (proj / "02_First_Frames").mkdir(parents=True)
+    if with_ledger:
+        (tmp_path / "src").mkdir()
+        pj, src = _setup(tmp_path / "src")
+        import shutil
+        shutil.copytree(src / "01_Reference", proj / "01_Reference")
+        shutil.copy(src / "checkpoint1.json", proj / "checkpoint1.json")
+        shutil.copy(pj, proj / "02_First_Frames" / "production_package_PROD_test.json")
+    else:
+        (proj / "01_Reference").mkdir()
+    return brand
+
+
+def test_run_full_audit_uses_ledger_gates(tmp_path):
+    brand = _brand_project(tmp_path, True)
+    rep = UGCHarness.run_full_project_audit(brand, "PROD_001_test", precheck=True)
+    by = {g["gate_id"]: g for g in rep["gates"]}
+    assert "GATE_8" in by and by["GATE_8"]["passed"], by.get("GATE_8")
+    assert by["GATE_7"]["passed"] and "Ledger" in by["GATE_7"]["name"]
+
+
+def test_run_full_audit_legacy_has_no_gate8(tmp_path):
+    brand = _brand_project(tmp_path, False)
+    rep = UGCHarness.run_full_project_audit(brand, "PROD_001_test", precheck=True)
+    ids = {g["gate_id"] for g in rep["gates"]}
+    assert "GATE_7" in ids and "GATE_8" not in ids
