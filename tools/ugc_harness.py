@@ -20,6 +20,8 @@ sys.path.insert(0, str(base_dtc))
 
 from tools.schemas.production_package import ProductionPackage
 from tools.project_state import record_gates
+from tools.ledger import LEDGER_FILE, fidelity, ledger_hash, load_ledger, tokenize
+from tools.prompt_compiler import time_marker
 
 class HarnessGateResult:
     def __init__(self, gate_id: str, name: str, passed: bool, message: str, details: Optional[List[str]] = None):
@@ -41,7 +43,7 @@ class HarnessGateResult:
 class UGCHarness:
     """
     UGC Production & QA Harness.
-    Supervisa y audita automáticamente cada fase del proceso contra los 7 Quality Gates.
+    Supervisa y audita automáticamente cada fase del proceso contra los 8 Quality Gates (GATE_8 solo si hay ledger de referencia).
     """
 
     # Marcas comerciales terceras no autorizadas en el guion del video
@@ -458,6 +460,115 @@ class UGCHarness:
             details
         )
 
+    MIN_DIALOGUE_FIDELITY = 0.85
+    TIME_TOLERANCE_S = 0.05
+
+    @staticmethod
+    def ledger_active(project_dir: Path) -> bool:
+        """True si el proyecto usa ledger de referencia (archivo presente o hash registrado en checkpoint1.json)."""
+        if (Path(project_dir) / "01_Reference" / LEDGER_FILE).exists():
+            return True
+        try:
+            cp = json.loads((Path(project_dir) / "checkpoint1.json").read_text(encoding="utf-8"))
+            return bool(cp.get("ledger_hash"))
+        except Exception:
+            return False
+
+    @staticmethod
+    def audit_ledger_dialogue(json_path: Path, project_dir: Path) -> HarnessGateResult:
+        """GATE_7 con ledger: cada fila (salvo CTA) conserva >= 85% de sus palabras en los pasos que la replican."""
+        name = "Reference Fidelity (Ledger, dialogue verbatim)"
+        try:
+            ledger = load_ledger(Path(project_dir) / "01_Reference" / LEDGER_FILE)
+            chunks = json.loads(Path(json_path).read_text(encoding="utf-8")).get("chunks", [])
+        except Exception as e:
+            return HarnessGateResult("GATE_7", name, False, f"No se pudo leer el ledger o el paquete: {e}")
+        errors, details = [], []
+        for row in ledger.rows:
+            if row.is_cta or not tokenize(row.dialogue_verbatim):
+                continue
+            gen = " ".join(s.get("dialogue", "") for ch in chunks for s in ch.get("action_timeline", [])
+                           if s.get("ledger_row") == row.id)
+            score = fidelity(row.dialogue_verbatim, gen)
+            details.append(f"{row.id}: {score:.2f} de las palabras conservadas (mínimo {UGCHarness.MIN_DIALOGUE_FIDELITY:.2f})")
+            if score < UGCHarness.MIN_DIALOGUE_FIDELITY:
+                errors.append(f"Error: {row.id} se aleja del diálogo literal de la referencia.")
+        passed = not errors
+        return HarnessGateResult(
+            "GATE_7", name, passed,
+            "Diálogo fiel a la referencia" if passed else "El diálogo se aleja de la referencia",
+            details + errors)
+
+    @staticmethod
+    def audit_action_coverage(json_path: Path, project_dir: Path) -> HarnessGateResult:
+        """GATE_8: cada fila del ledger está cubierta, en orden, con timeline contiguo y reflejada en el prompt."""
+        name = "Action Coverage (Ledger)"
+        project_dir = Path(project_dir)
+        ledger_path = project_dir / "01_Reference" / LEDGER_FILE
+        try:
+            ledger = load_ledger(ledger_path)
+            pkg = json.loads(Path(json_path).read_text(encoding="utf-8"))
+            cp = json.loads((project_dir / "checkpoint1.json").read_text(encoding="utf-8"))
+        except Exception as e:
+            return HarnessGateResult("GATE_8", name, False, f"No se pudo leer ledger, paquete o checkpoint1.json: {e}")
+
+        tol = UGCHarness.TIME_TOLERANCE_S
+        errors = []
+        confirmed = cp.get("ledger_hash")
+        if not confirmed:
+            errors.append("El ledger no está confirmado en Checkpoint 1 (falta ledger_hash; usa --ledger-confirmed).")
+        elif confirmed != ledger_hash(ledger_path):
+            errors.append("El ledger cambió después de confirmarlo en Checkpoint 1; vuelve a confirmarlo.")
+
+        order = {r.id: n for n, r in enumerate(ledger.rows)}
+        covered, last_order = set(), -1
+        for ch in pkg.get("chunks", []):
+            cid = ch.get("chunk_id")
+            rows, steps = ch.get("ledger_rows", []), ch.get("action_timeline", [])
+            if not rows or not steps:
+                errors.append(f"Chunk {cid}: falta ledger_rows o action_timeline.")
+                continue
+            for rid in rows:
+                if rid not in order:
+                    errors.append(f"Chunk {cid}: ledger_rows contiene '{rid}', que no existe en el ledger.")
+            prompt = ch.get("video_motion_prompt_i2v", "")
+            prev_t1, step_rows = 0.0, set()
+            for s in steps:
+                t0, t1, rid = s.get("t0", 0), s.get("t1", 0), s.get("ledger_row")
+                if t1 <= t0:
+                    errors.append(f"Chunk {cid}: paso {rid} con t1 <= t0.")
+                if abs(t0 - prev_t1) > tol:
+                    errors.append(f"Chunk {cid}: hueco o solape en el timeline ({prev_t1:g}s -> {t0:g}s).")
+                prev_t1 = t1
+                if rid not in rows or rid not in order:
+                    errors.append(f"Chunk {cid}: el paso '{rid}' no está en los ledger_rows del chunk/ledger.")
+                    continue
+                step_rows.add(rid)
+                covered.add(rid)
+                if order[rid] < last_order:
+                    errors.append(f"Chunk {cid}: pasos fuera de orden respecto al ledger ({rid}).")
+                last_order = max(last_order, order[rid])
+                if not str(s.get("action", "")).strip():
+                    errors.append(f"Chunk {cid}: paso {rid} sin acción.")
+                if time_marker(t0, t1) not in prompt:
+                    errors.append(f"Chunk {cid}: el prompt no contiene el marcador {time_marker(t0, t1)} (recompila con tools/prompt_compiler.py).")
+                if s.get("dialogue") and s["dialogue"] not in prompt:
+                    errors.append(f"Chunk {cid}: el prompt no contiene el diálogo del paso {rid}.")
+            if prev_t1 > ch.get("recommended_duration_s", 0) + tol:
+                errors.append(f"Chunk {cid}: el timeline termina en {prev_t1:g}s, más allá de la duración del clip.")
+            for rid in set(rows) - step_rows:
+                errors.append(f"Chunk {cid}: la fila {rid} está en ledger_rows pero ningún paso la replica.")
+
+        missing = [r.id for r in ledger.rows if r.id not in covered]
+        if missing:
+            errors.append(f"Filas del ledger sin cubrir: {missing}")
+        passed = not errors
+        details = errors or [f"Las {len(ledger.rows)} filas del ledger están cubiertas, en orden y con timeline contiguo."]
+        return HarnessGateResult(
+            "GATE_8", name, passed,
+            "Todas las acciones de la referencia están cubiertas" if passed else "Acciones de la referencia sin cubrir o timeline inválido",
+            details)
+
     @classmethod
     def run_full_project_audit(cls, base_brand_dir: Path, prod_folder_name: str, deliverable_name: Optional[str] = None, precheck: bool = False) -> Dict[str, Any]:
         prod_dir = base_brand_dir / "04_IN_PRODUCTION" / prod_folder_name
@@ -555,7 +666,7 @@ if __name__ == "__main__":
     parser.add_argument("--project", help="Name of project folder in 04_IN_PRODUCTION (e.g. PROD_001_cuenta_1)")
     parser.add_argument("--brand", default=None, help="Brand directory name (optional, auto-detected if omitted)")
     parser.add_argument("--precheck", action="store_true",
-                        help="Corre solo los gates 1-4 y 7 (sin clips ni entregables) antes de gastar en generación de video")
+                        help="Corre solo los gates 1-4, 7 y 8 (sin clips ni entregables) antes de gastar en generación de video")
     parser.add_argument("--deliverable", help="Deliverable folder name (optional, auto-detected if omitted)")
     args = parser.parse_args()
 

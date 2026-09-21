@@ -37,7 +37,8 @@ def record_gates(project_dir: Path, gates: list, precheck: bool = False) -> dict
     state = load_state(project_dir)
     merged = {**state.get("gates", {}), **results}
     updates = {"gates": merged}
-    if not precheck and len(merged) == 7 and all(merged.values()):
+    required = {f"GATE_{i}" for i in range(1, 8)}
+    if not precheck and required <= set(merged) and all(merged.values()):
         updates["phase"] = "certificado"
     return save_state(project_dir, **updates)
 
