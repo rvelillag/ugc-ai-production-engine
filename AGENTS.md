@@ -38,7 +38,7 @@ The system operates across 4 core skills and automated tools in `tools/`:
    - Cover Headline: Maximum 7 words curiosity hook.
 
 4. **Quality Assurance & Verification (`tools/ugc_harness.py`):**
-   - MUST run `python tools/ugc_harness.py --project [PROJECT_NAME] [--deliverable [DELIVERABLE]]` and achieve 6/6 PASS before certifying delivery.
+   - MUST run `python tools/ugc_harness.py --project [PROJECT_NAME] [--deliverable [DELIVERABLE]]` and achieve 7/7 PASS before certifying delivery.
 
 ## Tool Execution Commands
 - Cadence & Beat Extractor: `python tools/scene_keyframe_extractor.py --video "[PATH]"`

@@ -79,26 +79,27 @@ When executing or assisting in a production run, follow these 4 canonical phases
    - `[ID]_Subtitles.srt`
    - `[ID]_Cover.jpg`
    - `post_copy_title_and_caption.txt`
-5. Run `python tools/ugc_harness.py --project [PROJECT] --deliverable [ID]` to certify 6/6 PASS.
+5. Run `python tools/ugc_harness.py --project [PROJECT] --deliverable [ID]` to certify 7/7 PASS.
 
 ---
 
-## The 6 QA Harness Quality Gates
+## The 7 QA Harness Quality Gates
 
-Before approving any project or deliverable, verify that `tools/ugc_harness.py` passes all 6 gates:
+Before approving any project or deliverable, verify that `tools/ugc_harness.py` passes all 7 gates:
 - **GATE_1 (Schema & Anatomy):** JSON validates against Pydantic schema; Cover Headline <= 7 words.
 - **GATE_2 (Timing & Cadence):** All chunks have WPS <= 2.4 based on allocated durations.
 - **GATE_3 (Anti-Filter Safety):** Zero banned words ('age', 'DM', medical claims) in video scripts or prompts.
 - **GATE_4 (Brand Decoupling):** Video dialogue discusses generic problem/solution; brand conversion is 100% via ManyChat DM automation.
 - **GATE_5 (Raw Clips Integrity):** All `1.mp4` to `N.mp4` exist, are 9:16 vertical, valid bitrate and audio streams.
 - **GATE_6 (Canonical Deliverables):** Exactly 4 files in `05_PROCESSED_DELIVERABLES/[ID]/`.
+- **GATE_7 (Reference Fidelity 70/30):** Generated script keeps the reference's length (word count within ±10%) and core meaning (>= 50% of the reference's content words preserved). Lexical overlap is a heuristic; meaning still needs human review.
 
 ---
 
 ## Critical Constraints & Prohibitions
 
 1. **NO Skipping Checkpoint 1:** Always confirm Scene/Environment, Outfit, Keyword, and Cover Headline with user before generating prompts.
-2. **70/30 Script Rule:** Always keep 70% core message and 1:1 viral hook while adapting tone to avatar identity.
+2. **70/30 Script Rule:** Always keep 70% core message and 1:1 viral hook while adapting tone to avatar identity. The script must also keep the reference's length (word count within ±10%) and meaning; enforced by GATE_7. Since references often run ~3 WPS, reach the same word count with more/longer clips (<= 10s each) rather than cutting words.
 3. **Dynamic Prompt Grouping (<= 10s rule):** Never exceed 10s per AI video clip; group same-angle actions with explicit timeline markers.
 4. **NO Censored Trigger Words:** Never use 'age' or 'DM' in video scripts.
 5. **NO Unreferenced File Clutter:** Keep project directories clean according to the canonical folder structure.

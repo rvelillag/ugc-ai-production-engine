@@ -29,7 +29,7 @@ class FrameCompositionAudit(BaseModel):
 class ChunkItem(BaseModel):
     chunk_id: int
     beat_name: str
-    recommended_duration_s: int
+    recommended_duration_s: int = Field(..., ge=1, le=10, description="Duración del clip IA en segundos (máx 10s: límite Veo3/Kling)")
     word_count: int
     voiceover_clean_tts: str
     visual_direction: str

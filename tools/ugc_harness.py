@@ -15,7 +15,7 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-base_dtc = Path(r"c:\Users\Asus\Downloads\DTC")
+base_dtc = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(base_dtc))
 
 from tools.schemas.production_package import ProductionPackage
@@ -40,7 +40,7 @@ class HarnessGateResult:
 class UGCHarness:
     """
     UGC Production & QA Harness.
-    Supervisa y audita automáticamente cada fase del proceso contra los 6 Quality Gates.
+    Supervisa y audita automáticamente cada fase del proceso contra los 7 Quality Gates.
     """
 
     # Marcas comerciales terceras no autorizadas en el guion del video
@@ -48,6 +48,8 @@ class UGCHarness:
         "rhode", "laneige", "elf", "e.l.f.", "nyx", "l'oreal", "loreal",
         "maybelline", "fenty", "sephora", "ulta", "dior", "chanel", "cerave", "the ordinary"
     ]
+
+    MAX_CLIP_DURATION_S = 10
 
     # Términos sensibles que activan filtros de moderación/spam
     PROHIBITED_TERMS = [
@@ -118,6 +120,14 @@ class UGCHarness:
             w_count = len(words)
             wps = round(w_count / dur_s, 2) if dur_s > 0 else 0.0
 
+            if dur_s > UGCHarness.MAX_CLIP_DURATION_S:
+                gate2_passed = False
+                gate2_details.append(f"Chunk {cid}: duración {dur_s}s excede el máximo de {UGCHarness.MAX_CLIP_DURATION_S}s por clip IA (Veo3/Kling).")
+            declared_wc = ch.get("word_count")
+            if declared_wc is not None and declared_wc != w_count:
+                gate2_passed = False
+                gate2_details.append(f"Chunk {cid}: word_count declarado ({declared_wc}) no coincide con el texto real ({w_count}).")
+
             # Max allowed words per chunk based on duration:
             max_words = int(dur_s * 2.4)
             if w_count > max_words:
@@ -144,6 +154,7 @@ class UGCHarness:
         for ch in chunks:
             all_texts_to_scan.append((f"Chunk {ch.get('chunk_id')} Voiceover", ch.get("voiceover_clean_tts", "")))
             all_texts_to_scan.append((f"Chunk {ch.get('chunk_id')} Video Prompt", ch.get("video_motion_prompt_i2v", "")))
+            all_texts_to_scan.append((f"Chunk {ch.get('chunk_id')} Image Prompt", ch.get("midjourney_prompt_9_16", "")))
 
         for source_name, txt in all_texts_to_scan:
             for pattern in UGCHarness.PROHIBITED_TERMS:
@@ -167,9 +178,18 @@ class UGCHarness:
         gate4_passed = True
         gate4_details = []
 
+        keyword = (raw_data.get("post_copy", {}).get("manychat_keyword") or "").strip()
+        if not keyword:
+            gate4_passed = False
+            gate4_details.append("Falta 'manychat_keyword' en post_copy: la conversión de marca depende 100% de ManyChat.")
+
+        own_brand = (raw_data.get("brand") or "").strip().lower()
         for ch in chunks:
             cid = ch.get("chunk_id")
             vo = ch.get("voiceover_clean_tts", "").lower()
+            if own_brand and re.search(r'\b' + re.escape(own_brand) + r'\b', vo):
+                gate4_passed = False
+                gate4_details.append(f"Chunk {cid}: la marca propia '{own_brand}' aparece en el diálogo (debe convertirse solo vía ManyChat).")
             for brand in UGCHarness.THIRD_PARTY_BRANDS:
                 if re.search(r'\b' + re.escape(brand) + r'\b', vo):
                     gate4_passed = False
@@ -185,6 +205,47 @@ class UGCHarness:
         ))
 
         return results
+
+    MIN_CLIP_BITRATE = 500_000
+
+    @staticmethod
+    def _probe_clip(ffprobe_bin: str, clip: Path) -> List[str]:
+        """Devuelve la lista de problemas del clip (vacía si es válido)."""
+        cmd = [ffprobe_bin, "-v", "error", "-show_entries",
+               "stream=codec_type,width,height:format=duration,bit_rate", "-of", "json", str(clip)]
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            info = json.loads(res.stdout)
+        except Exception as e:
+            return [f"no se pudo analizar con ffprobe ({e})"]
+
+        problems = []
+        streams = info.get("streams", [])
+        video = next((s for s in streams if s.get("codec_type") == "video"), None)
+        audio = next((s for s in streams if s.get("codec_type") == "audio"), None)
+        fmt = info.get("format", {})
+
+        if not video:
+            problems.append("sin stream de video")
+        else:
+            w, h = int(video.get("width", 0)), int(video.get("height", 0))
+            if h <= w:
+                problems.append(f"no es vertical 9:16 ({w}x{h})")
+            elif abs((w / h) - (9 / 16)) > 0.02:
+                problems.append(f"relación de aspecto {w}x{h} se desvía de 9:16")
+        if not audio:
+            problems.append("sin stream de audio")
+        try:
+            if float(fmt.get("duration", 0)) <= 0:
+                problems.append("duración inválida")
+        except (TypeError, ValueError):
+            problems.append("duración ilegible")
+        try:
+            if int(fmt.get("bit_rate", 0)) < UGCHarness.MIN_CLIP_BITRATE:
+                problems.append(f"bitrate demasiado bajo ({fmt.get('bit_rate', 0)} bps < {UGCHarness.MIN_CLIP_BITRATE})")
+        except (TypeError, ValueError):
+            problems.append("bitrate ilegible")
+        return problems
 
     @staticmethod
     def audit_raw_clips(raw_dir: Path, expected_count: int = 6) -> HarnessGateResult:
@@ -210,17 +271,12 @@ class UGCHarness:
                 continue
             
             found_clips += 1
-            # Probe clip duration and resolution
-            try:
-                cmd = [ffprobe_bin, "-v", "error", "-show_entries", "stream=width,height,duration", "-of", "json", str(clip)]
-                res = subprocess.run(cmd, capture_output=True, text=True)
-                info = json.loads(res.stdout)
-                streams = info.get("streams", [{}])
-                w = streams[0].get("width", 0) if streams else 0
-                h = streams[0].get("height", 0) if streams else 0
-                details.append(f"Clip {i}.mp4: {w}x{h} ({clip.stat().st_size} bytes)")
-            except Exception:
-                details.append(f"Clip {i}.mp4: presente ({clip.stat().st_size} bytes)")
+            problems = UGCHarness._probe_clip(ffprobe_bin, clip)
+            if problems:
+                passed = False
+                details.extend(f"Clip {i}.mp4: {p}" for p in problems)
+            else:
+                details.append(f"Clip {i}.mp4: válido ({clip.stat().st_size} bytes)")
 
         if found_clips < expected_count:
             passed = False
@@ -242,46 +298,40 @@ class UGCHarness:
         files = list(deliverables_dir.glob("*"))
         file_names = [f.name for f in files if f.is_file()]
 
-        # Check .mp4
-        has_mp4 = any(f.endswith(".mp4") and (project_id in f or "Final" in f) for f in file_names)
-        if not has_mp4:
-            passed = False
-            details.append(f"Falta video final .mp4 con formato {project_id}_Final_1080x1920.mp4")
-        else:
-            details.append("Video final .mp4 presente y válido.")
-
-        # Check .srt
-        has_srt = any(f.endswith(".srt") for f in file_names)
-        if not has_srt:
-            passed = False
-            details.append("Falta archivo de subtítulos sincronizados .srt")
-        else:
-            details.append("Archivo de subtítulos .srt presente.")
-
-        # Check Cover.jpg
-        has_cover = any("Cover.jpg" in f or "Cover.jpeg" in f for f in file_names)
-        if not has_cover:
-            passed = False
-            details.append("Falta imagen de portada Cover.jpg")
-        else:
-            details.append("Imagen de portada Cover.jpg presente.")
-
-        # Check post_copy_title_and_caption.txt
-        has_copy = "post_copy_title_and_caption.txt" in file_names
-        if not has_copy:
-            passed = False
-            details.append("Falta archivo post_copy_title_and_caption.txt")
-        else:
-            # Check if cover headline is in the copy file
-            copy_txt = (deliverables_dir / "post_copy_title_and_caption.txt").read_text(encoding="utf-8")
-            if "HEADLINE DE PORTADA" in copy_txt:
-                details.append("post_copy_title_and_caption.txt verificado (contiene Headline de Portada).")
+        expected = {
+            "video": lambda f: f.endswith("_Final_1080x1920.mp4"),
+            "subtitles": lambda f: f.endswith("_Subtitles.srt"),
+            "cover": lambda f: f.endswith("_Cover.jpg"),
+            "copy": lambda f: f == "post_copy_title_and_caption.txt",
+        }
+        labels = {
+            "video": f"[ID]_Final_1080x1920.mp4",
+            "subtitles": "[ID]_Subtitles.srt",
+            "cover": "[ID]_Cover.jpg",
+            "copy": "post_copy_title_and_caption.txt",
+        }
+        matched = set()
+        for key, check in expected.items():
+            hits = [f for f in file_names if check(f)]
+            if len(hits) == 1:
+                matched.add(hits[0])
+                details.append(f"{labels[key]} presente ({hits[0]}).")
+            elif not hits:
+                passed = False
+                details.append(f"Falta {labels[key]}")
             else:
-                details.append("post_copy_title_and_caption.txt presente.")
+                passed = False
+                details.append(f"Múltiples archivos para {labels[key]}: {hits}")
 
-        if len(file_names) > 5:
+        extras = [f for f in file_names if f not in matched]
+        if extras:
             passed = False
-            details.append(f"Advertencia de gobernanza: existen archivos extra no canónicos ({len(file_names)} archivos encontrados).")
+            details.append(f"Archivos no canónicos (deben ser exactamente 4): {extras}")
+
+        copy_file = deliverables_dir / "post_copy_title_and_caption.txt"
+        if copy_file.exists() and "HEADLINE DE PORTADA" not in copy_file.read_text(encoding="utf-8"):
+            passed = False
+            details.append("post_copy_title_and_caption.txt no contiene 'HEADLINE DE PORTADA'.")
 
         return HarnessGateResult(
             "GATE_6", "Canonical Deliverables Governance", passed,
@@ -289,10 +339,79 @@ class UGCHarness:
             details
         )
 
+    LENGTH_TOLERANCE = 0.10
+    MIN_CONTENT_OVERLAP = 0.50
+    STOPWORDS = set(
+        "a an the and or but of to in on at for with your you i my me it its is are was be this that "
+        "these those just so then than as if by from into up out not no do does did have has had will "
+        "would can could very really".split()
+    )
+
+    @staticmethod
+    def _words(text: str) -> List[str]:
+        return re.findall(r"[a-záéíóúñü']+", text.lower())
+
+    @staticmethod
+    def _extract_reference_text(reference_dir: Path) -> Optional[str]:
+        files = sorted(reference_dir.glob("script_beats_*.txt")) if reference_dir.exists() else []
+        if not files:
+            return None
+        raw = files[0].read_text(encoding="utf-8", errors="replace")
+        m = re.search(r"TRANSCRIPCI[^\n]*\n=+\n(.*?)\n=+\n", raw, re.S)
+        if m:
+            return m.group(1)
+        quoted = re.findall(r'Voiceover Original:\s*"([^"]*)"', raw)
+        return " ".join(quoted) if quoted else None
+
+    @staticmethod
+    def audit_reference_fidelity(json_path: Path, reference_dir: Path) -> HarnessGateResult:
+        """Regla 70/30: el guion nuevo conserva la extensión y el núcleo semántico de la referencia."""
+        name = "Reference Fidelity (70/30)"
+        ref_text = UGCHarness._extract_reference_text(reference_dir)
+        if not ref_text:
+            return HarnessGateResult("GATE_7", name, False,
+                                     "No se pudo leer el guion de referencia (script_beats_*.txt) en 01_Reference/")
+        try:
+            data = json.loads(Path(json_path).read_text(encoding="utf-8"))
+            gen_text = " ".join(c.get("voiceover_clean_tts", "") for c in data.get("chunks", []))
+        except Exception as e:
+            return HarnessGateResult("GATE_7", name, False, f"No se pudo leer el paquete JSON: {e}")
+
+        ref_words, gen_words = UGCHarness._words(ref_text), UGCHarness._words(gen_text)
+        if not ref_words or not gen_words:
+            return HarnessGateResult("GATE_7", name, False, "Guion de referencia o generado vacío")
+
+        passed, details = True, []
+        ratio = len(gen_words) / len(ref_words)
+        lo, hi = 1 - UGCHarness.LENGTH_TOLERANCE, 1 + UGCHarness.LENGTH_TOLERANCE
+        details.append(f"Extensión: {len(gen_words)} palabras vs {len(ref_words)} de la referencia (ratio {ratio:.2f}, rango {lo:.2f}-{hi:.2f})")
+        if not lo <= ratio <= hi:
+            passed = False
+            details.append("Error: la extensión del guion se desvía de la referencia.")
+
+        def content(ws):
+            return {w for w in ws if w not in UGCHarness.STOPWORDS and len(w) > 2}
+        ref_c, gen_c = content(ref_words), content(gen_words)
+        overlap = len(ref_c & gen_c) / len(ref_c) if ref_c else 0.0
+        details.append(f"Núcleo semántico: {overlap:.2f} de las palabras de contenido de la referencia se conservan (mínimo {UGCHarness.MIN_CONTENT_OVERLAP:.2f})")
+        if overlap < UGCHarness.MIN_CONTENT_OVERLAP:
+            passed = False
+            details.append("Error: el guion se aleja demasiado del contenido de la referencia.")
+        details.append("Nota: el solapamiento léxico es una heurística; la equivalencia de sentido requiere revisión humana.")
+
+        return HarnessGateResult(
+            "GATE_7", name, passed,
+            "Extensión y núcleo de la referencia conservados" if passed else "El guion no respeta la extensión/sentido de la referencia",
+            details
+        )
+
     @classmethod
     def run_full_project_audit(cls, base_brand_dir: Path, prod_folder_name: str, deliverable_name: Optional[str] = None) -> Dict[str, Any]:
         prod_dir = base_brand_dir / "04_IN_PRODUCTION" / prod_folder_name
-        json_path = prod_dir / "02_First_Frames" / f"production_package_{prod_folder_name.split('_')[0]}_{prod_folder_name.split('_')[1]}.json"
+        name_parts = prod_folder_name.split("_")
+        if len(name_parts) < 2 or not name_parts[1]:
+            raise ValueError(f"Nombre de proyecto inválido '{prod_folder_name}': se espera PROD_[XXX]_[referencia]")
+        json_path = prod_dir / "02_First_Frames" / f"production_package_{name_parts[0]}_{name_parts[1]}.json"
         
         # Fallback search for json
         if not json_path.exists():
@@ -302,7 +421,7 @@ class UGCHarness:
 
         raw_clips_dir = prod_dir / "03_Raw_Clips"
         
-        deliv_id = deliverable_name or prod_folder_name.split("_")[1]
+        deliv_id = deliverable_name or name_parts[1]
         deliverables_dir = base_brand_dir / "05_PROCESSED_DELIVERABLES" / deliv_id
 
         expected_chunks = 6
@@ -323,6 +442,9 @@ class UGCHarness:
         
         # Gate 6
         all_gates.append(cls.audit_deliverables(deliverables_dir, deliv_id))
+
+        # Gate 7 (regla 70/30: extensión y sentido de la referencia)
+        all_gates.append(cls.audit_reference_fidelity(json_path, prod_dir / "01_Reference"))
 
         total_gates = len(all_gates)
         passed_gates = sum(1 for g in all_gates if g.passed)

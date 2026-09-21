@@ -99,7 +99,7 @@ def option_assemble_project(base_dir: Path):
 def option_audit_qa(base_dir: Path):
     clear_screen()
     print("========================================================")
-    print("        AUDITORIA DE CALIDAD QA HARNESS (6 GATES)")
+    print("        AUDITORIA DE CALIDAD QA HARNESS (7 GATES)")
     print("========================================================\n")
     creators = list_creators(base_dir)
     all_prods = []
@@ -171,7 +171,7 @@ def main():
         print("========================================================")
         print(" [1] Crear un nuevo Avatar / Creador")
         print(" [2] Ensamblar Video (Smart Silence Trimming + Subtitulado)")
-        print(" [3] Auditar Proyecto con QA Harness (6 Gates)")
+        print(" [3] Auditar Proyecto con QA Harness (7 Gates)")
         print(" [4] Ver estado de Creadores y Proyectos")
         print(" [5] Abrir carpeta de Plantilla Maestra (_CREATOR_TEMPLATE)")
         print(" [6] Abrir carpeta de un Creador / Avatar")
