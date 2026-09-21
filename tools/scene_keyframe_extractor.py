@@ -8,6 +8,24 @@ from faster_whisper import WhisperModel
 
 sys.stdout.reconfigure(encoding="utf-8")
 
+MAX_KEYFRAMES = 10
+
+def beat_label(idx: int, total: int) -> str:
+    """Canonical beat name for keyframe idx (0-based). Middle 'action' slots should be renamed to the real verb."""
+    if idx == 0:
+        return "beat1_hook"
+    if total > 1 and idx == total - 1:
+        return "beat5_cta"
+    if idx == 1:
+        return "beat2_reframe"
+    middle = total - 3
+    pos = idx - 2
+    if middle == 1:
+        return "beat3_action"
+    if pos < middle - 1:
+        return f"beat3_{pos + 1}_action"
+    return "beat4_action"
+
 def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None):
     if output_dir is None:
         output_dir = video_path.parent
@@ -74,13 +92,18 @@ def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None):
             round(total_duration * 0.88, 2)
         ]
     
+    if len(cut_timestamps) > MAX_KEYFRAMES:
+        step = (len(cut_timestamps) - 1) / (MAX_KEYFRAMES - 1)
+        cut_timestamps = [cut_timestamps[round(i * step)] for i in range(MAX_KEYFRAMES)]
+        print(f"Capped to {MAX_KEYFRAMES} keyframes (governance limit).")
+
     print(f"Detected {len(cut_timestamps)} visual takes at timestamps: {cut_timestamps}")
-    
+
     # 4. Extract Keyframes
     extracted_frames = []
     for idx, ts in enumerate(cut_timestamps):
         frame_time = min(ts + 0.4, total_duration - 0.2)
-        frame_filename = f"0{idx+1}_take{idx+1}_{frame_time:.1f}s.jpg" if idx < 9 else f"{idx+1}_take{idx+1}_{frame_time:.1f}s.jpg"
+        frame_filename = f"{idx+1:02d}_{beat_label(idx, len(cut_timestamps))}.jpg"
         out_frame_path = output_dir / frame_filename
         
         ff_extract = [

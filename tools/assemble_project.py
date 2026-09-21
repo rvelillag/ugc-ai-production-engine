@@ -34,7 +34,10 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
 
     brand_dir = project_path.parent.parent
     prod_name = project_path.name
-    deliv_id = prod_name.split("_")[1]
+    name_parts = prod_name.split("_")
+    if len(name_parts) < 2 or not name_parts[1]:
+        raise ValueError(f"Nombre de proyecto inválido '{prod_name}': se espera PROD_[XXX]_[referencia]")
+    deliv_id = name_parts[1]
 
     raw_clips_dir = project_path / "03_Raw_Clips"
     montage_dir = project_path / "05_Montage"
@@ -47,11 +50,8 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
     trimmed_dir = job_dir / "trimmed_clips"
     trimmed_dir.mkdir(parents=True, exist_ok=True)
 
-    avatar_first_name = brand_dir.name.split(" - ")[0].split()[0] if " - " in brand_dir.name else "Deliverable"
-    deliv_brand_folder = brand_dir / "05_PROCESSED_DELIVERABLES" / f"{avatar_first_name}{deliv_id}"
-    deliv_numeric_folder = brand_dir / "05_PROCESSED_DELIVERABLES" / deliv_id
-    deliv_brand_folder.mkdir(parents=True, exist_ok=True)
-    deliv_numeric_folder.mkdir(parents=True, exist_ok=True)
+    deliv_dir = brand_dir / "05_PROCESSED_DELIVERABLES" / deliv_id
+    deliv_dir.mkdir(parents=True, exist_ok=True)
 
     # 1. Detect Raw Clips
     raw_clips = sorted(list(raw_clips_dir.glob("*.mp4")), key=lambda x: int(x.stem) if x.stem.isdigit() else 999)
@@ -206,20 +206,12 @@ Caption:
         shutil.copy(output_srt, montage_dir / f"{prod_name.split('_')[0]}_{deliv_id}_Subtitles.srt")
     shutil.copy(cover_badge_path, montage_dir / "Cover.jpg")
 
-    # Brand Deliv
-    shutil.copy(output_burned_video, deliv_brand_folder / f"{avatar_first_name}{deliv_id}_Final_1080x1920.mp4")
+    # Canonical deliverables (exactly 4 files)
+    shutil.copy(output_burned_video, deliv_dir / f"{deliv_id}_Final_1080x1920.mp4")
     if output_srt and output_srt.exists():
-        shutil.copy(output_srt, deliv_brand_folder / f"{avatar_first_name}{deliv_id}_Subtitles.srt")
-    shutil.copy(cover_badge_path, deliv_brand_folder / f"{avatar_first_name}{deliv_id}_Cover.jpg")
-    with open(deliv_brand_folder / "post_copy_title_and_caption.txt", "w", encoding="utf-8") as f:
-        f.write(copy_content)
-
-    # Numeric Deliv
-    shutil.copy(output_burned_video, deliv_numeric_folder / f"{deliv_id}_Final_1080x1920.mp4")
-    if output_srt and output_srt.exists():
-        shutil.copy(output_srt, deliv_numeric_folder / f"{deliv_id}_Subtitles.srt")
-    shutil.copy(cover_badge_path, deliv_numeric_folder / f"{deliv_id}_Cover.jpg")
-    with open(deliv_numeric_folder / "post_copy_title_and_caption.txt", "w", encoding="utf-8") as f:
+        shutil.copy(output_srt, deliv_dir / f"{deliv_id}_Subtitles.srt")
+    shutil.copy(cover_badge_path, deliv_dir / f"{deliv_id}_Cover.jpg")
+    with open(deliv_dir / "post_copy_title_and_caption.txt", "w", encoding="utf-8") as f:
         f.write(copy_content)
 
     print(f"\n[SUCCESS] Project {prod_name} assembled with Smart Silence Trimming!")
@@ -227,7 +219,7 @@ Caption:
         "burned_video": str(output_burned_video),
         "srt": str(output_srt),
         "cover": str(cover_badge_path),
-        "deliverables_dir": str(deliv_brand_folder)
+        "deliverables_dir": str(deliv_dir)
     }
 
 if __name__ == "__main__":
