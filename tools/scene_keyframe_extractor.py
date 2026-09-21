@@ -8,6 +8,9 @@ from faster_whisper import WhisperModel
 
 sys.stdout.reconfigure(encoding="utf-8")
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from tools.ledger import LEDGER_FILE, anchor_times
+
 MAX_KEYFRAMES = 10
 
 def beat_label(idx: int, total: int) -> str:
@@ -26,7 +29,7 @@ def beat_label(idx: int, total: int) -> str:
         return f"beat3_{pos + 1}_action"
     return "beat4_action"
 
-def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None):
+def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_size: str = "medium", language: str = None):
     if output_dir is None:
         output_dir = video_path.parent
     
@@ -39,8 +42,8 @@ def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None):
     
     # 2. Transcribe with Whisper
     print("Running Whisper transcription with word timestamps...")
-    model = WhisperModel("base", device="cpu", compute_type="int8")
-    segments, info = model.transcribe(str(video_path), word_timestamps=True)
+    model = WhisperModel(model_size, device="cpu", compute_type="int8")
+    segments, info = model.transcribe(str(video_path), word_timestamps=True, language=language)
     
     whisper_segments = []
     all_words = []
@@ -81,16 +84,20 @@ def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None):
                 if ts - cut_timestamps[-1] >= 1.2 and ts < total_duration - 0.8:
                     cut_timestamps.append(round(ts, 2))
     
-    # If scene detection found fewer than 4 cuts, generate balanced beat anchors
+    # Few genuine cuts (typical single-take UGC): prefer the ledger's action boundaries over arbitrary percentages
     if len(cut_timestamps) < 4:
-        cut_timestamps = [
-            0.0,
-            round(total_duration * 0.18, 2),
-            round(total_duration * 0.36, 2),
-            round(total_duration * 0.54, 2),
-            round(total_duration * 0.72, 2),
-            round(total_duration * 0.88, 2)
-        ]
+        anchors = anchor_times(output_dir / LEDGER_FILE)
+        if len(anchors) >= 4:
+            cut_timestamps = anchors
+        else:
+            cut_timestamps = [
+                0.0,
+                round(total_duration * 0.18, 2),
+                round(total_duration * 0.36, 2),
+                round(total_duration * 0.54, 2),
+                round(total_duration * 0.72, 2),
+                round(total_duration * 0.88, 2)
+            ]
     
     if len(cut_timestamps) > MAX_KEYFRAMES:
         step = (len(cut_timestamps) - 1) / (MAX_KEYFRAMES - 1)
@@ -154,7 +161,7 @@ DESGLOSE FORENSE POR TOMAS Y ACCIONES VISUALES (1:1):
 * Timestamp: {start_t:.2f}s - {end_t:.2f}s ({round(end_t - start_t, 1)}s)
 * Voiceover Segment: "{spoken_text}"
 * Keyframe Extraído: {frame_info["filename"]}
-* Acción y Encuadre: Plano correspondiente al corte visual detectado en {start_t:.2f}s.
+* Acción y Encuadre: (no se infiere del corte; se documenta en {LEDGER_FILE})
 """
 
     script_beats_file = output_dir / f"script_beats_{video_path.stem}.txt"
@@ -177,8 +184,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--video", required=True, help="Path to reference video")
     parser.add_argument("--output", required=False, help="Output directory")
+    parser.add_argument("--model", default="medium", help="Modelo faster-whisper (base/small/medium)")
+    parser.add_argument("--language", default=None, help="Idioma del audio (en/es); auto si se omite")
     args = parser.parse_args()
     
     video = Path(args.video)
     out = Path(args.output) if args.output else video.parent
-    extract_scenes_and_cadence(video, out)
+    extract_scenes_and_cadence(video, out, model_size=args.model, language=args.language)
