@@ -7,6 +7,9 @@ from pathlib import Path
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from tools.project_state import save_state
+
 CHECKPOINT_FILE = "checkpoint1.json"
 SCENE_MODES = ("replicate_1to1", "adapt_to_brand")
 REQUIRED_FIELDS = ("scene_mode", "outfit", "manychat_keyword", "cover_headline")
@@ -39,6 +42,7 @@ def write_checkpoint(project_dir: Path, scene_mode: str, outfit: str, keyword: s
     }
     out = project_dir / CHECKPOINT_FILE
     out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    save_state(project_dir, phase="checkpoint1")
     return out
 
 

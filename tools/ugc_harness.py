@@ -19,6 +19,7 @@ base_dtc = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(base_dtc))
 
 from tools.schemas.production_package import ProductionPackage
+from tools.project_state import record_gates
 
 class HarnessGateResult:
     def __init__(self, gate_id: str, name: str, passed: bool, message: str, details: Optional[List[str]] = None):
@@ -53,7 +54,15 @@ class UGCHarness:
 
     # Términos sensibles que activan filtros de moderación/spam
     PROHIBITED_TERMS = [
-        r"\bage\b", r"\bedad\b", r"\bdm\b", r"\bdms\b", r"\bdirect message\b", r"\bmensaje directo\b"
+        r"\bages?\b", r"\bedad(?:es)?\b",
+        r"(?<![\w'’])d[\s.\-_]?ms?\b",  # DM, DMs, D.M, D M, d-m
+        r"\bdirect messages?\b", r"\bmensajes? directos?\b",
+    ]
+
+    # Afirmaciones médicas que disparan moderación (lista conservadora; ampliar según plataforma)
+    MEDICAL_CLAIM_TERMS = [
+        r"\bcures?\b", r"\bcura(?:r|n|s)?\b", r"\bdiagnos\w*", r"\bdiagnóstic\w*",
+        r"\bprescri\w*", r"\breceta médica\b", r"\bclinically proven\b", r"\bcl[ií]nicamente\b",
     ]
 
     @staticmethod
@@ -158,13 +167,18 @@ class UGCHarness:
 
         for source_name, txt in all_texts_to_scan:
             for pattern in UGCHarness.PROHIBITED_TERMS:
-                matches = re.findall(pattern, txt, flags=re.IGNORECASE)
-                if matches:
+                m = re.search(pattern, txt, flags=re.IGNORECASE)
+                if m:
                     gate3_passed = False
-                    gate3_details.append(f"Infracción en {source_name}: detectado término prohibido '{matches[0]}' (Filtro anti-spam/edad).")
+                    gate3_details.append(f"Infracción en {source_name}: detectado término prohibido '{m.group(0)}' (Filtro anti-spam/edad).")
+            for pattern in UGCHarness.MEDICAL_CLAIM_TERMS:
+                m = re.search(pattern, txt, flags=re.IGNORECASE)
+                if m:
+                    gate3_passed = False
+                    gate3_details.append(f"Infracción en {source_name}: posible afirmación médica '{m.group(0)}'.")
 
         if gate3_passed:
-            gate3_details.append("Escaneo de moderación limpio: Cero términos censurados ('age', 'DM') en guiones de video.")
+            gate3_details.append("Escaneo de moderación limpio: cero términos censurados ('age', 'DM') ni afirmaciones médicas en guiones de video.")
 
         results.append(HarnessGateResult(
             "GATE_3", "Safety & Anti-Filter Moderation", gate3_passed,
@@ -236,8 +250,11 @@ class UGCHarness:
         if not audio:
             problems.append("sin stream de audio")
         try:
-            if float(fmt.get("duration", 0)) <= 0:
+            duration = float(fmt.get("duration", 0))
+            if duration <= 0:
                 problems.append("duración inválida")
+            elif duration > UGCHarness.MAX_CLIP_DURATION_S + 0.5:
+                problems.append(f"duración {duration:.1f}s excede el máximo de {UGCHarness.MAX_CLIP_DURATION_S}s")
         except (TypeError, ValueError):
             problems.append("duración ilegible")
         try:
@@ -377,7 +394,10 @@ class UGCHarness:
     STOPWORDS = set(
         "a an the and or but of to in on at for with your you i my me it its is are was be this that "
         "these those just so then than as if by from into up out not no do does did have has had will "
-        "would can could very really".split()
+        "would can could very really "
+        "el la los las un una unos unas y o pero de del al en con por para tu tus mi mis yo me te se su sus "
+        "es son era ser esto esta este estos estas eso solo así entonces que como si no lo le les muy más ya "
+        "tiene tienen hay fue ha han".split()
     )
 
     @staticmethod
@@ -439,7 +459,7 @@ class UGCHarness:
         )
 
     @classmethod
-    def run_full_project_audit(cls, base_brand_dir: Path, prod_folder_name: str, deliverable_name: Optional[str] = None) -> Dict[str, Any]:
+    def run_full_project_audit(cls, base_brand_dir: Path, prod_folder_name: str, deliverable_name: Optional[str] = None, precheck: bool = False) -> Dict[str, Any]:
         prod_dir = base_brand_dir / "04_IN_PRODUCTION" / prod_folder_name
         name_parts = prod_folder_name.split("_")
         if len(name_parts) < 2 or not name_parts[1]:
@@ -457,14 +477,13 @@ class UGCHarness:
         deliv_id = deliverable_name or name_parts[1]
         deliverables_dir = base_brand_dir / "05_PROCESSED_DELIVERABLES" / deliv_id
 
-        expected_chunks = 6
+        expected_chunks = None
         if json_path and json_path.exists():
             try:
                 with open(json_path, "r", encoding="utf-8") as f:
-                    pkg_data = json.load(f)
-                    expected_chunks = len(pkg_data.get("chunks", [])) or 6
+                    expected_chunks = len(json.load(f).get("chunks", [])) or None
             except Exception:
-                expected_chunks = 6
+                expected_chunks = None
 
         all_gates = []
         # Gates 1 to 4
@@ -477,11 +496,16 @@ class UGCHarness:
                 all_gates[0].passed = False
                 all_gates[0].message = "Fallo en validación de Schema o Checkpoint 1"
         
-        # Gate 5
-        all_gates.append(cls.audit_raw_clips(raw_clips_dir, expected_count=expected_chunks))
-        
-        # Gate 6
-        all_gates.append(cls.audit_deliverables(deliverables_dir, deliv_id))
+        # Gate 5 (omitido en precheck: aún no hay clips)
+        if not precheck:
+            if expected_chunks is None:
+                all_gates.append(HarnessGateResult("GATE_5", "Raw Clips Integrity", False,
+                                                   "No se puede determinar el nº de clips: paquete JSON ausente o sin chunks"))
+            else:
+                all_gates.append(cls.audit_raw_clips(raw_clips_dir, expected_count=expected_chunks))
+
+            # Gate 6
+            all_gates.append(cls.audit_deliverables(deliverables_dir, deliv_id))
 
         # Gate 7 (regla 70/30: extensión y sentido de la referencia)
         all_gates.append(cls.audit_reference_fidelity(json_path, prod_dir / "01_Reference"))
@@ -490,10 +514,14 @@ class UGCHarness:
         passed_gates = sum(1 for g in all_gates if g.passed)
         is_compliant = (passed_gates == total_gates)
 
+        if prod_dir.exists():
+            record_gates(prod_dir, [g.to_dict() for g in all_gates], precheck=precheck)
+
         return {
             "project_name": prod_folder_name,
             "deliverable_id": deliv_id,
             "is_compliant": is_compliant,
+            "precheck": precheck,
             "score": f"{passed_gates}/{total_gates}",
             "gates": [g.to_dict() for g in all_gates]
         }
@@ -513,7 +541,10 @@ class UGCHarness:
             print("-" * 75)
         
         if report["is_compliant"]:
-            print(f"RESULTADO: {report['score']} GATES APROBADOS -- CALIDAD DE AGENCIA CERTIFICADA")
+            if report.get("precheck"):
+                print(f"RESULTADO PRECHECK: {report['score']} GATES APROBADOS -- OK para generar clips (no es certificación final)")
+            else:
+                print(f"RESULTADO: {report['score']} GATES APROBADOS -- CALIDAD DE AGENCIA CERTIFICADA")
         else:
             print(f"RESULTADO: {report['score']} GATES APROBADOS -- REQUIERE CORRECCION")
         print("=" * 75 + "\n")
@@ -523,6 +554,8 @@ if __name__ == "__main__":
     parser.add_argument("--json", help="Path to production_package_PROD_XXX.json to audit Gates 1-4")
     parser.add_argument("--project", help="Name of project folder in 04_IN_PRODUCTION (e.g. PROD_012_cuenta_a_6)")
     parser.add_argument("--brand", default=None, help="Brand directory name (optional, auto-detected if omitted)")
+    parser.add_argument("--precheck", action="store_true",
+                        help="Corre solo los gates 1-4 y 7 (sin clips ni entregables) antes de gastar en generación de video")
     parser.add_argument("--deliverable", help="Deliverable folder name (optional, auto-detected if omitted)")
     args = parser.parse_args()
 
@@ -549,7 +582,7 @@ if __name__ == "__main__":
                 candidates = [d for d in base_dtc.iterdir() if d.is_dir() and (d / "04_IN_PRODUCTION").exists()]
                 brand_path = candidates[0] if candidates else base_dtc
 
-        report = harness.run_full_project_audit(brand_path, args.project, args.deliverable)
+        report = harness.run_full_project_audit(brand_path, args.project, args.deliverable, precheck=args.precheck)
         harness.print_scorecard(report)
     else:
         print("UGC Production & QA Harness listo. Usa --help para ver los comandos.")

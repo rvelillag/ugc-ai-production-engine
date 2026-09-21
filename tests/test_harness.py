@@ -214,3 +214,75 @@ def test_checkpoint1_rejects_long_headline(tmp_path, package):
     proj, _, write = _cp_setup(tmp_path, package)
     with pytest.raises(ValueError):
         write(proj, "adapt_to_brand", "x", "GLOW", "one two three four five six seven eight")
+
+
+@pytest.mark.parametrize("bad", ["send me a DM", "drop a d.m now", "D M me", "what ages work", "cuál es tu edad", "it cures acne", "clinically proven"])
+def test_gate3_catches_variants(tmp_path, package, bad):
+    package["chunks"][0]["voiceover_clean_tts"] = bad
+    package["chunks"][0]["word_count"] = len(bad.split())
+    assert not _run(tmp_path, package)["GATE_3"].passed
+
+
+@pytest.mark.parametrize("ok", ["I'd make this every day", "the image is clean", "manage your mornings"])
+def test_gate3_no_false_positives(tmp_path, package, ok):
+    package["chunks"][0]["voiceover_clean_tts"] = ok
+    package["chunks"][0]["word_count"] = len(ok.split())
+    assert _run(tmp_path, package)["GATE_3"].passed
+
+
+def test_gate7_spanish_stopwords_not_counted(tmp_path):
+    ref = tmp_path / "01_Reference"
+    ref.mkdir()
+    (ref / "script_beats_x.txt").write_text('Voiceover Original: "el la los de que y en un una con por para el la los de"', encoding="utf-8")
+    pkg = tmp_path / "p.json"
+    pkg.write_text(json.dumps({"chunks": [{"voiceover_clean_tts": "el la los de que y en un una con por para el la los de"}]}), encoding="utf-8")
+    # solo stopwords en la referencia -> sin contenido comparable, no debe aprobar por solapamiento vacío
+    assert not UGCHarness.audit_reference_fidelity(pkg, ref).passed
+
+
+def test_precheck_skips_clips_and_deliverables(tmp_path):
+    proj = tmp_path / "Brand" / "04_IN_PRODUCTION" / "PROD_001_ref"
+    (proj / "02_First_Frames").mkdir(parents=True)
+    (proj / "01_Reference").mkdir()
+    rep = UGCHarness.run_full_project_audit(tmp_path / "Brand", "PROD_001_ref", precheck=True)
+    ids = {g["gate_id"] for g in rep["gates"]}
+    assert "GATE_5" not in ids and "GATE_6" not in ids and rep["precheck"] is True
+
+
+def test_gate5_fails_when_package_missing(tmp_path):
+    proj = tmp_path / "Brand" / "04_IN_PRODUCTION" / "PROD_001_ref"
+    (proj / "02_First_Frames").mkdir(parents=True)
+    rep = UGCHarness.run_full_project_audit(tmp_path / "Brand", "PROD_001_ref")
+    g5 = next(g for g in rep["gates"] if g["gate_id"] == "GATE_5")
+    assert not g5["passed"] and "paquete" in g5["message"]
+
+
+@pytest.mark.skipif(not FFMPEG, reason="ffmpeg no disponible")
+def test_single_pass_trim_concat_duration_and_sync(tmp_path):
+    from tools.assemble_project import build_trim_concat_cmd
+    a, b = tmp_path / "a.mp4", tmp_path / "b.mp4"
+    _make_clip(a, "540x960")
+    _make_clip(b, "1080x1920")
+    out = tmp_path / "out.mp4"
+    cmd = build_trim_concat_cmd(FFMPEG, [(a, 0.2, 0.8), (b, 0.0, 0.5)], out, fps="30")
+    subprocess.run(cmd, check=True, capture_output=True)
+    info = subprocess.check_output(
+        [shutil.which("ffprobe") or FFMPEG.replace("ffmpeg", "ffprobe"), "-v", "error", "-show_entries",
+         "stream=codec_type,width,height,duration", "-of", "json", str(out)], text=True)
+    streams = {s["codec_type"]: s for s in json.loads(info)["streams"]}
+    assert (streams["video"]["width"], streams["video"]["height"]) == (1080, 1920)
+    assert abs(float(streams["video"]["duration"]) - 1.1) < 0.1
+    assert abs(float(streams["audio"]["duration"]) - float(streams["video"]["duration"])) < 0.1
+
+
+def test_state_json_records_gates_and_phase(tmp_path):
+    from tools.project_state import load_state, record_gates
+    record_gates(tmp_path, [{"gate_id": f"GATE_{i}", "passed": True} for i in range(1, 8)])
+    st = load_state(tmp_path)
+    assert st["phase"] == "certificado" and len(st["gates"]) == 7
+
+
+def test_precheck_never_certifies(tmp_path):
+    from tools.project_state import load_state, record_gates
+    record_gates(tmp_path, [{"gate_id": f"GATE_{i}", "passed": True} for i in range(1, 8)], precheck=True)
+    assert load_state(tmp_path)["phase"] != "certificado"
