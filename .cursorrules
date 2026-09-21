@@ -3,8 +3,8 @@
 `CLAUDE.md` is the single source of truth. Read it before any production task.
 
 - Execute Mandatory Checkpoint 1 (Scene, Outfit, ManyChat Keyword, Cover Headline) before Phase 3.
-- Keep the reference script's length (+-10%) and meaning (70/30 rule); each clip <= 10s and <= 2.4 WPS.
+- Fill and confirm the reference ledger; keep all its actions in order and >=85% of its dialogue verbatim; each clip <= 10s and <= 2.4 WPS.
 - Never use 'age' or 'DM' in scripts or prompts; dialogue is brand-decoupled.
 - Keep `01_Reference/` to max 10 keyframes plus the video and script txt.
 - Deliverables contain exactly 4 files (.mp4, .srt, .jpg, .txt).
-- Verify with `python tools/ugc_harness.py --project [PROJECT]` (7/7 PASS).
+- Verify with `python tools/ugc_harness.py --project [PROJECT]` (all gates PASS: 7/7, or 8/8 with a ledger).

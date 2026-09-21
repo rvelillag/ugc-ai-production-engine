@@ -12,6 +12,7 @@ python tools/scene_keyframe_extractor.py --video "[PATH_TO_REFERENCE_VIDEO]"
 
 # 1b. Draft the reference ledger (dialogue + contact frames), then fill in actions from the frames (Fase 2)
 python tools/reference_ledger.py --project "[PROJECT_FOLDER_NAME]" [--language es|en]
+# (If the video has few scene cuts, re-run step 1 AFTER the ledger is filled so keyframes land on the ledger's action boundaries.)
 
 # 1c. Compile I2V prompts from each chunk's action_timeline (Fase 3)
 python tools/prompt_compiler.py --json "[PATH_TO_production_package.json]"
@@ -52,7 +53,7 @@ When executing or assisting in a production run, follow these 4 canonical phases
    - `05_beat4_[action].jpg`
    - `06_beat5_cta.jpg`
 3. **Strict Governance:** Maximum 8-10 keyframe files in `01_Reference/`.
-4. **Ledger de Referencia (fuente de verdad de acciones y diálogo):** Ejecuta `python tools/reference_ledger.py --project [PROJECT]`, mira los frames de contacto y completa en `01_Reference/reference_ledger.json`, fila por fila y en orden: `action`, `framing`, `props`, `gaze`, `gesture` e `is_cta` (el diálogo literal ya viene de Whisper; corrígelo escuchando si hace falta). Una fila por acción física distinta, aunque ocurra dentro de la misma toma.
+4. **Ledger de Referencia (fuente de verdad de acciones y diálogo):** Ejecuta `python tools/reference_ledger.py --project [PROJECT]`, mira los frames de contacto y completa en `01_Reference/reference_ledger.json`, fila por fila y en orden: `action`, `framing`, `props`, `gaze`, `gesture` e `is_cta` (el diálogo literal ya viene de Whisper; corrígelo escuchando si hace falta). Una fila por acción física distinta, aunque ocurra dentro de la misma toma. Si el video tiene pocos cortes de escena, vuelve a ejecutar `scene_keyframe_extractor.py` DESPUÉS de rellenar el ledger para que los keyframes se tomen en los límites de acción del ledger.
 5. **MANDATORY CHECKPOINT 1 (Alineación Creativa y Escenario):**
    Before proceeding to Phase 3 prompt generation, YOU MUST STOP and ask the user to confirm:
    - **A. Escenario / Entorno (Setting & Location):** ¿Replicar 1:1 el escenario de la referencia original o adaptarlo al espacio de la marca?
@@ -107,12 +108,13 @@ Before approving any project or deliverable, verify that `tools/ugc_harness.py` 
 - **GATE_6 (Canonical Deliverables):** Exactly 4 files in `05_PROCESSED_DELIVERABLES/[ID]/`.
 - **GATE_7 (Reference Fidelity):** Con ledger: cada fila (salvo CTA) conserva ≥85 % de las palabras del diálogo literal. Sin ledger (proyectos antiguos): longitud ±10 % y ≥50 % de palabras de contenido. Heurística léxica; el sentido sigue requiriendo revisión humana.
 - **GATE_8 (Action Coverage, solo con ledger):** El ledger está confirmado y sin cambios desde el Checkpoint 1; toda fila está cubierta por algún chunk; el `action_timeline` es contiguo, ordenado y ≤ duración del clip; el prompt contiene el marcador de tiempo y el diálogo de cada paso.
+
 ---
 
 ## Critical Constraints & Prohibitions
 
 1. **NO Skipping Checkpoint 1:** Always confirm Scene/Environment, Outfit, Keyword, Cover Headline, Ledger and hook exaggeration with user before generating prompts.
-2. **Ledger + Verbatim Rule:** Mantén todas las acciones de la referencia, en orden, y ≥85 % del diálogo literal (GATE_7/GATE_8). Como las referencias suelen rondar ~3 WPS, alcanza el mismo número de palabras con más/longer clips (<= 10s cada uno) en lugar de recortar palabras.
+2. **Ledger + Verbatim Rule:** Mantén todas las acciones de la referencia, en orden, y ≥85 % del diálogo literal (GATE_7/GATE_8). Como las referencias suelen rondar ~3 WPS, alcanza el mismo número de palabras con más clips (y más largos) (<= 10s cada uno) en lugar de recortar palabras.
 3. **Dynamic Prompt Grouping (<= 10s rule):** Never exceed 10s per AI video clip; group same-angle actions with explicit timeline markers.
 4. **NO Censored Trigger Words:** Never use 'age' or 'DM' in video scripts.
 5. **NO Unreferenced File Clutter:** Keep project directories clean according to the canonical folder structure.

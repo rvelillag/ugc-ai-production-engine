@@ -23,6 +23,7 @@ Antes de construir cualquier JSON o prompt, el sistema consulta obligatoriamente
 2. **Insumos de Referencia & Ficha de Beats:** Desde `04_IN_PRODUCTION/PROD_<ID>_<video>/01_Reference/` (`script_beats_<video>.txt` y capturas `.jpg`).
 3. **Catálogo de Producto Propio:** Desde `PRODUCT_CATALOG.yaml` para sustituir automáticamente marcas de terceros.
 4. **Historial de Vestuario:** Revisar el atuendo usado en la producción previa para rotar la paleta de color.
+5. **Ledger y Checkpoint 1:** `01_Reference/reference_ledger.json` (confirmado por el usuario) y `checkpoint1.json` (`scene_mode`, `hook_exaggeration`) son insumos obligatorios.
 
 ---
 

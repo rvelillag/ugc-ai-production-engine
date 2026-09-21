@@ -24,6 +24,10 @@ Automatizar el análisis técnico de videos UGC de referencia: transcripción li
 
 ---
 
+> Nota: si el video tiene pocos cortes de escena, vuelve a ejecutar `scene_keyframe_extractor.py` DESPUÉS de rellenar `reference_ledger.json` para que los keyframes se tomen en los límites de acción del ledger.
+
+---
+
 ### 2. Creación del Directorio de Staging
 - Crear la estructura de producción del proyecto dentro de `04_IN_PRODUCTION/`:
   - `04_IN_PRODUCTION/PROD_<ID>_<nombre_video>/`
