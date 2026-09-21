@@ -14,7 +14,10 @@ python tools/scene_keyframe_extractor.py --video "[PATH_TO_REFERENCE_VIDEO]"
 python tools/ugc_harness.py --project "[PROJECT_FOLDER_NAME]" [--deliverable "[DELIVERABLE_ID]"]
 
 # 3. Assemble final video + smart silence trimming + subtitles (viral yellow highlight style)
-python tools/assemble_project.py --project "[PROJECT_FOLDER_NAME]"
+python tools/assemble_project.py --project "[PROJECT_FOLDER_NAME]" [--language es|en|auto]
+
+# 4. (Optional) Standalone cadence analysis
+python tools/audio_cadence_analyzer.py --video "[PATH_TO_REFERENCE_VIDEO]"
 ```
 
 ---
@@ -61,10 +64,10 @@ When executing or assisting in a production run, follow these 4 canonical phases
    - **Misma Escena / Encuadre Continuo (Duración <= 10s):** Se agrupan múltiples sub-beats en UN SOLO PROMPT con secuencia de acciones especificada en el timeline:
      `SEQUENCE OF ACTIONS: (0:00-0:03) Action A... (0:03-0:08) Action B...`
    - **Cambio de Escena / Ángulo O Duración > 10s:** Se divide en prompts separados con sus respectivos First Frames.
-4. **Cadence Constraint:** Every chunk dialogue must respect WPS <= 2.4.
+4. **Cadence Constraint:** Every chunk dialogue must respect WPS <= 2.4. Map the script to the 5 canonical stages (Hook, Reframe, Mechanism, Payoff, CTA) across N clips.
 5. **Forensic First Frame Prompts (9:16 vertical):** Replicate composition, lighting, camera angle, micro-expressions, and props with hyper-exaggerated hook elements.
 6. **Estructura Canónica de Video Motion Prompts (I2V con Timeline Forense y SFX):**
-   - **Header de Bloqueo Inmutable:** 9:16 vertical, escenario canónico, identidad/edad/ropa y candado de continuidad.
+   - **Header de Bloqueo Inmutable:** 9:16 vertical, escenario canónico, identidad/edad/ropa y candado de continuidad. Plantilla: `Hyper-realistic vertical 9:16 smartphone UGC video. Use the canonical [ENVIRONMENT]. [AVATAR IDENTITY, AGE, CLOTHING]. Preserve her identity, clothing, lighting, environment, table position, props and camera style throughout the entire clip.`
    - **Bloques `*ACTION:*` con Timestamps de Milisegundo:** Segmentos temporales exactos (`0–3s:`, `3–8s:`, etc.) con plano de cámara, interacción física con props, dirección de mirada y diálogo literal entrecomillado (`says: "..."` / `while continuing: "..."`).
    - **Restricción de Realismo:** `"Natural realistic hand movements. No cuts. No exaggerated acting."`
    - **Capa Acústica y Foley (`*SFX:*`):** Ambiance de la sala, contacto con superficies y sonidos de manipulación de objetos.

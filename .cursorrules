@@ -1,11 +1,10 @@
 # UGC AI Production Engine Rules
 
-- Always execute Mandatory Checkpoint 1 (Escenario/Location, Outfit, ManyChat Keyword, Cover Headline) before Phase 3.
-- Enforce the 70/30 Script Rule: 70% semantic/structural fidelity to viral reference + 30% paraphrasing to match avatar personality and tone.
-- Always adhere to the JSON-First architecture validated by `tools/schemas/production_package.py`.
-- Enforce speech cadence limit of <= 2.4 words per second per chunk.
-- Never use banned words ('age', 'DM') in video scripts or audio prompts.
-- Ensure all video dialogues are brand-decoupled (generic/educational); conversion is handled via ManyChat.
-- Keep `01_Reference/` clean (max 8 files: 1 video, keyframes 01-06, 1 script txt).
-- All final deliverables must contain strictly 4 files (.mp4, .srt, .jpg, .txt).
-- Always verify projects with `python tools/ugc_harness.py --project [PROJECT]`.
+`CLAUDE.md` is the single source of truth. Read it before any production task.
+
+- Execute Mandatory Checkpoint 1 (Scene, Outfit, ManyChat Keyword, Cover Headline) before Phase 3.
+- Keep the reference script's length (+-10%) and meaning (70/30 rule); each clip <= 10s and <= 2.4 WPS.
+- Never use 'age' or 'DM' in scripts or prompts; dialogue is brand-decoupled.
+- Keep `01_Reference/` to max 10 keyframes plus the video and script txt.
+- Deliverables contain exactly 4 files (.mp4, .srt, .jpg, .txt).
+- Verify with `python tools/ugc_harness.py --project [PROJECT]` (7/7 PASS).
