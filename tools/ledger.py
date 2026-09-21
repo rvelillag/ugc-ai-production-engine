@@ -62,7 +62,7 @@ def ledger_hash(path: Path) -> str:
 
 
 def tokenize(text: str) -> List[str]:
-    return re.findall(r"[a-záéíóúñü']+", text.lower())
+    return re.findall(r"[a-záéíóúñü0-9']+", text.lower())
 
 
 def fidelity(ref_text: str, gen_text: str) -> float:
@@ -101,4 +101,8 @@ def anchor_times(ledger_path: Path) -> List[float]:
     path = Path(ledger_path)
     if not path.exists():
         return []
-    return [r.t_start for r in load_ledger(path).rows]
+    try:
+        return [r.t_start for r in load_ledger(path).rows]
+    except Exception as e:
+        print(f"Aviso: reference_ledger.json inválido, se ignoran anclas ({str(e).splitlines()[0]})", file=sys.stderr)
+        return []

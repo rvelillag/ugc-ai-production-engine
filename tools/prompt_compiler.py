@@ -43,7 +43,8 @@ def compile_package(json_path: Path) -> int:
         if chunk.get("action_timeline"):
             chunk["video_motion_prompt_i2v"] = compile_i2v_prompt(data, chunk)
             count += 1
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    if count > 0:
+        path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     return count
 
 

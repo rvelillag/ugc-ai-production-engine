@@ -122,10 +122,22 @@ class UGCHarness:
         gate2_passed = True
         gate2_details = []
         chunks = raw_data.get("chunks", [])
-        
+
+        def _timeline_spoken(ch):
+            steps = ch.get("action_timeline") or []
+            if not isinstance(steps, list):
+                return ""
+            return " ".join((s.get("dialogue") or "") for s in steps if isinstance(s, dict)).strip()
+
         for ch in chunks:
             cid = ch.get("chunk_id", 0)
             text = ch.get("voiceover_clean_tts", "")
+            spoken = _timeline_spoken(ch)
+            if spoken:
+                if tokenize(spoken) != tokenize(text):
+                    gate2_passed = False
+                    gate2_details.append(f"Chunk {cid}: el diálogo del action_timeline no coincide con voiceover_clean_tts (el timeline es lo que se locuta).")
+                text = spoken
             dur_s = ch.get("recommended_duration_s", 8)
             words = [w for w in text.split() if w]
             w_count = len(words)
@@ -202,7 +214,11 @@ class UGCHarness:
         own_brand = (raw_data.get("brand") or "").strip().lower()
         for ch in chunks:
             cid = ch.get("chunk_id")
+            spoken = _timeline_spoken(ch)
             vo = ch.get("voiceover_clean_tts", "").lower()
+            if spoken:
+                vo = vo + " " + spoken.lower()
+                vo += " " + " ".join(re.findall(r'"([^"]*)"', ch.get("video_motion_prompt_i2v", "") or "")).lower()
             if own_brand and re.search(r'\b' + re.escape(own_brand) + r'\b', vo):
                 gate4_passed = False
                 gate4_details.append(f"Chunk {cid}: la marca propia '{own_brand}' aparece en el diálogo (debe convertirse solo vía ManyChat).")

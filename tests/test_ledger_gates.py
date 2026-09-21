@@ -318,3 +318,50 @@ def test_run_full_audit_legacy_has_no_gate8(tmp_path):
     rep = UGCHarness.run_full_project_audit(brand, "PROD_001_test", precheck=True)
     ids = {g["gate_id"] for g in rep["gates"]}
     assert "GATE_7" in ids and "GATE_8" not in ids
+
+
+def _audit(tmp_path, chunk):
+    pkg = _package([chunk])
+    pj = tmp_path / "pkg.json"
+    pj.write_text(json.dumps(pkg), encoding="utf-8")
+    return {g.gate_id: g for g in UGCHarness.audit_package_json(pj)}
+
+
+def test_gates_2_4_use_timeline_dialogue_adversarial(tmp_path):
+    ch = _ledger_chunk()
+    long_text = " ".join(["word"] * 48) + " Sephora"
+    ch["voiceover_clean_tts"] = "short line"
+    ch["word_count"] = 2
+    ch["recommended_duration_s"] = 10
+    ch["action_timeline"] = [
+        {"t0": 0, "t1": 10, "ledger_row": "r01", "action": "Talks", "props": [], "dialogue": long_text},
+    ]
+    pkg = _package([ch])
+    ch["video_motion_prompt_i2v"] = compile_i2v_prompt(pkg, ch)
+    g = _audit(tmp_path, ch)
+    assert not g["GATE_2"].passed
+    assert not g["GATE_4"].passed
+
+
+def test_gate4_scans_quoted_dialogue_in_prompt(tmp_path):
+    ch = _ledger_chunk()
+    pkg = _package([ch])
+    ch["video_motion_prompt_i2v"] = compile_i2v_prompt(pkg, ch) + '\n\n0–1s: says: "try Sephora today"'
+    assert not _audit(tmp_path, ch)["GATE_4"].passed
+
+
+def test_faithful_ledger_chunk_passes_gates_1_to_4(tmp_path):
+    ch = _ledger_chunk()
+    pkg = _package([ch])
+    ch["video_motion_prompt_i2v"] = compile_i2v_prompt(pkg, ch)
+    g = _audit(tmp_path, ch)
+    for gid in ("GATE_1", "GATE_2", "GATE_3", "GATE_4"):
+        assert g[gid].passed, (gid, g[gid].details)
+
+
+def test_compile_package_count_zero_leaves_file_untouched(tmp_path):
+    p = tmp_path / "p.json"
+    raw = json.dumps(_package([_chunk(2, "this simple trick changed my mornings completely")]))  # compact, non-canonical
+    p.write_bytes(raw.encode("utf-8"))
+    assert compile_package(p) == 0
+    assert p.read_bytes() == raw.encode("utf-8")

@@ -88,3 +88,33 @@ def test_anchor_times(tmp_path):
     assert anchor_times(p) == []
     p.write_text(json.dumps(_ledger_dict()), encoding="utf-8")
     assert anchor_times(p) == [0.0, 4.0]
+
+
+def test_anchor_times_malformed_ledger_returns_empty(tmp_path, capsys):
+    p = tmp_path / "reference_ledger.json"
+    p.write_text('{"reference_video": "r.mp4"}', encoding="utf-8")
+    assert anchor_times(p) == []
+    assert "reference_ledger" in capsys.readouterr().err
+    p.write_text("not json", encoding="utf-8")
+    assert anchor_times(p) == []
+
+
+def test_tokenize_keeps_digits_and_number_change_lowers_fidelity():
+    assert tokenize("take 30 drops") == ["take", "30", "drops"]
+    assert fidelity("take 3 drops every night", "take 30 drops every night") < 1.0
+
+
+def test_backup_existing_copies_to_tempdir_not_reference(tmp_path):
+    import tempfile
+    from tools.reference_ledger import backup_existing
+    ref = tmp_path / "01_Reference"
+    ref.mkdir()
+    lp = ref / "reference_ledger.json"
+    lp.write_text('{"x": 1}', encoding="utf-8")
+    dest = backup_existing(lp)
+    try:
+        assert dest.read_text(encoding="utf-8") == '{"x": 1}'
+        assert dest.parent == Path(tempfile.gettempdir()) and dest.name.startswith("reference_ledger_backup_")
+        assert list(ref.iterdir()) == [lp]
+    finally:
+        dest.unlink()

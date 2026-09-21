@@ -1,8 +1,10 @@
 """Genera el borrador del ledger de referencia: diálogo literal (Whisper) + frames de contacto para describir acciones."""
 import argparse
+import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -20,6 +22,13 @@ def _duration(video: Path) -> float:
     return float(out.strip())
 
 
+def backup_existing(ledger_path: Path) -> Path:
+    """Copia el ledger existente al directorio temporal del sistema (nunca dentro de 01_Reference)."""
+    dest = Path(tempfile.gettempdir()) / f"reference_ledger_backup_{time.strftime('%Y%m%d_%H%M%S')}.json"
+    shutil.copy2(ledger_path, dest)
+    return dest
+
+
 def make_draft(project_dir: Path, language, model_size: str, fps: float, force: bool) -> Path:
     ref_dir = project_dir / "01_Reference"
     videos = sorted(ref_dir.glob("*.mp4"))
@@ -27,7 +36,9 @@ def make_draft(project_dir: Path, language, model_size: str, fps: float, force: 
         raise FileNotFoundError(f"No hay .mp4 en {ref_dir}")
     out = ref_dir / LEDGER_FILE
     if out.exists() and not force:
-        raise FileExistsError(f"{out} ya existe (usa --force para regenerar; invalida el Checkpoint 1)")
+        raise FileExistsError(f"{out} ya existe (usa --force para sobrescribirlo; se guarda una copia de seguridad en el directorio temporal e invalida el Checkpoint 1)")
+    if out.exists():
+        print(f"Copia de seguridad del ledger anterior: {backup_existing(out)}")
     video = videos[0]
     duration = _duration(video)
 
