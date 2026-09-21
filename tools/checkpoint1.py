@@ -9,6 +9,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from tools.project_state import save_state
+from tools.ledger import LEDGER_FILE, ledger_hash, load_ledger
 
 CHECKPOINT_FILE = "checkpoint1.json"
 SCENE_MODES = ("replicate_1to1", "adapt_to_brand")
@@ -25,7 +26,8 @@ def find_project(name_or_path: str, base_dir: Path) -> Path:
     return found[0]
 
 
-def write_checkpoint(project_dir: Path, scene_mode: str, outfit: str, keyword: str, headline: str) -> Path:
+def write_checkpoint(project_dir: Path, scene_mode: str, outfit: str, keyword: str, headline: str,
+                     ledger_confirmed: bool = False, hook_exaggeration: bool = False) -> Path:
     if scene_mode not in SCENE_MODES:
         raise ValueError(f"scene_mode debe ser uno de {SCENE_MODES}")
     if len(headline.split()) > 7:
@@ -37,9 +39,16 @@ def write_checkpoint(project_dir: Path, scene_mode: str, outfit: str, keyword: s
         "outfit": outfit.strip(),
         "manychat_keyword": keyword.strip(),
         "cover_headline": headline.strip(),
+        "hook_exaggeration": bool(hook_exaggeration),
         "confirmed_by_user": True,
         "confirmed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
+    if ledger_confirmed:
+        ledger_path = Path(project_dir) / "01_Reference" / LEDGER_FILE
+        if not ledger_path.exists():
+            raise FileNotFoundError(f"Falta {ledger_path}: genera y completa el ledger antes de confirmarlo")
+        load_ledger(ledger_path)  # valida el esquema
+        data["ledger_hash"] = ledger_hash(ledger_path)
     out = project_dir / CHECKPOINT_FILE
     out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     save_state(project_dir, phase="checkpoint1")
@@ -55,8 +64,13 @@ if __name__ == "__main__":
     parser.add_argument("--headline", required=True, help="Cover headline (máx 7 palabras)")
     parser.add_argument("--confirmed-by-user", action="store_true", required=True,
                         help="Obligatorio: certifica que el usuario confirmó estos 4 puntos")
+    parser.add_argument("--ledger-confirmed", action="store_true",
+                        help="El usuario confirmó el reference_ledger.json (guarda su hash)")
+    parser.add_argument("--hook-exaggeration", action="store_true",
+                        help="Opt-in: el usuario pidió exagerar el disparador del hook (por defecto: acción idéntica a la referencia)")
     args = parser.parse_args()
 
     base = Path(__file__).resolve().parent.parent
-    path = write_checkpoint(find_project(args.project, base), args.scene, args.outfit, args.keyword, args.headline)
+    path = write_checkpoint(find_project(args.project, base), args.scene, args.outfit, args.keyword, args.headline,
+                            ledger_confirmed=args.ledger_confirmed, hook_exaggeration=args.hook_exaggeration)
     print(f"Checkpoint 1 registrado: {path}")

@@ -9,6 +9,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from test_harness import _chunk
 from tools.schemas.production_package import ProductionPackage
 from tools.prompt_compiler import compile_i2v_prompt, compile_package, time_marker
+from tools.checkpoint1 import write_checkpoint
+from tools.ledger import ledger_hash
 
 D1 = "I stopped washing my hair with shampoo alone"
 D2 = "and here is why it works"
@@ -78,3 +80,40 @@ def test_compile_package_rewrites_only_chunks_with_timeline(tmp_path):
     data = json.loads(p.read_text(encoding="utf-8"))
     assert "*ACTION:*" in data["chunks"][0]["video_motion_prompt_i2v"]
     assert data["chunks"][1]["video_motion_prompt_i2v"] == "she talks"
+
+
+LEDGER = {"reference_video": "r.mp4", "duration_s": 8.0, "rows": [
+    {"id": "r01", "t_start": 0, "t_end": 4, "dialogue_verbatim": D1, "action": "Holds the bottle up"},
+    {"id": "r02", "t_start": 4, "t_end": 8, "dialogue_verbatim": D2, "action": "Pours into palm"},
+]}
+
+
+def _project(tmp_path, ledger=LEDGER):
+    (tmp_path / "01_Reference").mkdir(exist_ok=True)
+    if ledger is not None:
+        (tmp_path / "01_Reference" / "reference_ledger.json").write_text(json.dumps(ledger), encoding="utf-8")
+    return tmp_path
+
+
+def test_checkpoint_records_ledger_hash_and_default_no_exaggeration(tmp_path):
+    proj = _project(tmp_path)
+    out = write_checkpoint(proj, "adapt_to_brand", "cream sweater", "GLOW", "Stop Doing This", ledger_confirmed=True)
+    cp = json.loads(out.read_text(encoding="utf-8"))
+    assert cp["ledger_hash"] == ledger_hash(proj / "01_Reference" / "reference_ledger.json")
+    assert cp["hook_exaggeration"] is False
+
+
+def test_checkpoint_hook_exaggeration_is_opt_in(tmp_path):
+    proj = _project(tmp_path)
+    out = write_checkpoint(proj, "adapt_to_brand", "o", "GLOW", "Stop Doing This", hook_exaggeration=True)
+    assert json.loads(out.read_text(encoding="utf-8"))["hook_exaggeration"] is True
+
+
+def test_checkpoint_ledger_confirmed_requires_valid_ledger(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        write_checkpoint(_project(tmp_path, ledger=None), "adapt_to_brand", "o", "GLOW", "h", ledger_confirmed=True)
+
+
+def test_checkpoint_without_ledger_flag_has_no_hash(tmp_path):
+    out = write_checkpoint(_project(tmp_path), "adapt_to_brand", "o", "GLOW", "h")
+    assert "ledger_hash" not in json.loads(out.read_text(encoding="utf-8"))
