@@ -15,6 +15,40 @@ from app.core.ffmpeg_utils import FFmpegLocator
 from app.core.pipeline import CaptionPipeline
 from tools.cover_generator import generate_cover_advanced
 
+def probe_fps(ffprobe_bin: str, clip: Path) -> str:
+    out = subprocess.check_output(
+        [ffprobe_bin, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=avg_frame_rate",
+         "-of", "default=noprint_wrappers=1:nokey=1", str(clip)], text=True).strip()
+    num, _, den = out.partition("/")
+    return f"{num}/{den}" if den and den != "0" else "30"
+
+def build_trim_concat_cmd(ffmpeg_bin: str, segments, output_path: Path, fps: str = "30", width: int = 1080, height: int = 1920):
+    """Single-pass trim + concat: segments is [(clip_path, start_s, end_s)]. One encode instead of one per clip plus one for the join."""
+    cmd = [ffmpeg_bin, "-y"]
+    for clip, _, _ in segments:
+        cmd += ["-i", str(clip)]
+    parts = []
+    for i, (_, start, end) in enumerate(segments):
+        parts.append(
+            f"[{i}:v]trim=start={start:.3f}:end={end:.3f},setpts=PTS-STARTPTS,"
+            f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
+            f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps={fps}[v{i}]"
+        )
+        parts.append(
+            f"[{i}:a]atrim=start={start:.3f}:end={end:.3f},asetpts=PTS-STARTPTS,"
+            f"aresample=48000,aformat=channel_layouts=stereo[a{i}]"
+        )
+    joined = "".join(f"[v{i}][a{i}]" for i in range(len(segments)))
+    parts.append(f"{joined}concat=n={len(segments)}:v=1:a=1[outv][outa]")
+    cmd += [
+        "-filter_complex", ";".join(parts),
+        "-map", "[outv]", "-map", "[outa]",
+        "-c:v", "libx264", "-preset", "fast", "-crf", "18",
+        "-c:a", "aac", "-b:a", "192k",
+        str(output_path),
+    ]
+    return cmd
+
 def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_padding_start: float = 0.12, silence_padding_end: float = 0.22, language: str = "auto"):
     ffmpeg_bin, ffprobe_bin = FFmpegLocator.get_binaries()
     project_path = Path(project_path_str)
@@ -47,8 +81,6 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
     
     job_dir = Path.cwd() / "scratch" / f"{prod_name}_assembly"
     job_dir.mkdir(parents=True, exist_ok=True)
-    trimmed_dir = job_dir / "trimmed_clips"
-    trimmed_dir.mkdir(parents=True, exist_ok=True)
 
     deliv_dir = brand_dir / "05_PROCESSED_DELIVERABLES" / deliv_id
     deliv_dir.mkdir(parents=True, exist_ok=True)
@@ -63,7 +95,7 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
     # 2. Smart Silence Trimming using Faster-Whisper
     print("Stage 1: Performing Smart Silence Trimming on individual clips...")
     whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
-    trimmed_clips = []
+    cuts = []
 
     for idx, clip in enumerate(raw_clips, 1):
         cmd_dur = [ffprobe_bin, "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(clip)]
@@ -89,44 +121,13 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
             start_trim = 0.0
             end_trim = dur
 
-        trimmed_clip = trimmed_dir / f"trimmed_{clip.name}"
-        trimmed_clips.append(trimmed_clip)
+        cuts.append((clip, start_trim, end_trim))
+        print(f"  [Trim] {clip.name}: {start_trim:.2f}s -> {end_trim:.2f}s (Dur: {end_trim - start_trim:.2f}s, Cut: {dur - (end_trim - start_trim):.2f}s dead silence)")
 
-        cmd_cut = [
-            ffmpeg_bin, "-y",
-            "-ss", f"{start_trim:.3f}",
-            "-i", str(clip),
-            "-t", f"{end_trim - start_trim:.3f}",
-            "-c:v", "libx264",
-            "-preset", "fast",
-            "-crf", "18",
-            "-c:a", "aac",
-            "-b:a", "192k",
-            str(trimmed_clip)
-        ]
-        subprocess.run(cmd_cut, check=True)
-        print(f"  [Trimmed] {clip.name}: {start_trim:.2f}s -> {end_trim:.2f}s (Dur: {end_trim - start_trim:.2f}s, Cut: {dur - (end_trim - start_trim):.2f}s dead silence)")
-
-    # 3. Concatenation
-    print("\nStage 2: Concatenating seamlessly trimmed clips...")
-    concat_list_path = job_dir / "concat_list.txt"
-    with open(concat_list_path, "w", encoding="utf-8") as f:
-        for tc in trimmed_clips:
-            f.write(f"file '{tc.resolve()}'\n")
-
+    # 3. Single-pass trim + concatenation (one encode)
+    print("\nStage 2: Trimming and concatenating in a single pass...")
     concat_video_path = job_dir / "concatenated_tight.mp4"
-    cmd_concat = [
-        ffmpeg_bin, "-y",
-        "-f", "concat",
-        "-safe", "0",
-        "-i", str(concat_list_path),
-        "-c:v", "libx264",
-        "-preset", "fast",
-        "-crf", "18",
-        "-c:a", "aac",
-        "-b:a", "192k",
-        str(concat_video_path)
-    ]
+    cmd_concat = build_trim_concat_cmd(ffmpeg_bin, cuts, concat_video_path, fps=probe_fps(ffprobe_bin, raw_clips[0]))
     subprocess.run(cmd_concat, check=True)
     print(f"Seamless video created: {concat_video_path}")
 
