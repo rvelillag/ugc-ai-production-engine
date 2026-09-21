@@ -69,3 +69,7 @@ watch/
 
 # Nested legacy engine copy (untracked gitlink, no .gitmodules)
 ugc-ai-production-engine/
+
+# Local environment files (may hold API keys); keep only .env.example
+.env
+!.env.example
