@@ -174,3 +174,43 @@ def test_gate7_missing_reference_fails(tmp_path, package):
     f = tmp_path / "p.json"
     f.write_text(json.dumps(package), encoding="utf-8")
     assert not UGCHarness.audit_reference_fidelity(f, tmp_path / "nope").passed
+
+
+def _cp_setup(tmp_path, package, **overrides):
+    from tools.checkpoint1 import write_checkpoint
+    proj = tmp_path / "PROD_001_x"
+    (proj / "02_First_Frames").mkdir(parents=True)
+    jp = proj / "02_First_Frames" / "production_package_PROD_001.json"
+    jp.write_text(json.dumps(package), encoding="utf-8")
+    return proj, jp, write_checkpoint
+
+
+def test_checkpoint1_missing_fails(tmp_path, package):
+    proj, jp, _ = _cp_setup(tmp_path, package)
+    assert not UGCHarness.audit_checkpoint1(jp, proj)[0]
+
+
+def test_checkpoint1_matching_passes(tmp_path, package):
+    proj, jp, write = _cp_setup(tmp_path, package)
+    write(proj, "adapt_to_brand", "beige blazer", "glow", "Stop Doing This Every Morning")
+    assert UGCHarness.audit_checkpoint1(jp, proj)[0]
+
+
+def test_checkpoint1_keyword_mismatch_fails(tmp_path, package):
+    proj, jp, write = _cp_setup(tmp_path, package)
+    write(proj, "adapt_to_brand", "beige blazer", "HAIR", "Stop Doing This Every Morning")
+    assert not UGCHarness.audit_checkpoint1(jp, proj)[0]
+
+
+def test_checkpoint1_unconfirmed_fails(tmp_path, package):
+    proj, jp, write = _cp_setup(tmp_path, package)
+    cp = write(proj, "adapt_to_brand", "beige blazer", "GLOW", "Stop Doing This Every Morning")
+    data = json.loads(cp.read_text(encoding="utf-8")); data["confirmed_by_user"] = False
+    cp.write_text(json.dumps(data), encoding="utf-8")
+    assert not UGCHarness.audit_checkpoint1(jp, proj)[0]
+
+
+def test_checkpoint1_rejects_long_headline(tmp_path, package):
+    proj, _, write = _cp_setup(tmp_path, package)
+    with pytest.raises(ValueError):
+        write(proj, "adapt_to_brand", "x", "GLOW", "one two three four five six seven eight")

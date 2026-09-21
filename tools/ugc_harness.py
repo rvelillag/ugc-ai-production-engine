@@ -339,6 +339,39 @@ class UGCHarness:
             details
         )
 
+    @staticmethod
+    def audit_checkpoint1(json_path: Path, project_dir: Path):
+        """Devuelve (passed, details): checkpoint1.json existe, está confirmado y coincide con el paquete."""
+        cp_path = project_dir / "checkpoint1.json"
+        if not cp_path.exists():
+            return False, ["Falta checkpoint1.json: el Checkpoint 1 no quedó registrado (tools/checkpoint1.py)."]
+        try:
+            cp = json.loads(cp_path.read_text(encoding="utf-8"))
+            pkg = json.loads(Path(json_path).read_text(encoding="utf-8"))
+        except Exception as e:
+            return False, [f"No se pudo leer checkpoint1.json o el paquete: {e}"]
+
+        passed, details = True, []
+        missing = [k for k in ("scene_mode", "outfit", "manychat_keyword", "cover_headline") if not str(cp.get(k, "")).strip()]
+        if missing:
+            passed = False
+            details.append(f"checkpoint1.json incompleto, faltan: {missing}")
+        if cp.get("confirmed_by_user") is not True:
+            passed = False
+            details.append("checkpoint1.json no está marcado como confirmado por el usuario.")
+
+        post = pkg.get("post_copy", {})
+        for cp_key, pkg_val, label in (
+            ("manychat_keyword", post.get("manychat_keyword", ""), "manychat_keyword"),
+            ("cover_headline", post.get("cover_headline", ""), "cover_headline"),
+        ):
+            if str(cp.get(cp_key, "")).strip().lower() != str(pkg_val).strip().lower():
+                passed = False
+                details.append(f"'{label}' del paquete ('{pkg_val}') no coincide con el confirmado en Checkpoint 1 ('{cp.get(cp_key, '')}').")
+        if passed:
+            details.append("Checkpoint 1 registrado, confirmado y coherente con el paquete (keyword y headline).")
+        return passed, details
+
     LENGTH_TOLERANCE = 0.10
     MIN_CONTENT_OVERLAP = 0.50
     STOPWORDS = set(
@@ -436,6 +469,13 @@ class UGCHarness:
         all_gates = []
         # Gates 1 to 4
         all_gates.extend(cls.audit_package_json(json_path))
+
+        cp_passed, cp_details = cls.audit_checkpoint1(json_path, prod_dir)
+        if all_gates and all_gates[0].gate_id == "GATE_1":
+            all_gates[0].details.extend(cp_details)
+            if not cp_passed:
+                all_gates[0].passed = False
+                all_gates[0].message = "Fallo en validación de Schema o Checkpoint 1"
         
         # Gate 5
         all_gates.append(cls.audit_raw_clips(raw_clips_dir, expected_count=expected_chunks))

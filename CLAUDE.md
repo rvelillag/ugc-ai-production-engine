@@ -52,6 +52,7 @@ When executing or assisting in a production run, follow these 4 canonical phases
    - **B. Outfit & Estilismo del Avatar:** Ropa, colores y accesorios acordes a la escena.
    - **C. ManyChat Keyword:** Palabra clave segura para la llamada a la acción (ej. HAIR, LIFT, GLOW).
    - **D. Cover Headline:** Titular gancho de curiosidad de máximo 7 palabras para la portada/miniatura.
+5. **Registro del Checkpoint 1:** Solo después de que el usuario confirme A-D, ejecuta `python tools/checkpoint1.py --project [PROJECT] --scene [replicate_1to1|adapt_to_brand] --outfit "..." --keyword [KEYWORD] --headline "..." --confirmed-by-user`. GATE_1 exige `checkpoint1.json` y que keyword y headline del paquete coincidan con lo confirmado. Nunca lo ejecutes sin confirmación real.
 
 ### Fase 3: Generación JSON-First & Prompts Dinámicos (ugc-viral-video-generator)
 1. **Regla de Escenario Propio vs. Disparador Stop-Scroll Replicado / Hiper-Exagerado:**
@@ -89,7 +90,7 @@ When executing or assisting in a production run, follow these 4 canonical phases
 ## The 7 QA Harness Quality Gates
 
 Before approving any project or deliverable, verify that `tools/ugc_harness.py` passes all 7 gates:
-- **GATE_1 (Schema & Anatomy):** JSON validates against Pydantic schema; Cover Headline <= 7 words.
+- **GATE_1 (Schema & Anatomy):** JSON validates against Pydantic schema; Cover Headline <= 7 words. `checkpoint1.json` exists, is user-confirmed, and matches the package keyword/headline.
 - **GATE_2 (Timing & Cadence):** All chunks have WPS <= 2.4 based on allocated durations.
 - **GATE_3 (Anti-Filter Safety):** Zero banned words ('age', 'DM', medical claims) in video scripts or prompts.
 - **GATE_4 (Brand Decoupling):** Video dialogue discusses generic problem/solution; brand conversion is 100% via ManyChat DM automation.
