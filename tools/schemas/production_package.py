@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 class LeftSubjectAudit(BaseModel):
     name: str = Field(..., description="Nombre del avatar o sujeto izquierdo")
-    character_id: str = Field(..., description="ID del character (ej: sofia_torres_47yo)")
+    character_id: str = Field(..., description="ID del character (ej: sofia_torres_45yo)")
     orientation: str = Field(..., description="Orientación exacta del torso y rostro (ej: 3/4 profile facing right)")
     pose: str = Field(..., description="Pose de brazos y cuerpo exacta (ej: Right arm raised holding soft cosmetic puff near right subject's forehead)")
     hands_interaction: str = Field(..., description="Acción física de las manos")

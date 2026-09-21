@@ -23,7 +23,7 @@ El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
 │   ├── 📁 01_Character/            # Fotos, Character Sheet y *_CHARACTER_DNA.md (Fuente de Verdad)
 │   └── 📁 02_Environments/         # Cocina, dormitorio, fondos oficiales
 ├── 📁 03_INBOX_REFERENCES/         # Ingesta de videos descargados por procesar
-│   └── 📁 <cuenta_origen>/         # Ej: cuenta_b/, cuenta_c/
+│   └── 📁 <cuenta_origen>/         # Ej: cuenta_a/, cuenta_b/
 │       └── 📁 _PROCESSED/          # Histórico de videos ya procesados
 ├── 📁 04_IN_PRODUCTION/            # Proyectos en curso (Work In Progress)
 │   └── 📁 PROD_<ID>_<video_name>/
@@ -79,8 +79,8 @@ El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
    * El prompt del Chunk 1 debe utilizar descriptores de alta intensidad y contraste visual (*severe, prominent, high-contrast dark patches, pronounced swelling*). Queda prohibido el uso de términos tímidos (*slight, subtle*).
 5. **Fidelidad al Guion de Referencia, Adaptación de Tono y Sustitución de Producto:**
    * **Estructura y Técnica Fieles:** Se respeta la estructura narrativa, los beats, la problemática y el orden de pasos del video original.
-   * **Adaptación de Tono:** Se personaliza a la voz del avatar (**Sofia Torres** — 47 años, estilo confesión doméstica de cocina, empática, honesta y natural).
-   * **Regla de Producto Propio (Cero Marcas Terceras):** Queda prohibido incluir marcas o productos comerciales de terceros presentes en el video de referencia (ej. Rhode, NYX, Maybelline, etc.). Toda solución, mecanismo o paso de producto se **adapta e integra obligatoriamente hacia el producto de nuestra marca (GlowLab)**.
+   * **Adaptación de Tono:** Se personaliza a la voz del avatar (**el avatar definido en `CHARACTER_DNA.md`**, p. ej. 45 años, estilo confesión doméstica de cocina, empática, honesta y natural).
+   * **Regla de Producto Propio (Cero Marcas Terceras):** Queda prohibido incluir marcas o productos comerciales de terceros presentes en el video de referencia (ej. Rhode, NYX, Maybelline, etc.). Toda solución, mecanismo o paso de producto se **adapta e integra obligatoriamente hacia el producto de nuestra marca (la definida en `creator_profile.yaml`)**.
    * Formato de audio limpio: sin guiones largos (em dashes), sin negritas en texto para locución, ritmo natural fluido (~2.3 a 2.5 palabras/segundo).
 6. **Composición Fiel y Prompts Limpios (Cero Overlays):**
    * Los prompts de imagen y video deben respetar la **composición y posiciones exactas de la referencia**, aplicando la regla de exageración en el Hook.
@@ -123,7 +123,7 @@ El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
    * `<Project_ID>_Subtitles.srt`
    * `<Project_ID>_Cover.jpg`
    * `post_copy_title_and_caption.txt`
-2. Registrar la entrega en `01_KNOWLEDGE_BASE/GlowLab AI Creator Playbook.xlsx`.
+2. Registrar la entrega en `01_KNOWLEDGE_BASE/<Marca> AI Creator Playbook.xlsx`.
 
 ---
 

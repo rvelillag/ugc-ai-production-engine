@@ -225,7 +225,7 @@ Caption:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Assemble raw clips with Smart Silence Trimming into canonical deliverable.")
-    parser.add_argument("--project", required=True, help="Project directory name or path (e.g., PROD_012_cuenta_a_6)")
+    parser.add_argument("--project", required=True, help="Project directory name or path (e.g., PROD_001_cuenta_1)")
     parser.add_argument("--language", default="auto", help="Caption language code (es, en, ...) or 'auto' to detect")
     args = parser.parse_args()
     assemble_project(args.project, language=args.language)

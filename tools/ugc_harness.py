@@ -552,7 +552,7 @@ class UGCHarness:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="UGC Production & QA Harness")
     parser.add_argument("--json", help="Path to production_package_PROD_XXX.json to audit Gates 1-4")
-    parser.add_argument("--project", help="Name of project folder in 04_IN_PRODUCTION (e.g. PROD_012_cuenta_a_6)")
+    parser.add_argument("--project", help="Name of project folder in 04_IN_PRODUCTION (e.g. PROD_001_cuenta_1)")
     parser.add_argument("--brand", default=None, help="Brand directory name (optional, auto-detected if omitted)")
     parser.add_argument("--precheck", action="store_true",
                         help="Corre solo los gates 1-4 y 7 (sin clips ni entregables) antes de gastar en generación de video")
