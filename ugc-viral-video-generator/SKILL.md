@@ -26,11 +26,11 @@ Antes de construir cualquier JSON o prompt, el sistema consulta obligatoriamente
 
 ---
 
-## 2. Metodología de Desglose Fotográfico en 5 Capas & Regla de Desacoplamiento de Escenario
+## 2. Metodología de Desglose Fotográfico en 5 Capas & Regla de Escenario
 
-### A. Regla Dorada: Escenario Propio vs. Disparador Stop-Scroll Replicado / Exagerado
-* **El Escenario / Location NO se clona de la referencia:** El entorno siempre se adapta al **escenario canónico de la marca / avatar** (`02_AVATAR_ASSETS/02_Environments/` o el confirmado en Checkpoint 1, ej: Cocina/Tocador minimalista de lujo, isla de mármol Calacatta, paredes de yeso beige cálido, iluminación luminosa difusa).
-* **El Disparador Visual de Hook (Stop-Scroll Trigger) SI se traslada con Hiper-Exageración:** Se extrae el componente visual insólito o disruptivo del video de referencia y se coloca sobre el escenario de la marca, **haciéndolo igual o más exagerado / de mayor escala y tensión visual que en la referencia original** (ej. maquetas anatómicas colosales que ocupan el 50% del encuadre en 24mm con perspectiva forzada, síntomas macro extremos, vertido dinámico de fluidos, expresiones de asombro de alta retención).
+### A. Escenario y Disparador de Hook (gobernados por Checkpoint 1)
+* **Escenario:** lo decide `scene_mode` de `checkpoint1.json`: `replicate_1to1` replica el entorno de la referencia; `adapt_to_brand` usa el escenario canónico de la marca.
+* **Acciones:** se replican idénticas, en orden, desde `01_Reference/reference_ledger.json`. La hiper-exageración del disparador visual solo se aplica si `hook_exaggeration` es `true`.
 
 ### B. Desglose en 5 Capas Técnicas:
 Cada beat se audita obligatoriamente contra su captura `.jpg` correspondiente (`01_` a `06_`):
@@ -59,11 +59,15 @@ Cada beat se audita obligatoriamente contra su captura `.jpg` correspondiente (`
 ## 4. Pipeline de Generación (JSON-First -> Markdown)
 
 1. **Generar JSON Validado:** Crear `04_IN_PRODUCTION/PROD_<ID>_<nombre>/02_First_Frames/production_package_PROD_<ID>.json`.
-2. **Compilar Markdown:** Ejecutar el conversor oficial:
+2. **Rellenar por chunk** `ledger_rows`, `ref_window`, `voiceover_reference` y `action_timeline`; luego compilar los prompts I2V:
+   ```bash
+   python tools/prompt_compiler.py --json "04_IN_PRODUCTION/PROD_<ID>_<nombre>/02_First_Frames/production_package_PROD_<ID>.json"
+   ```
+3. **Compilar Markdown:** Ejecutar el conversor oficial:
    ```bash
    python tools/render_package_markdown.py --json "04_IN_PRODUCTION/PROD_<ID>_<nombre>/02_First_Frames/production_package_PROD_<ID>.json"
    ```
-3. El script creará automáticamente `prompts_and_script_PROD_<ID>.md` formateado con tablas y bloques de código listos para copiar.
+4. El script creará automáticamente `prompts_and_script_PROD_<ID>.md` formateado con tablas y bloques de código listos para copiar.
 
 ---
 
@@ -87,12 +91,9 @@ Para prevenir bloqueos automáticos en generadores de voz/video (ElevenLabs, Kli
 
 ---
 
-## 6. Estándar de Guión 70/30 (Fidelidad Semántica + Adaptación al Personaje) & Desacoplamiento ManyChat
+## 6. Estándar de Guión (Fidelidad Verbatim ≥85 %) & Desacoplamiento ManyChat
 
-1. **La Regla 70/30 en el Guión:**
-   - **70% Fidelidad Semántica y Estructural:** Conserva el 100% de la carga emocional, el gancho de curiosidad, los puntos de dolor, las revelaciones, el mecanismo explicativo y la secuencia lógica del video viral de referencia.
-   - **30% Parafraseo y Adaptación al Avatar:** El diálogo se parafrasea y adapta para reflejar la voz, el tono, la naturalidad y la personalidad única del Avatar/Personaje (según `CHARACTER_DNA.md`), evitando traducciones rígidas, robóticas o literales que no encajen con su estilo de comunicación.
-   - **Cadencia Rigurosa:** Todo el texto parafraseado debe encajar estrictamente dentro de la constante de locución ($\le 2.4$ palabras por segundo).
+1. **Regla de Fidelidad Verbatim (≥85 %):** el diálogo de cada fila del ledger se conserva ≥85 % palabra por palabra; solo se permiten ajustes mínimos de voz del avatar y el cambio de marcas/CTA por las fórmulas seguras. Cadencia ≤ 2.4 WPS.
 
 2. **Desacoplamiento de Marca y Venta (Venta en ManyChat, NO en el Video):**
    - **El video no menciona marcas comerciales específicas** (ni marcas de terceros ni venta directa agresiva en el diálogo del video).
@@ -106,7 +107,7 @@ Para prevenir bloqueos automáticos en generadores de voz/video (ElevenLabs, Kli
 
 ## 8. Estructura Canónica de Prompts de Video (I2V Motion con Timeline Forense y SFX)
 
-Para garantizar sincronización de labios exacta, correlación 1:1 entre acciones y diálogos, y físicas de movimiento realistas en generadores de video (Veo3, Kling, Hailuo, Grok), **todos los Video Motion Prompts deben seguir estrictamente esta arquitectura de 4 bloques**:
+Para garantizar sincronización de labios exacta, correlación 1:1 entre acciones y diálogos, y físicas de movimiento realistas en generadores de video (Veo3, Kling, Hailuo, Grok), **todos los Video Motion Prompts deben seguir estrictamente esta arquitectura de 4 bloques**. Los prompts se generan con `tools/prompt_compiler.py` a partir del `action_timeline`; la plantilla de abajo describe su salida.
 
 ### Plantilla Maestra de Video Motion Prompt:
 ```text

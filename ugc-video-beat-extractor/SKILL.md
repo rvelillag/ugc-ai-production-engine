@@ -31,6 +31,7 @@ Automatizar el análisis técnico de videos UGC de referencia: transcripción li
     - `📁 02_First_Frames/` (para los renders 9:16)
     - `📁 03_Raw_Clips/` (para los clips de video falado)
     - `📁 04_Audio/` (para locuciones o audios nativos)
+    - `📁 05_Montage/` (para el montaje final)
 - Copiar el archivo de video `.mp4` a `01_Reference/<nombre_video>.mp4`.
 
 ---
@@ -57,8 +58,9 @@ transcript_data = ASREngine.transcribe(temp_wav, language="en")
 - Extraer **exclusivamente** los fotogramas clave oficiales de cada beat (`01_beat1_hook.jpg`, `02_beat2_reframe.jpg`, etc.) en resolución nativa y alta calidad (`-q:v 2`).
 - **Gobernanza Estricta de `01_Reference/`:** Queda prohibido dejar archivos temporales de muestreo (`sample_frame_*.jpg`). La carpeta debe contener estrictamente:
   1. `<nombre_video>.mp4` (video de referencia).
-  2. `01_beat1_hook.jpg` a `06_beat5_cta.jpg` (fotogramas canónicos 1:1).
+  2. `01_beat1_hook.jpg` … (máx 10 keyframes según `CLAUDE.md`; fotogramas canónicos 1:1).
   3. `script_beats_<nombre_video>.txt` (desglose estructural de beats y diagnóstico).
+  4. `reference_ledger.json` (ledger de acciones y diálogo, ver 5b).
 
 ---
 
@@ -119,6 +121,12 @@ SCRIPT COMPLETO CONTINUO (VOICEOVER ORIGINAL LITERAL)
 
 ---
 
+### 5b. Ledger de Referencia (obligatorio)
+- Ejecutar `python tools/reference_ledger.py --project PROD_<ID>_<nombre>`; ver los frames de contacto impresos (f_0001 = 0 s; t = (n-1)/2) y completar por fila `action`, `framing`, `props`, `gaze`, `gesture`, `is_cta`. Una fila por acción física distinta, aunque sea dentro de una misma toma.
+- Mostrar la tabla al usuario en el Checkpoint 1 y registrar `--ledger-confirmed`.
+
+---
+
 ### 6. Aislamiento y Archivo del Video en Inbox
 - Mover físicamente el video original desde `03_INBOX_REFERENCES/<canal>/<nombre_video>.mp4` a la subcarpeta `03_INBOX_REFERENCES/<canal>/_PROCESSED/` para mantener el inbox libre de duplicados.
 
@@ -130,4 +138,5 @@ SCRIPT COMPLETO CONTINUO (VOICEOVER ORIGINAL LITERAL)
 - [ ] Screenshots `.jpg` nítidos presentes en `01_Reference/`.
 - [ ] Diagnóstico de formato e intensidad del Hook documentados.
 - [ ] Video original archivado en `_PROCESSED/`.
+- [ ] reference_ledger.json completo y confirmado por el usuario.
 - [ ] Archivo `script_beats_<nombre_video>.txt` generado y listo para la Fase 3.
