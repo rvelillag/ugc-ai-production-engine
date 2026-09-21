@@ -1,4 +1,8 @@
-# Python
+# =======================================================
+# UGC AI Video Production Engine — Git Ignore Rules
+# =======================================================
+
+# Python & Environment
 __pycache__/
 *.py[cod]
 *$py.class
@@ -17,8 +21,48 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+*.swo
 
-# Temporary / Scratch
+# Temporary, Logs & Scratch
 scratch/
 .tempmediaStorage/
 *.log
+temp/
+tmp/
+*.tmp
+
+# Auto Captions Service Runtime & Storage
+auto-captions-service/storage/jobs/*
+!auto-captions-service/storage/jobs/.gitkeep
+auto-captions-service/storage/uploads/*
+!auto-captions-service/storage/uploads/.gitkeep
+auto-captions-service/watch/input/*
+!auto-captions-service/watch/input/README.txt
+auto-captions-service/watch/output/*
+!auto-captions-service/watch/output/README.txt
+auto-captions-service/temp*.wav
+auto-captions-service/temp*.mp4
+storage/
+watch/
+
+# Media Binaries (Audio, Video, Images) across Workspace
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.wav
+*.mp3
+*.m4a
+*.aac
+*.flac
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.gif
+
+# Avatar / Brand Workspaces & Deliverables (Agnostic Engine Isolation)
+# All active avatar/creator workspaces are local-only runtime instances
+* - */
+Sofia Torres - GlowLab/
