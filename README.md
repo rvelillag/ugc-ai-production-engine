@@ -43,6 +43,8 @@ ugc-ai-production-engine/
 
 ## 🚀 Instalación Rápida (Windows)
 
+> Para elegir una versión específica, actualizar o volver a una versión anterior, ver [INSTALL.md](INSTALL.md).
+
 ### 1. Clonar el repositorio
 ```bash
 git clone https://github.com/TU_USUARIO/ugc-ai-production-engine.git
