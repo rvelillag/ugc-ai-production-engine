@@ -10,7 +10,7 @@ Un sistema integral, modular y escalable para la producción automatizada de vid
 * **Extracción Técnica de Beats:** Transcripción palabra por palabra con Whisper ASR y extracción automática de fotogramas clave con FFmpeg.
 * **Recorte Inteligente de Silencios (*Smart Silence Trimming*):** Detección automática de pausas muertas entre clips de IA mediante Whisper, eliminando silencios iniciales y finales para garantizar un ritmo publicitario continuo y ágil.
 * **Sustitución Automática de Marcas Terceras:** Mapeo inteligente hacia tu catálogo de producto propio (`PRODUCT_CATALOG.yaml`).
-* **Subtitulado Dinámico CapCut (`capcut_italic_yellow`):** Estilo cursiva negrita en minúsculas, palabra activa en Amarillo Neón (`#FFE500`), palabras inactivas en Blanco Puro y margen seguro al **18% de altura** (libre de botones de Reels/TikTok).
+* **Subtitulado Dinámico CapCut/Hormozi (`viral_yellow_highlight`):** Montserrat Bold en mayúsculas, tamaño compacto (4.5% de altura), palabra activa en Amarillo Viral (`#FFD400`), palabras inactivas en Blanco Puro y margen seguro al **18% de altura** (libre de botones de Reels/TikTok). Es la plantilla que ejecuta `tools/assemble_project.py`; `auto-captions-service` incluye otras plantillas alternativas (ej. `capcut_italic_yellow`) para uso manual vía su propio servicio.
 * **Multi-Creador Plug & Play:** Crea nuevos personajes en 1 minuto usando el wizard guiado.
 
 ---

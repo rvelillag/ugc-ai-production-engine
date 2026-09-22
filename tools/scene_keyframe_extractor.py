@@ -11,8 +11,6 @@ sys.stdout.reconfigure(encoding="utf-8")
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from tools.ledger import LEDGER_FILE, anchor_times
 
-MAX_KEYFRAMES = 10
-
 def beat_label(idx: int, total: int) -> str:
     """Canonical beat name for keyframe idx (0-based). Middle 'action' slots should be renamed to the real verb."""
     if idx == 0:
@@ -99,10 +97,8 @@ def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_
                 round(total_duration * 0.88, 2)
             ]
     
-    if len(cut_timestamps) > MAX_KEYFRAMES:
-        step = (len(cut_timestamps) - 1) / (MAX_KEYFRAMES - 1)
-        cut_timestamps = [cut_timestamps[round(i * step)] for i in range(MAX_KEYFRAMES)]
-        print(f"Capped to {MAX_KEYFRAMES} keyframes (governance limit).")
+    # No fixed cap: the number of genuine cuts scales with the video's length/edit density.
+    # The >=1.2s de-dup above already keeps the count meaningful rather than exploding on noise.
 
     print(f"Detected {len(cut_timestamps)} visual takes at timestamps: {cut_timestamps}")
 

@@ -18,7 +18,7 @@ El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
 
 ```
 <Creador>/ (ej. Sofia Torres - GlowLab/)
-├── 📁 01_KNOWLEDGE_BASE/          # Playbooks, frameworks de copy (70% similitud) y SOPs
+├── 📁 01_KNOWLEDGE_BASE/          # Playbooks, frameworks de copy (fidelidad ≥85% vía ledger) y SOPs
 ├── 📁 02_AVATAR_ASSETS/            # Identidad inmutable del avatar y fondos validados
 │   ├── 📁 01_Character/            # Fotos, Character Sheet y *_CHARACTER_DNA.md (Fuente de Verdad)
 │   └── 📁 02_Environments/         # Cocina, dormitorio, fondos oficiales
@@ -52,7 +52,7 @@ El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
 ### FASE 2: Extracción y Diagnóstico Técnico (`ugc-video-beat-extractor`)
 1. Crear la estructura en staging: `04_IN_PRODUCTION/PROD_<ID>_<nombre_video>/01_Reference/`.
 2. Copiar el video original a `01_Reference/`.
-3. Ejecutar FFmpeg para extraer los 6 frames clave en alta resolución (`01_hook.jpg` a `06_cta.jpg`).
+3. Ejecutar FFmpeg para extraer los keyframes clave en alta resolución (`01_beat1_hook.jpg` en adelante); la cantidad no es fija, sigue los cortes de escena reales y las acciones del ledger, así que escala con la duración del video.
 4. **Diagnóstico del Hook:**
    * **Clasificación de Formato:** Determinar si es **Unipersonal** (1 persona) o **Multi-Personaje** (Especialista + Paciente/Modelo).
    * **Auditoría de Intensidad del Problema:** Evaluar si el síntoma en el hook es *Sutil, Moderado o Exagerado*.
@@ -72,16 +72,18 @@ El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
    * Si no existe el archivo `*_CHARACTER_DNA.md`, el sistema se detiene y solicita la ficha de identidad al usuario antes de continuar.
 2. **Traslación de Arquetipo de Personaje:**
    * Si el video de referencia es *Clínico/Médico* pero el avatar de la marca es *Mirror + Convert (Relatable Peer)*, traducir el rol de especialista clínico a **"Anfitriona de cocina compartiendo su descubrimiento con una amiga/invitada"** en un ambiente doméstico honesto.
+   * **Límite:** esta traslación es de tono, encuadre narrativo y escenario (gobernada por `scene_mode` del Checkpoint 1) — **no** una licencia para reescribir diálogo ni acciones. El diálogo de cada fila del ledger sigue debiendo conservar ≥85% de las palabras literales (GATE_7) y las acciones físicas se mantienen en el mismo orden del ledger (GATE_8); solo cambian avatar, vestuario y, si aplica, el escenario.
 3. **Control y Rotación de Vestuario:**
    * Auditar los entregables previos (`PROD_001`, `PROD_002`...) para identificar el color usado anteriormente.
    * Proponer y asignar un color diferenciado de la paleta permitida del avatar (ej. Terracota Cálido, Verde Salvia, Azul Pizarra) para evitar el look de "uniforme rígido" en el feed.
-4. **Regla de Exageración Forzada en el Hook (Parámetros Concretos):**
-   * El prompt del Chunk 1 debe utilizar descriptores de alta intensidad y contraste visual (*severe, prominent, high-contrast dark patches, pronounced swelling*). Queda prohibido el uso de términos tímidos (*slight, subtle*).
+4. **Exageración del Hook (Opt-in, Parámetros Concretos si Aplica):**
+   * Por defecto la acción del hook es idéntica a la referencia (sin exagerar), según el Checkpoint 1 (punto F). Solo si el usuario pidió `hook_exaggeration: true` en `checkpoint1.json`, el prompt del Chunk 1 usa descriptores de alta intensidad y contraste visual (*severe, prominent, high-contrast dark patches, pronounced swelling*) en lugar de términos tímidos (*slight, subtle*).
+   * **WPS Objetivo y Estrategia de Duración (Checkpoint 1, punto G):** `wps_target` = el WPS real de ESA referencia (`CADENCIA PROMEDIO` en `script_beats_<video>.txt`), sin techo artificial — ya no un 2.4 fijo. GATE_2 valida contra este `wps_target` guardado en `checkpoint1.json`. Sobre esa base, `fidelity_target` decide el resto: `full_verbatim` (100% del guion, duración ≈ la original) o `trim_to_min` (recorta además dentro de ≥85% por fila si se quiere acortar aún más). Ninguno de los dos valores es un múltiplo fijo entre proyectos.
 5. **Fidelidad al Guion de Referencia, Adaptación de Tono y Sustitución de Producto:**
    * **Estructura y Técnica Fieles:** Se respeta la estructura narrativa, los beats, la problemática y el orden de pasos del video original.
    * **Adaptación de Tono:** Se personaliza a la voz del avatar (**el avatar definido en `CHARACTER_DNA.md`**, p. ej. 45 años, estilo confesión doméstica de cocina, empática, honesta y natural).
    * **Regla de Producto Propio (Cero Marcas Terceras):** Queda prohibido incluir marcas o productos comerciales de terceros presentes en el video de referencia (ej. Rhode, NYX, Maybelline, etc.). Toda solución, mecanismo o paso de producto se **adapta e integra obligatoriamente hacia el producto de nuestra marca (la definida en `creator_profile.yaml`)**.
-   * Formato de audio limpio: sin guiones largos (em dashes), sin negritas en texto para locución, ritmo natural fluido (~2.3 a 2.5 palabras/segundo).
+   * Formato de audio limpio: sin guiones largos (em dashes), sin negritas en texto para locución, ritmo natural fluido (≤2.4 palabras/segundo, límite técnico de lip-sync).
 6. **Composición Fiel y Prompts Limpios (Cero Overlays):**
    * Los prompts de imagen y video deben respetar la **composición y posiciones exactas de la referencia**, aplicando la regla de exageración en el Hook.
    * Queda estrictamente prohibido incorporar overlays de texto, marcas de agua o íconos de redes sociales en los prompts visuales.
@@ -97,7 +99,7 @@ El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
 
 ### FASE 4: Producción Audiovisual (Generación Externa)
 1. Generar los First Frames en la herramienta de imagen y guardarlos en `02_First_Frames/`.
-2. Animar los clips `.mp4` usando los Video Generation Prompts en Kling / Veo3 / Grok y guardarlos en `03_Raw_Clips/` (`1.mp4` a `6.mp4`).
+2. Animar los clips `.mp4` usando los Video Generation Prompts en Kling / Veo3 / Grok y guardarlos en `03_Raw_Clips/` (`1.mp4` a `N.mp4`, uno por chunk del paquete).
 3. Generar la locución limpia con ElevenLabs en `04_Audio/` si la herramienta de video no realiza TTS nativo.
 
 ---
@@ -106,8 +108,8 @@ El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
 1. **Recorte Inteligente de Silencios (Smart Silence Trimming Obligatorio):**
    * Antes de concatenar, se auditan con Whisper las marcas de tiempo exactas del primer y último instante de locución en cada clip crudo (`1.mp4` a `N.mp4`).
    * Se recortan automáticamente todos los silencios muertos iniciales y finales dejando únicamente un margen natural de respiración ($\approx 0.12\text{s}$ inicio, $\approx 0.22\text{s}$ fin) para evitar baches incómodos y garantizar un ritmo publicitario fluido y de alta retención.
-2. **Concatenación y Subtitulado Dinámico Oficial (`viral_yellow_highlight` / `capcut_italic_yellow`):**
-   * Estilo en minúsculas/mayúsculas con palabra activa en Amarillo Neón (`#FFE500`), palabras inactivas en Blanco (`#FFFFFF`), contorno negro.
+2. **Concatenación y Subtitulado Dinámico Oficial (`viral_yellow_highlight`, hardcodeado en `assemble_project.py`):**
+   * Montserrat Bold en mayúsculas, tamaño compacto (4.5% de altura), palabra activa en Amarillo Viral (`#FFD400`), palabras inactivas en Blanco (`#FFFFFF`), contorno negro.
    * **Zona Segura Inferior (Reels/TikTok Safe Zone):** Margen inferior fijo al **18% de la altura** (`vertical_margin_pct: 18.0%`) para garantizar que el texto nunca quede tapado por la interfaz o botones de Instagram y TikTok.
 3. **Ejecución Unificada Automatizada:**
    ```bash

@@ -55,7 +55,7 @@ Guardar todos los renders en `02_AVATAR_ASSETS/01_Character/` y `02_AVATAR_ASSET
 
 ### Paso 4: Redactar la Fuente de Verdad (`*_CHARACTER_DNA.md`)
 Crear el archivo `02_AVATAR_ASSETS/01_Character/<NOMBRE>_CHARACTER_DNA.md` integrando:
-* **Prompt Anchor Verbatim:** El párrafo descriptivo inmutable del avatar que se copiará literalmente en cada First Frame.
+* **Prompt Anchor Verbatim:** El párrafo descriptivo inmutable del avatar. Puede empezar con su nombre para uso interno del documento, pero **al copiarlo a `avatar_visual_descriptor` en Fase 3, se omite el nombre y apellido** — un prompt hiperrealista con el nombre completo de una persona dispara los filtros de "personas destacadas/reales" de Veo3/Kling (error real observado en producción, no teórico). El resto del descriptor físico se copia literal.
 * **Audio & Voice Direction Anchor:** La definición acústica, tono, ritmo (~2.3 palabras/segundo) y acústica de habitación doméstica para generadores con audio integrado.
 
 ---

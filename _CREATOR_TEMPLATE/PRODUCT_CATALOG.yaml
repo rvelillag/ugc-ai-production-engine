@@ -15,7 +15,7 @@ products:
     manychat_keyword: "ESSENCE"
 
   - id: "hero_product_02"
-    name: "Age-Defying Botanical Serum Foundation"
+    name: "Youthful Glow Botanical Serum Foundation"
     category: "Lightweight Treatment Base"
     description_visual_for_prompts: "a sleek beige squeeze tube with an elegant pump dispenser and minimalist gold cap"
     texture: "ultra-light serum liquid with light-reflecting natural mineral pigments"

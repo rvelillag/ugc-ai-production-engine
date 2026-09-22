@@ -62,11 +62,22 @@ def test_compiled_prompt_follows_canonical_template():
     pkg = _package([_ledger_chunk()])
     prompt = compile_i2v_prompt(pkg, pkg["chunks"][0])
     assert prompt.startswith("Hyper-realistic vertical 9:16 smartphone UGC video. Use the canonical ")
-    assert "Avatar, 47yo, wearing cream knit sweater" in prompt
+    # No debe llevar el nombre propio del avatar (dispara filtros de "personas reales" en Veo3/Kling);
+    # sin avatar_visual_descriptor, cae a un descriptor genérico por edad.
+    assert "Avatar," not in prompt
+    assert "A 47-year-old woman, wearing cream knit sweater" in prompt
     assert "Preserve her identity, clothing, lighting, environment, table position, props and camera style" in prompt
     assert "*ACTION:*" in prompt
     assert f'0–4s: Holds the bottle up to the camera, and says: "{D1}"' in prompt
     assert f'4–8s: Pours it into her palm, while continuing: "{D2}"' in prompt
+
+
+def test_compiled_prompt_uses_visual_descriptor_over_name():
+    pkg = _package([_ledger_chunk()])
+    pkg["avatar_visual_descriptor"] = "a warm 47-year-old woman with a wavy layered bob"
+    prompt = compile_i2v_prompt(pkg, pkg["chunks"][0])
+    assert "A warm 47-year-old woman with a wavy layered bob, wearing cream knit sweater" in prompt
+    assert pkg["avatar_name"] not in prompt
     assert "Natural realistic hand movements. No cuts. No exaggerated acting." in prompt
     assert "*SFX:*" in prompt
     assert not any(w in prompt.lower().split() for w in ("age", "dm"))

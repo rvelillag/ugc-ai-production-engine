@@ -7,8 +7,9 @@ and all prohibitions. Read it in full before any production task. This file inte
 so the two can never diverge.
 
 ## Non-negotiables (details in CLAUDE.md)
-- Stop at **Checkpoint 1** (Scene, Outfit, ManyChat keyword, Cover headline) before generating prompts.
-- Fill and confirm the reference ledger (`reference_ledger.json`); keep all its actions in order and >=85% of its dialogue verbatim; every clip <= 10s and <= 2.4 WPS.
+- Stop at **Checkpoint 1** (Scene, Outfit, ManyChat keyword, Cover headline, Ledger, hook exaggeration, wps_target, duration strategy) before generating prompts.
+- Fill and confirm the reference ledger (`reference_ledger.json`); keep all its actions in order and >=85% of its dialogue verbatim; every clip <= 10s and <= `wps_target` (from `checkpoint1.json` — never assume a fixed 2.4).
+- Chunk boundaries follow the real camera takes in `script_beats_<video>.txt`, never the ledger's own row boundaries (acoustic-pause artifacts). `wps_target` = that reference's own measured WPS, no artificial ceiling ([0.5, 10.0] is only a data-sanity guardrail); total runtime vs. the reference scales with that value and `checkpoint1.json`'s `fidelity_target` — never assume a fixed duration multiplier across projects.
 - Never use 'age' or 'DM' in scripts or prompts; dialogue is brand-decoupled (conversion via ManyChat).
 - Certify with `python tools/ugc_harness.py --project [PROJECT] [--deliverable [ID]]` (all gates PASS: 7/7, or 8/8 with a ledger).
 
