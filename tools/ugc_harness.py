@@ -54,6 +54,13 @@ class UGCHarness:
 
     MAX_CLIP_DURATION_S = 10
 
+    # WPS objetivo: variable por proyecto (checkpoint1.json:wps_target) = WPS real medido de la
+    # referencia, sin techo artificial. Estos limites son solo guardarrailes de cordura contra
+    # datos corruptos, no una politica de velocidad maxima.
+    DEFAULT_WPS_TARGET = 2.4
+    MIN_WPS_TARGET = 0.5
+    MAX_WPS_TARGET = 10.0
+
     # Términos sensibles que activan filtros de moderación/spam
     PROHIBITED_TERMS = [
         r"\bages?\b", r"\bedad(?:es)?\b",
@@ -68,10 +75,17 @@ class UGCHarness:
     ]
 
     @staticmethod
-    def audit_package_json(json_path: Path) -> List[HarnessGateResult]:
+    def audit_package_json(json_path: Path, wps_target: Optional[float] = None) -> List[HarnessGateResult]:
         results = []
         if not json_path.exists():
             return [HarnessGateResult("GATE_1", "Schema & Anatomy", False, f"Archivo JSON no encontrado: {json_path}")]
+
+        if wps_target is None:
+            wps_target = UGCHarness.DEFAULT_WPS_TARGET
+        elif not (UGCHarness.MIN_WPS_TARGET <= wps_target <= UGCHarness.MAX_WPS_TARGET):
+            return [HarnessGateResult("GATE_1", "Schema & Anatomy", False,
+                                      f"checkpoint1.json: wps_target ({wps_target}) parece un dato corrupto "
+                                      f"(fuera de [{UGCHarness.MIN_WPS_TARGET}, {UGCHarness.MAX_WPS_TARGET}]).")]
 
         try:
             with open(json_path, "r", encoding="utf-8") as f:
@@ -152,17 +166,17 @@ class UGCHarness:
                 gate2_details.append(f"Chunk {cid}: word_count declarado ({declared_wc}) no coincide con el texto real ({w_count}).")
 
             # Max allowed words per chunk based on duration:
-            max_words = int(dur_s * 2.4)
+            max_words = int(dur_s * wps_target)
             if w_count > max_words:
                 gate2_passed = False
-                gate2_details.append(f"Chunk {cid} ({dur_s}s): {w_count} palabras excede el límite máximo de {max_words} palabras ({wps} WPS > 2.4 WPS).")
+                gate2_details.append(f"Chunk {cid} ({dur_s}s): {w_count} palabras excede el límite máximo de {max_words} palabras ({wps} WPS > {wps_target} WPS).")
             else:
-                margin = round(dur_s - (w_count / 2.3), 1)
+                margin = round(dur_s - (w_count / wps_target), 1)
                 gate2_details.append(f"Chunk {cid} ({dur_s}s): {w_count} palabras ({wps} WPS) -> Margen libre: +{margin}s")
 
         results.append(HarnessGateResult(
             "GATE_2", "Timing & Cadence Audit", gate2_passed,
-            "Todas las duraciones respetan la constante de locución (<= 2.4 WPS)" if gate2_passed else "Exceso de palabras detectado en locución",
+            f"Todas las duraciones respetan la constante de locución (<= {wps_target} WPS)" if gate2_passed else "Exceso de palabras detectado en locución",
             gate2_details
         ))
 
@@ -438,8 +452,8 @@ class UGCHarness:
 
     @staticmethod
     def audit_reference_fidelity(json_path: Path, reference_dir: Path) -> HarnessGateResult:
-        """Regla 70/30: el guion nuevo conserva la extensión y el núcleo semántico de la referencia."""
-        name = "Reference Fidelity (70/30)"
+        """Heurística legacy (sin ledger): extensión ±10% y >=50% de solapamiento de contenido con la referencia."""
+        name = "Reference Fidelity (legacy, no ledger)"
         ref_text = UGCHarness._extract_reference_text(reference_dir)
         if not ref_text:
             return HarnessGateResult("GATE_7", name, False,
@@ -639,9 +653,17 @@ class UGCHarness:
             except Exception:
                 expected_chunks = None
 
+        wps_target = None
+        try:
+            cp_raw = json.loads((prod_dir / "checkpoint1.json").read_text(encoding="utf-8"))
+            if isinstance(cp_raw.get("wps_target"), (int, float)):
+                wps_target = float(cp_raw["wps_target"])
+        except Exception:
+            wps_target = None
+
         all_gates = []
         # Gates 1 to 4
-        all_gates.extend(cls.audit_package_json(json_path))
+        all_gates.extend(cls.audit_package_json(json_path, wps_target=wps_target))
 
         cp_passed, cp_details = cls.audit_checkpoint1(json_path, prod_dir)
         if all_gates and all_gates[0].gate_id == "GATE_1":
@@ -720,7 +742,15 @@ if __name__ == "__main__":
     harness = UGCHarness()
 
     if args.json:
-        results = harness.audit_package_json(Path(args.json))
+        json_p = Path(args.json)
+        wps_target = None
+        try:
+            cp_raw = json.loads((json_p.parent.parent / "checkpoint1.json").read_text(encoding="utf-8"))
+            if isinstance(cp_raw.get("wps_target"), (int, float)):
+                wps_target = float(cp_raw["wps_target"])
+        except Exception:
+            wps_target = None
+        results = harness.audit_package_json(json_p, wps_target=wps_target)
         report = {
             "project_name": Path(args.json).stem,
             "is_compliant": all(r.passed for r in results),

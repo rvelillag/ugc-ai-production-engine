@@ -2,9 +2,11 @@
 
 `CLAUDE.md` is the single source of truth. Read it before any production task.
 
-- Execute Mandatory Checkpoint 1 (Scene, Outfit, ManyChat Keyword, Cover Headline) before Phase 3.
-- Fill and confirm the reference ledger; keep all its actions in order and >=85% of its dialogue verbatim; each clip <= 10s and <= 2.4 WPS.
+- Execute Mandatory Checkpoint 1 (Scene, Outfit, ManyChat Keyword, Cover Headline, Ledger, hook exaggeration, wps_target, duration strategy) before Phase 3.
+- Fill and confirm the reference ledger; keep all its actions in order and >=85% of its dialogue verbatim; each clip <= 10s and <= wps_target (from checkpoint1.json; not a fixed 2.4 — see below).
+- Group chunks by the real camera takes in script_beats_<video>.txt, not by ledger row boundaries (those come from Whisper acoustic pauses, not scene cuts or grammar); split a take only at a sentence end or, if one sentence is too long, its one natural breath connector.
+- wps_target is variable per project: it IS that reference's own measured WPS from script_beats_<video>.txt, with no artificial ceiling (never hardcode 2.4; [0.5, 10.0] is only a data-sanity guardrail, not a speed policy). Total runtime vs. the reference then depends on wps_target and the `fidelity_target` chosen in Checkpoint 1 (`full_verbatim` keeps 100% of the script, landing close to the reference's own length; `trim_to_min` trims further within the >=85% floor).
 - Never use 'age' or 'DM' in scripts or prompts; dialogue is brand-decoupled.
-- Keep `01_Reference/` to max 10 keyframes plus the video and script txt.
+- Keep `01_Reference/` free of clutter: keyframes plus the video and script txt only, no fixed cap — count follows genuine scene cuts/ledger action boundaries, which scale with video length.
 - Deliverables contain exactly 4 files (.mp4, .srt, .jpg, .txt).
 - Verify with `python tools/ugc_harness.py --project [PROJECT]` (all gates PASS: 7/7, or 8/8 with a ledger).

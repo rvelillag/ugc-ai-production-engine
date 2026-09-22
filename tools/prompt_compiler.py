@@ -17,9 +17,14 @@ def time_marker(t0: float, t1: float) -> str:
 
 def compile_i2v_prompt(pkg: dict, chunk: dict) -> str:
     env = chunk["composition_audit"]["environment_background"].rstrip(".")
+    # No usar avatar_name (nombre y apellido) en el prompt literal: combinado con lenguaje
+    # hiperrealista, dispara los filtros de "personas destacadas/reales" de Veo3/Kling. Se usa
+    # el descriptor físico sin nombre; avatar_name queda solo para continuidad/documentación.
+    identity = pkg.get("avatar_visual_descriptor") or f"a {pkg['avatar_age']}-year-old woman"
+    identity = identity[:1].upper() + identity[1:] if identity else identity
     header = (
         f"Hyper-realistic vertical 9:16 smartphone UGC video. Use the canonical {env}. "
-        f"{pkg['avatar_name']}, {pkg['avatar_age']}yo, wearing {pkg['wardrobe_assigned']}. "
+        f"{identity}, wearing {pkg['wardrobe_assigned']}. "
         "Preserve her identity, clothing, lighting, environment, table position, props and camera style "
         "throughout the entire clip."
     )

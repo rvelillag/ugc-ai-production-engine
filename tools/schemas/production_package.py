@@ -68,6 +68,12 @@ class ProductionPackage(BaseModel):
     avatar_name: str
     avatar_age: int
     avatar_archetype: str
+    avatar_visual_descriptor: str = Field(
+        "", description="Descripción física del avatar SIN nombre propio (ej: 'a 47-year-old woman with a "
+                        "collarbone-length layered bob...'). Es lo que se inyecta en los prompts de Midjourney/Veo3/"
+                        "Kling en vez de avatar_name — nombrar a una persona con nombre y apellido en un prompt "
+                        "hiperrealista dispara los filtros de 'personas destacadas/reales' de estos generadores. "
+                        "avatar_name se mantiene solo para continuidad/documentación interna (asset_tags, notas).")
     wardrobe_previous: str
     wardrobe_assigned: str
     audio_voice_direction_anchor: str

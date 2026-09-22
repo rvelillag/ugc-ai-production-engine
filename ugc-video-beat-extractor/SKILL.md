@@ -60,9 +60,9 @@ transcript_data = ASREngine.transcribe(temp_wav, language="en")
 
 ### 4. Extracción de Keyframes Canónicos 1:1 (FFmpeg)
 - Extraer **exclusivamente** los fotogramas clave oficiales de cada beat (`01_beat1_hook.jpg`, `02_beat2_reframe.jpg`, etc.) en resolución nativa y alta calidad (`-q:v 2`).
-- **Gobernanza Estricta de `01_Reference/`:** Queda prohibido dejar archivos temporales de muestreo (`sample_frame_*.jpg`). La carpeta debe contener estrictamente:
+- **Gobernanza Estricta de `01_Reference/`:** Queda prohibido dejar archivos temporales de muestreo (`sample_frame_*.jpg`). No hay un tope fijo de keyframes: la cantidad depende de la duración del video y de los cortes/acciones reales (un hook de 10s en plano fijo y un video de 40s con varias tomas requieren distinto número de frames). La carpeta debe contener estrictamente:
   1. `<nombre_video>.mp4` (video de referencia).
-  2. `01_beat1_hook.jpg` … (máx 10 keyframes según `CLAUDE.md`; fotogramas canónicos 1:1).
+  2. `01_beat1_hook.jpg` … (uno por corte de escena genuino o límite de acción del ledger; sin relleno; fotogramas canónicos 1:1).
   3. `script_beats_<nombre_video>.txt` (desglose estructural de beats y diagnóstico).
   4. `reference_ledger.json` (ledger de acciones y diálogo, ver 5b).
 
