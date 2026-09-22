@@ -22,6 +22,7 @@ from tools.schemas.production_package import ProductionPackage
 from tools.project_state import record_gates
 from tools.ledger import LEDGER_FILE, fidelity, ledger_hash, load_ledger, tokenize
 from tools.prompt_compiler import time_marker
+from tools.deliverable_naming import resolve_deliverable_id
 
 class HarnessGateResult:
     def __init__(self, gate_id: str, name: str, passed: bool, message: str, details: Optional[List[str]] = None):
@@ -642,7 +643,7 @@ class UGCHarness:
 
         raw_clips_dir = prod_dir / "03_Raw_Clips"
         
-        deliv_id = deliverable_name or name_parts[1]
+        deliv_id = deliverable_name or resolve_deliverable_id(base_brand_dir, name_parts[1])
         deliverables_dir = base_brand_dir / "05_PROCESSED_DELIVERABLES" / deliv_id
 
         expected_chunks = None

@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "auto-captions-s
 from app.core.ffmpeg_utils import FFmpegLocator
 from app.core.pipeline import CaptionPipeline
 from tools.cover_generator import generate_cover_advanced
+from tools.deliverable_naming import resolve_deliverable_id
 
 def probe_fps(ffprobe_bin: str, clip: Path) -> str:
     out = subprocess.check_output(
@@ -71,7 +72,7 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
     name_parts = prod_name.split("_")
     if len(name_parts) < 2 or not name_parts[1]:
         raise ValueError(f"Nombre de proyecto inválido '{prod_name}': se espera PROD_[XXX]_[referencia]")
-    deliv_id = name_parts[1]
+    deliv_id = resolve_deliverable_id(brand_dir, name_parts[1])
 
     raw_clips_dir = project_path / "03_Raw_Clips"
     montage_dir = project_path / "05_Montage"
