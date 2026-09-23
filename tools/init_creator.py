@@ -7,7 +7,10 @@ from pathlib import Path
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-def init_creator():
+ARCHETYPES = ["Especialista", "Espejo", "Familiar", "Insider", "Convertido"]
+
+
+def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Inicializador de Nuevo Creador / Avatar para UGC Production Engine")
     parser.add_argument("--name", required=True, help="Nombre del creador (ej: 'Sofia Torres')")
     parser.add_argument("--brand", required=True, help="Nombre de la marca (ej: 'GlowLab')")
@@ -15,12 +18,33 @@ def init_creator():
     parser.add_argument("--gender", default="female", help="Género del avatar ('female' / 'male')")
     parser.add_argument("--niche", default="Skincare / Cuidado de la piel", help="Nicho de la marca")
     parser.add_argument("--keyword", default="GLOW", help="Keyword predeterminada para ManyChat")
+    parser.add_argument("--archetype", default="Espejo", choices=ARCHETYPES,
+                         help="Tipo de personaje: " + ", ".join(ARCHETYPES))
+    parser.add_argument("--target-audience", default="", dest="target_audience",
+                         help="Descripción de la audiencia objetivo (ej: 'Mujeres de 30 a 45 años')")
+    return parser
 
-    args = parser.parse_args()
+
+def substitute_profile_fields(content: str, *, name: str, brand: str, age: int, gender: str,
+                               archetype: str, niche: str, keyword: str, target_audience: str) -> str:
+    content = content.replace('"Nombre del Creador"', f'"{name}"')
+    content = content.replace("age: 47", f"age: {age}")
+    content = content.replace('"female"', f'"{gender}"')
+    content = content.replace('archetype: "Mirror + Convert"', f'archetype: "{archetype}"')
+    if target_audience:
+        content = content.replace('target_audience: "Mujeres de 40 a 55 años"', f'target_audience: "{target_audience}"')
+    content = content.replace('"Nombre de la Marca"', f'"{brand}"')
+    content = content.replace('"Skincare / Cuidado de la piel"', f'"{niche}"')
+    content = content.replace('"YOUTHFUL"', f'"{keyword}"')
+    return content
+
+
+def init_creator():
+    args = build_arg_parser().parse_args()
 
     base_dir = Path(__file__).resolve().parent.parent
     template_dir = base_dir / "_CREATOR_TEMPLATE"
-    
+
     if not template_dir.exists():
         print(f"Error: No se encontró la plantilla en {template_dir}")
         sys.exit(1)
@@ -47,12 +71,12 @@ def init_creator():
     profile_file = target_dir / "creator_profile.yaml"
     if profile_file.exists():
         content = profile_file.read_text(encoding="utf-8")
-        content = content.replace('"Nombre del Creador"', f'"{args.name}"')
-        content = content.replace("age: 47", f"age: {args.age}")
-        content = content.replace('"female"', f'"{args.gender}"')
-        content = content.replace('"Nombre de la Marca"', f'"{args.brand}"')
-        content = content.replace('"Skincare / Cuidado de la piel"', f'"{args.niche}"')
-        content = content.replace('"YOUTHFUL"', f'"{args.keyword}"')
+        content = substitute_profile_fields(
+            content,
+            name=args.name, brand=args.brand, age=args.age, gender=args.gender,
+            archetype=args.archetype, niche=args.niche, keyword=args.keyword,
+            target_audience=args.target_audience,
+        )
         profile_file.write_text(content, encoding="utf-8")
 
     # Personalizar y renombrar CHARACTER_DNA_TEMPLATE.md
@@ -68,7 +92,7 @@ def init_creator():
         dna_content = dna_content.replace("[Nombre]", args.name)
         dna_content = dna_content.replace("[NOMBRE_MARCA]", args.brand)
         dna_content = dna_content.replace("[Edad]", str(args.age))
-        dna_content = dna_content.replace("[Arquetipo]", "Mirror + Convert")
+        dna_content = dna_content.replace("[Arquetipo]", args.archetype)
         new_dna.write_text(dna_content, encoding="utf-8")
         old_dna.unlink()
 
@@ -86,6 +110,7 @@ def init_creator():
     print(f"1. Generar fotos de referencia y guardarlas en: '{creator_folder_name}/02_AVATAR_ASSETS/01_Character/'")
     print(f"2. Ajustar el catálogo propio en: '{creator_folder_name}/PRODUCT_CATALOG.yaml'")
     print(f"3. Colocar videos de referencia en: '{creator_folder_name}/03_INBOX_REFERENCES/'")
+
 
 if __name__ == "__main__":
     init_creator()
