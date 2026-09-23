@@ -16,9 +16,18 @@ Esta skill proporciona el procedimiento paso a paso para dar de alta a un nuevo 
 
 ### Paso 0: Entrevista de Personaje
 
-Antes de crear ningún archivo, conduce esta entrevista conversacional con el usuario, una pregunta a la vez. El objetivo es producir la ficha del personaje y los prompts de imagen — este paso lo conduce el agente de IA (Claude, Codex, etc.), no es un script.
+Antes de crear ningún archivo, pregunta al usuario cuál de las dos rutas quiere tomar:
 
-1. **Contexto del video/audiencia.** Pregunta por el nicho/tema del video y la investigación de audiencia que ya tenga. Si no tiene nada, haz 2-3 preguntas rápidas (quién sufre qué, cuál es el gancho emocional) para esbozar una audiencia ligera — no esperes un documento de investigación completo.
+- **Ruta A — Desde cero:** el agente conduce una entrevista para construir la ficha del personaje a partir del contexto de audiencia y marca.
+- **Ruta B — Desde referencia:** el usuario aporta fotos o videos de un avatar real que ya convierte; el agente extrae la ficha directamente de esos materiales y la remodela con la identidad de la nueva marca.
+
+---
+
+#### Ruta A — Desde cero
+
+Conduce esta entrevista conversacional, una pregunta a la vez:
+
+1. **Contexto del video/audiencia.** Pregunta por el nicho/tema del video y la investigación de audiencia que ya tenga. Si no tiene nada, haz 2-3 preguntas rápidas (quién sufre qué, cuál es el gancho emocional) para esbozar una audiencia ligera.
 
 2. **Tipo de personaje.** Propón uno de estos 5 arquetipos con una razón de una línea basada en el contexto del paso 1; el usuario puede aceptar o pedir otra opción:
    - **Especialista** — autoridad profesional, accesible, sin bata blanca ni lenguaje distante.
@@ -27,43 +36,86 @@ Antes de crear ningún archivo, conduce esta entrevista conversacional con el us
    - **Insider** — habla desde dentro de la industria/empresa, "esto es lo que no te cuentan."
    - **Convertido** — un ex-escéptico/sufriente que encontró la solución y ahora la evangeliza.
 
-3. **Ficha del personaje.** Completa lo siguiente, proponiendo sugerencias concretas (no solo preguntas abiertas) cuando el usuario no tenga nada en mente:
+3. **Ficha del personaje.** Completa lo siguiente, proponiendo sugerencias concretas cuando el usuario no tenga nada en mente:
    - Nombre, edad, género, apariencia general (clase social que transparece).
    - Jeito de ser: cómo habla, qué valora, energía (cansada, acogedora, animada, seria).
-   - Apariencia física: cabello, piel, cuerpo, ropa, accesorios — anclados a parecerse a la audiencia del paso 1, no a un modelo genérico.
+   - Apariencia física: cabello, piel, cuerpo, ropa, accesorios — anclados a parecerse a la audiencia, no a un modelo genérico.
    - Expresión de rostro en reposo.
    - Gancho de atención: qué hace que la persona no siga scrolleando.
 
 4. **Confirmación.** Muestra la ficha completa al usuario para un sí/ajuste final antes de escribir nada a disco.
 
-5. **Escritura de archivos** (solo después de la confirmación):
-   - Llama primero a `python tools/init_creator.py --name "<Nombre>" --brand "<Marca>" --archetype "<Tipo>" --target-audience "<Audiencia>" [--age N] [--gender ...] [--niche ...] [--keyword ...]` para crear la carpeta del creador con todos los valores ya decididos. Este paso debe ejecutarse ANTES de escribir cualquier otro archivo: `init_creator.py` aborta si la carpeta destino ya existe, así que ningún archivo del personaje puede crearse por adelantado.
-   - Una vez creada la carpeta, redacta `CHARACTER_BRIEF.md` en `<Nombre Creador> - <Marca>/02_AVATAR_ASSETS/01_Character/CHARACTER_BRIEF.md` con esta estructura:
+5. **Escritura de archivos** — ver sección común al final de este paso.
 
-     ```markdown
-     # Character Brief — <Nombre>
+---
 
-     ## Contexto de Audiencia
-     <nicho, resumen de investigación de audiencia>
+#### Ruta B — Desde referencia
 
-     ## Tipo de Personaje: <Especialista|Espejo|Familiar|Insider|Convertido>
-     <por qué este tipo encaja con esta audiencia>
+Parte de materiales reales de un avatar que ya funciona con la audiencia objetivo:
 
-     ## Jeito de Ser
-     <cómo habla, qué valora, energía>
+1. **Pide nombre y marca.** Son los únicos datos necesarios para crear la carpeta antes de analizar los archivos.
 
-     ## Apariencia Física
-     <cabello, piel, cuerpo, ropa, accesorios — y por qué cada elección refleja a la audiencia>
+2. **Crea la carpeta** ejecutando `python tools/init_creator.py --name "<Nombre>" --brand "<Marca>"` con solo esos dos campos. Esto genera `<Nombre>/02_AVATAR_ASSETS/00_Reference_Input/` donde el usuario colocará los archivos.
 
-     ## Expresión en Reposo
-     <...>
+3. **Pide los archivos de referencia.** Indica al usuario que coloque fotos o videos del avatar de referencia en:
+   ```
+   <Nombre>/02_AVATAR_ASSETS/00_Reference_Input/
+   ```
+   Formatos aceptados: `.jpg`, `.jpeg`, `.png`, `.mp4`, `.mov`. Cuando el usuario confirme que los archivos están listos, léelos con la herramienta Read (imágenes) o analízalos visualmente.
 
-     ## Gancho de Atención
-     <qué hace que la persona no siga scrolleando>
-     ```
+4. **Extrae la ficha.** A partir de los materiales, documenta:
+   - Apariencia física: cabello, piel, edad aparente, cuerpo, ropa, accesorios.
+   - Energía y jeito de ser: cómo habla, ritmo, tono emocional.
+   - Expresión en reposo y microexpresiones características.
+   - Gancho de atención: qué hace en los primeros segundos que detiene el scroll.
+   - Arquetipo que mejor describe a este avatar (propón uno con una razón de una línea).
 
-   - Redacta el párrafo-ancla compacto para `*_CHARACTER_DNA.md` (Paso 4), siguiendo la regla existente de no usar nombre completo real.
-   - Compila los prompts de imagen desde `prompts_avatar_builder.md` (Retrato de Perfil, Hoja de Consistencia Facial, y Hoja de Referencia desde Imagen Subida) sustituyendo los detalles de la ficha, y preséntalos como texto listo para copiar en Midjourney/Flux.
+5. **Remodela la ficha** para la nueva marca: mantén la apariencia y energía del avatar de referencia; ajusta solo lo que la identidad de marca requiera (nombre, keyword, nicho, outfit si aplica).
+
+6. **Confirmación.** Muestra la ficha remodeada al usuario para un sí/ajuste final antes de escribir nada más a disco.
+
+7. **Escritura de archivos** — ver sección común al final de este paso.
+
+---
+
+#### Escritura de archivos (común a Ruta A y Ruta B)
+
+Solo ejecutar después de la confirmación del usuario:
+
+- **Ruta A:** llama primero a `python tools/init_creator.py --name "<Nombre>" --brand "<Marca>" --archetype "<Tipo>" --target-audience "<Audiencia>" [--age N] [--gender ...] [--niche ...] [--keyword ...]`. `init_creator.py` aborta si la carpeta ya existe, así que ningún archivo puede crearse por adelantado.
+- **Ruta B:** la carpeta ya existe desde el paso 2; actualiza `creator_profile.yaml` con los campos faltantes (archetype, target_audience, age, gender, niche, keyword) que no se pasaron en el `init_creator.py` inicial.
+
+Una vez que la carpeta existe, escribe los siguientes archivos:
+
+- `CHARACTER_BRIEF.md` en `<Nombre>/02_AVATAR_ASSETS/01_Character/CHARACTER_BRIEF.md`:
+
+  ```markdown
+  # Character Brief — <Nombre>
+
+  ## Contexto de Audiencia
+  <nicho, resumen de investigación de audiencia>
+
+  ## Tipo de Personaje: <Especialista|Espejo|Familiar|Insider|Convertido>
+  <por qué este tipo encaja con esta audiencia>
+
+  ## Jeito de Ser
+  <cómo habla, qué valora, energía>
+
+  ## Apariencia Física
+  <cabello, piel, cuerpo, ropa, accesorios — y por qué cada elección refleja a la audiencia>
+
+  ## Expresión en Reposo
+  <...>
+
+  ## Gancho de Atención
+  <qué hace que la persona no siga scrolleando>
+
+  ## Fuente
+  <"Construido desde cero" | "Extraído de referencia: [nombre del archivo]">
+  ```
+
+- El párrafo-ancla compacto para `*_CHARACTER_DNA.md` (Paso 4), sin nombre completo real en el descriptor visual.
+- Los prompts de imagen desde `prompts_avatar_builder.md` (Retrato de Perfil, Hoja de Consistencia Facial, y — si hay imagen aprobada — Hoja de Referencia desde Imagen Subida), presentados como texto listo para copiar en Midjourney/Flux.
 
 ---
 

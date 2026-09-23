@@ -62,6 +62,7 @@ def init_creator():
 
     # Asegurar explícitamente la creación de todos los directorios 01 a 05
     (target_dir / "01_KNOWLEDGE_BASE").mkdir(parents=True, exist_ok=True)
+    (target_dir / "02_AVATAR_ASSETS" / "00_Reference_Input").mkdir(parents=True, exist_ok=True)
     (target_dir / "02_AVATAR_ASSETS" / "01_Character").mkdir(parents=True, exist_ok=True)
     (target_dir / "02_AVATAR_ASSETS" / "02_Environments").mkdir(parents=True, exist_ok=True)
     (target_dir / "03_INBOX_REFERENCES").mkdir(parents=True, exist_ok=True)
