@@ -1,0 +1,1 @@
+Lee `ugc-avatar-genesis/SKILL.md` en su totalidad y sigue el flujo de onboarding descrito ahí desde el principio: presenta las dos rutas (Ruta A — desde cero, Ruta B — desde referencia) y conduce al usuario paso a paso para crear un nuevo avatar en el sistema.
