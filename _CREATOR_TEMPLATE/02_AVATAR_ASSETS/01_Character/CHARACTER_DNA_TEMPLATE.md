@@ -7,9 +7,8 @@
 
 ## 1. NAME & CHARACTER TYPE: [Nombre] — [Arquetipo]
 
-* **Archetype:** **Mirror + Convert** (Fusión de Espejo y Conversa Escéptica).
-  * **Mirror:** Físicamente y socialmente idéntica a la audiencia objetivo en todo, excepto en la única cosa específica que solucionó.
-  * **Convert:** Al principio era escéptica, lo probó por desesperación/frustración tras gastar dinero en tratamientos que no funcionaban, y ahora cuenta el resultado con asombro genuino y honesto.
+* **Archetype:** **[Arquetipo]**
+  [Rationale: por qué este arquetipo encaja con esta audiencia — completar desde CHARACTER_BRIEF.md]
 * **Por qué NO es "Experta con bata blanca":**
   * La audiencia objetivo desconfía inmediatamente de doctores con piel perfecta y lenguaje clínico ("ad-radar").
   * Una mujer real de [Edad] años que se ve exactamente como ellas, con arrugas suaves, canas sutiles y confesión honesta desde su cocina, genera **prueba social pura y credibilidad instantánea**.

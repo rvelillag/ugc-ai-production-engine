@@ -37,7 +37,8 @@ Antes de crear ningún archivo, conduce esta entrevista conversacional con el us
 4. **Confirmación.** Muestra la ficha completa al usuario para un sí/ajuste final antes de escribir nada a disco.
 
 5. **Escritura de archivos** (solo después de la confirmación):
-   - Redacta `CHARACTER_BRIEF.md` en `02_AVATAR_ASSETS/01_Character/CHARACTER_BRIEF.md` con esta estructura:
+   - Llama primero a `python tools/init_creator.py --name "<Nombre>" --brand "<Marca>" --archetype "<Tipo>" --target-audience "<Audiencia>" [--age N] [--gender ...] [--niche ...] [--keyword ...]` para crear la carpeta del creador con todos los valores ya decididos. Este paso debe ejecutarse ANTES de escribir cualquier otro archivo: `init_creator.py` aborta si la carpeta destino ya existe, así que ningún archivo del personaje puede crearse por adelantado.
+   - Una vez creada la carpeta, redacta `CHARACTER_BRIEF.md` en `<Nombre Creador> - <Marca>/02_AVATAR_ASSETS/01_Character/CHARACTER_BRIEF.md` con esta estructura:
 
      ```markdown
      # Character Brief — <Nombre>
@@ -63,7 +64,6 @@ Antes de crear ningún archivo, conduce esta entrevista conversacional con el us
 
    - Redacta el párrafo-ancla compacto para `*_CHARACTER_DNA.md` (Paso 4), siguiendo la regla existente de no usar nombre completo real.
    - Compila los prompts de imagen desde `prompts_avatar_builder.md` (Retrato de Perfil, Hoja de Consistencia Facial, y Hoja de Referencia desde Imagen Subida) sustituyendo los detalles de la ficha, y preséntalos como texto listo para copiar en Midjourney/Flux.
-   - Llama a `python tools/init_creator.py --name "<Nombre>" --brand "<Marca>" --archetype "<Tipo>" --target-audience "<Audiencia>" [--age N] [--gender ...] [--niche ...] [--keyword ...]` para crear la carpeta del creador con todos los valores ya decididos.
 
 ---
 

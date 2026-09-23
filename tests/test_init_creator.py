@@ -41,35 +41,22 @@ def test_parser_defaults_archetype_and_target_audience():
 
 
 def test_substitute_profile_fields_replaces_all_placeholders():
-    template = (
-        'creator:\n'
-        '  name: "Nombre del Creador"\n'
-        '  age: 47\n'
-        '  gender: "female"\n'
-        '  archetype: "Mirror + Convert"\n'
-        '  target_audience: "Mujeres de 40 a 55 años"\n'
-        '\n'
-        'brand:\n'
-        '  name: "Nombre de la Marca"\n'
-        '  niche: "Skincare / Cuidado de la piel"\n'
-        '\n'
-        'manychat:\n'
-        '  default_keyword: "YOUTHFUL"\n'
-    )
+    repo_root = Path(__file__).resolve().parent.parent
+    template = (repo_root / "_CREATOR_TEMPLATE" / "creator_profile.yaml").read_text(encoding="utf-8")
     result = substitute_profile_fields(
         template,
         name="Sofia Torres",
         brand="GlowLab",
         age=52,
         gender="female",
-        archetype="Espejo",
+        archetype="Insider",
         niche="Skincare",
         keyword="GLOW",
         target_audience="Mujeres de 30 a 45 anos",
     )
     assert 'name: "Sofia Torres"' in result
     assert "age: 52" in result
-    assert 'archetype: "Espejo"' in result
+    assert 'archetype: "Insider"' in result
     assert 'target_audience: "Mujeres de 30 a 45 anos"' in result
     assert 'name: "GlowLab"' in result
     assert 'niche: "Skincare"' in result

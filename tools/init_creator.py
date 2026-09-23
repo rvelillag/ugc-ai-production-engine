@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import shutil
 import argparse
@@ -30,9 +31,9 @@ def substitute_profile_fields(content: str, *, name: str, brand: str, age: int, 
     content = content.replace('"Nombre del Creador"', f'"{name}"')
     content = content.replace("age: 47", f"age: {age}")
     content = content.replace('"female"', f'"{gender}"')
-    content = content.replace('archetype: "Mirror + Convert"', f'archetype: "{archetype}"')
+    content = re.sub(r'(?m)^(\s*archetype:\s*)"[^"]*"', lambda m: f'{m.group(1)}"{archetype}"', content)
     if target_audience:
-        content = content.replace('target_audience: "Mujeres de 40 a 55 años"', f'target_audience: "{target_audience}"')
+        content = re.sub(r'(?m)^(\s*target_audience:\s*)"[^"]*"', lambda m: f'{m.group(1)}"{target_audience}"', content)
     content = content.replace('"Nombre de la Marca"', f'"{brand}"')
     content = content.replace('"Skincare / Cuidado de la piel"', f'"{niche}"')
     content = content.replace('"YOUTHFUL"', f'"{keyword}"')
