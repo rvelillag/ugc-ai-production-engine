@@ -12,7 +12,60 @@ Esta skill proporciona el procedimiento paso a paso para dar de alta a un nuevo 
 
 ---
 
-## 1. Flujo de Onboarding en 5 Pasos
+## 1. Flujo de Onboarding en 6 Pasos (0 a 5)
+
+### Paso 0: Entrevista de Personaje
+
+Antes de crear ningún archivo, conduce esta entrevista conversacional con el usuario, una pregunta a la vez. El objetivo es producir la ficha del personaje y los prompts de imagen — este paso lo conduce el agente de IA (Claude, Codex, etc.), no es un script.
+
+1. **Contexto del video/audiencia.** Pregunta por el nicho/tema del video y la investigación de audiencia que ya tenga. Si no tiene nada, haz 2-3 preguntas rápidas (quién sufre qué, cuál es el gancho emocional) para esbozar una audiencia ligera — no esperes un documento de investigación completo.
+
+2. **Tipo de personaje.** Propón uno de estos 5 arquetipos con una razón de una línea basada en el contexto del paso 1; el usuario puede aceptar o pedir otra opción:
+   - **Especialista** — autoridad profesional, accesible, sin bata blanca ni lenguaje distante.
+   - **Espejo** — idéntico a la audiencia, empieza escéptico, comparte un descubrimiento honesto.
+   - **Familiar** — un par/amigo que comparte su rutina cotidiana sin esfuerzo.
+   - **Insider** — habla desde dentro de la industria/empresa, "esto es lo que no te cuentan."
+   - **Convertido** — un ex-escéptico/sufriente que encontró la solución y ahora la evangeliza.
+
+3. **Ficha del personaje.** Completa lo siguiente, proponiendo sugerencias concretas (no solo preguntas abiertas) cuando el usuario no tenga nada en mente:
+   - Nombre, edad, género, apariencia general (clase social que transparece).
+   - Jeito de ser: cómo habla, qué valora, energía (cansada, acogedora, animada, seria).
+   - Apariencia física: cabello, piel, cuerpo, ropa, accesorios — anclados a parecerse a la audiencia del paso 1, no a un modelo genérico.
+   - Expresión de rostro en reposo.
+   - Gancho de atención: qué hace que la persona no siga scrolleando.
+
+4. **Confirmación.** Muestra la ficha completa al usuario para un sí/ajuste final antes de escribir nada a disco.
+
+5. **Escritura de archivos** (solo después de la confirmación):
+   - Redacta `CHARACTER_BRIEF.md` en `02_AVATAR_ASSETS/01_Character/CHARACTER_BRIEF.md` con esta estructura:
+
+     ```markdown
+     # Character Brief — <Nombre>
+
+     ## Contexto de Audiencia
+     <nicho, resumen de investigación de audiencia>
+
+     ## Tipo de Personaje: <Especialista|Espejo|Familiar|Insider|Convertido>
+     <por qué este tipo encaja con esta audiencia>
+
+     ## Jeito de Ser
+     <cómo habla, qué valora, energía>
+
+     ## Apariencia Física
+     <cabello, piel, cuerpo, ropa, accesorios — y por qué cada elección refleja a la audiencia>
+
+     ## Expresión en Reposo
+     <...>
+
+     ## Gancho de Atención
+     <qué hace que la persona no siga scrolleando>
+     ```
+
+   - Redacta el párrafo-ancla compacto para `*_CHARACTER_DNA.md` (Paso 4), siguiendo la regla existente de no usar nombre completo real.
+   - Compila los prompts de imagen desde `prompts_avatar_builder.md` (Retrato de Perfil, Hoja de Consistencia Facial, y Hoja de Referencia desde Imagen Subida) sustituyendo los detalles de la ficha, y preséntalos como texto listo para copiar en Midjourney/Flux.
+   - Llama a `python tools/init_creator.py --name "<Nombre>" --brand "<Marca>" --archetype "<Tipo>" --target-audience "<Audiencia>" [--age N] [--gender ...] [--niche ...] [--keyword ...]` para crear la carpeta del creador con todos los valores ya decididos.
+
+---
 
 ### Paso 1: Inicializar el Espacio de Trabajo
 Ejecutar el script de inicialización para crear la estructura de carpetas a partir de la plantilla maestra:
@@ -73,6 +126,7 @@ Registrar en `PRODUCT_CATALOG.yaml` los productos que la marca comercializa:
 
 - [ ] Carpeta del creador creada con la estructura estándar (01 a 05).
 - [ ] `creator_profile.yaml` configurado con paleta de vestuario y ManyChat.
+- [ ] `CHARACTER_BRIEF.md` redactado en `01_Character/` con la ficha completa de la entrevista.
 - [ ] `Profile Picture.jpeg` y `character_sheet.png` guardados en `01_Character/`.
 - [ ] Fondos oficiales 9:16 guardados en `02_Environments/`.
 - [ ] `*_CHARACTER_DNA.md` creado con Prompt Anchor y Audio Anchor probados.
