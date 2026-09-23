@@ -4,6 +4,17 @@ This repository is an **Autonomous UGC AI Video Production Engine** designed to 
 
 ---
 
+## Setup Check (run once per session)
+
+Before doing any pipeline work in this repo, check whether `.setup_complete` exists at the repo root.
+
+- **If it exists:** setup has already run — proceed normally.
+- **If it's missing:** this looks like a fresh clone. Tell the user setup hasn't been run yet, and offer to run `install_and_setup.bat` for them (via Bash/PowerShell) before continuing with any other request in this repo. Don't run it without asking first.
+
+This applies to every CLI agent working in this repo (Claude Code, Codex, Cursor, Windsurf, etc.) — `AGENTS.md` already directs all of them to read this file in full before any production task.
+
+---
+
 ## Quick Command Reference
 
 ```bash
