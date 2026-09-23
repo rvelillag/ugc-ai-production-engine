@@ -28,6 +28,7 @@ scratch/
 .tempmediaStorage/
 *.log
 temp/
+.setup_complete
 tmp/
 *.tmp
 
