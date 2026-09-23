@@ -50,7 +50,7 @@ def init_creator():
         print(f"Error: No se encontró la plantilla en {template_dir}")
         sys.exit(1)
 
-    creator_folder_name = f"{args.name} - {args.brand}"
+    creator_folder_name = args.name
     target_dir = base_dir / creator_folder_name
 
     if target_dir.exists():
