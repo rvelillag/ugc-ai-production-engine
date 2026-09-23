@@ -23,6 +23,9 @@ def option_create_avatar(base_dir: Path):
     print("========================================================")
     print("     CREAR NUEVO AVATAR / CREADOR (WIZARD GUIADO)")
     print("========================================================\n")
+    print("Sugerencia: para una entrevista guiada con sugerencias de IA (arquetipo,")
+    print("apariencia, ficha de personaje y prompts de imagen), pídeselo a tu agente de código")
+    print("(Claude Code, Codex, etc.) en vez de usar este wizard básico.\n")
     name = input("1. Nombre del Creador (ej: Sofia Torres): ").strip()
     if not name:
         print("El nombre no puede estar vacío.")
