@@ -7,7 +7,7 @@ creator:
   name: "Nombre del Creador"          # Ej: "Sofia Torres"
   age: 47                             # Edad del avatar
   gender: "female"                    # "female" / "male"
-  archetype: "Mirror + Convert"       # "Mirror + Convert" | "Authority Expert" | "Lifestyle Peer"
+  archetype: "Espejo"                 # "Especialista" | "Espejo" | "Familiar" | "Insider" | "Convertido"
   target_audience: "Mujeres de 40 a 55 años"
 
 brand:

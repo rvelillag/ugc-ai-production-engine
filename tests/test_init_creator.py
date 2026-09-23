@@ -76,3 +76,11 @@ def test_substitute_profile_fields_replaces_all_placeholders():
     assert 'default_keyword: "GLOW"' in result
     assert "Mirror + Convert" not in result
     assert "Mujeres de 40 a 55 años" not in result
+
+
+def test_template_archetype_comment_lists_five_types():
+    repo_root = Path(__file__).resolve().parent.parent
+    template = (repo_root / "_CREATOR_TEMPLATE" / "creator_profile.yaml").read_text(encoding="utf-8")
+    archetype_line = next(line for line in template.splitlines() if line.strip().startswith("archetype:"))
+    for archetype in ARCHETYPES:
+        assert archetype in archetype_line, f"{archetype} missing from archetype comment: {archetype_line}"
