@@ -68,6 +68,9 @@ Antes de crear ningún archivo, conduce esta entrevista conversacional con el us
 ---
 
 ### Paso 1: Inicializar el Espacio de Trabajo
+
+> **Nota:** Si ya completaste el Paso 0 (Entrevista de Personaje), este paso ya se ejecutó automáticamente como parte de la Escritura de Archivos del Paso 0. En ese caso, puedes omitir el comando siguiente — el espacio de trabajo ya está creado con el archetype y target-audience ya capturados. Este comando es solo necesario si creas el espacio de trabajo sin pasar por la entrevista guiada.
+
 Ejecutar el script de inicialización para crear la estructura de carpetas a partir de la plantilla maestra:
 
 ```bash
@@ -81,9 +84,11 @@ Esto creará automáticamente la carpeta `<Nombre_Creador> - <Nombre_Marca>/` co
 ### Paso 2: Definir la Persona & Arquetipo en `creator_profile.yaml`
 Completar las variables clave:
 * **Arquetipo:**
-  * `Mirror + Convert`: Persona idéntica a la audiencia, escéptica al inicio que comparte su descubrimiento honesto.
-  * `Authority Expert`: Profesional accesible en entorno informal (sin bata blanca ni lenguaje distante).
-  * `Lifestyle Peer`: Amiga/o que comparte su rutina cotidiana sin esfuerzo.
+  * `Especialista` — autoridad profesional, accesible, sin bata blanca ni lenguaje distante.
+  * `Espejo` — idéntico a la audiencia, empieza escéptico, comparte un descubrimiento honesto.
+  * `Familiar` — un par/amigo que comparte su rutina cotidiana sin esfuerzo.
+  * `Insider` — habla desde dentro de la industria/empresa, "esto es lo que no te cuentan."
+  * `Convertido` — un ex-escéptico/sufriente que encontró la solución y ahora la evangeliza.
 * **Paleta de Vestuario:** 4 a 5 colores neutros/tierra para rotación sistemática.
 * **Configuración de Voz:** ID de voz en ElevenLabs o especificación para TTS nativo (Veo3/Kling).
 
