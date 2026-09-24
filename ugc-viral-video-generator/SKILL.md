@@ -126,6 +126,8 @@ Para garantizar sincronización de labios exacta, correlación 1:1 entre accione
 
 > **⚠️ Nunca el nombre propio del avatar en el prompt:** `prompt_compiler.py` usa `avatar_visual_descriptor` (descriptor físico, ej. "a 47-year-old woman with a collarbone-length layered bob..."), no `avatar_name`. Un prompt hiperrealista con nombre y apellido de una persona específica dispara los filtros de "personas destacadas/reales" de Veo3/Kling — error real observado en producción. Lo mismo aplica a `midjourney_prompt_9_16`: redáctalo con el descriptor físico, nunca con "[Nombre Avatar], a sophisticated...". `avatar_name`/`*_CHARACTER_DNA.md` quedan solo para continuidad interna (documentación, asset_tags).
 
+> **Consistencia de personajes secundarios:** la consistencia no aplica solo al avatar. Toda otra persona recurrente (clienta, paciente, extras de fondo) se define una vez en `secondary_characters` (`role` + `descriptor` sin nombre propio). `prompt_compiler.py` lo inyecta idéntico en el header de cada prompt I2V y en cada `midjourney_prompt_9_16`; el campo `secondary_state` de cada chunk solo describe qué cambia (ej. cabello mojado → seco). GATE_1 falla si hay `right_subject` sin `secondary_characters`. Tip: reutiliza el primer frame del personaje secundario como imagen de referencia en los demás chunks.
+
 ### Plantilla Maestra de Video Motion Prompt:
 ```text
 Hyper-realistic vertical 9:16 smartphone UGC video. Use the canonical [DETALLES DE ENTORNO/ESCENARIO CANÓNICO]. [DESCRIPTOR FÍSICO DEL AVATAR — NUNCA nombre y apellido, ver nota abajo —, AÑOS APARENTES (ej. 47yo, nunca 'age'/'edad': GATE_3), VESTUARIO EXACTO]. Preserve her identity, clothing, lighting, environment, table position, props and camera style throughout the entire clip.

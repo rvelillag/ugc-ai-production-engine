@@ -115,6 +115,19 @@ class UGCHarness:
             else:
                 gate1_details.append(f"Cover headline verificado: '{cover_hl}' ({len(words_hl)} palabras <= 7)")
 
+            # Consistencia de personajes secundarios (proyectos con checkpoint1 >= secondary_lock_required)
+            try:
+                cp_lock = json.loads((Path(json_path).parent.parent / "checkpoint1.json").read_text(encoding="utf-8")).get("secondary_lock_required")
+            except Exception:
+                cp_lock = False
+            others = [ch.chunk_id for ch in pkg.chunks if ch.composition_audit.right_subject is not None]
+            if cp_lock and others and not pkg.secondary_characters:
+                gate1_passed = False
+                gate1_details.append(f"Error: los chunks {others} tienen otra persona en escena pero falta 'secondary_characters' "
+                                     "(descriptor bloqueado para consistencia entre chunks).")
+            elif pkg.secondary_characters:
+                gate1_details.append(f"Personajes secundarios bloqueados: {[c.role for c in pkg.secondary_characters]}")
+
             # Check anatomy audit in each chunk
             for ch in pkg.chunks:
                 if not ch.composition_audit.left_subject.character_id:

@@ -286,3 +286,15 @@ def test_precheck_never_certifies(tmp_path):
     from tools.project_state import load_state, record_gates
     record_gates(tmp_path, [{"gate_id": f"GATE_{i}", "passed": True} for i in range(1, 8)], precheck=True)
     assert load_state(tmp_path)["phase"] != "certificado"
+
+
+def test_compiler_outfit_override_replaces_dna_wardrobe(tmp_path):
+    import json
+    from tools.prompt_compiler import _apply_outfit_override
+    (tmp_path / "checkpoint1.json").write_text(json.dumps({"outfit": "a burgundy satin blouse."}), encoding="utf-8")
+    dna = ('A stylist with a bob. She is wearing a dark navy silk blouse under a black apron with '
+           '"Bennett Studio" embroidered in gold cursive. She is holding shears and a comb. Warm expression.')
+    out = _apply_outfit_override(dna, tmp_path / "pkg.json")
+    assert "burgundy satin blouse" in out and "navy" not in out and "apron" not in out
+    assert "shears" not in out and "Warm expression." in out
+    assert _apply_outfit_override(dna, tmp_path / "sub" / "x" / "pkg.json") == dna

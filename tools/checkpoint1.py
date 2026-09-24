@@ -56,6 +56,7 @@ def write_checkpoint(project_dir: Path, scene_mode: str, outfit: str, keyword: s
         "fidelity_target": fidelity_target,
         "wps_target": float(wps_target),
         "confirmed_by_user": True,
+        "secondary_lock_required": True,  # GATE_1 exige secondary_characters si hay otras personas en escena
         "confirmed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
     if ledger_confirmed:

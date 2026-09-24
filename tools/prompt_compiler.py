@@ -36,6 +36,27 @@ def _load_dna_descriptor(json_path: Path) -> str | None:
     return None
 
 
+def _apply_outfit_override(descriptor: str, json_path: Path) -> str:
+    """Replace the DNA's wardrobe/props sentences with the outfit confirmed in checkpoint1.json.
+
+    The DNA block hard-codes a base wardrobe (blouse + apron + shears); the outfit chosen in
+    Checkpoint 1.B must win. Looks for checkpoint1.json in the project dir (json_path's parent
+    or grandparent). Returns the descriptor unchanged if there is no checkpoint/outfit or the
+    DNA has no "She is wearing ..." sentence.
+    """
+    for base in (json_path.resolve().parent, json_path.resolve().parent.parent):
+        cp_path = base / "checkpoint1.json"
+        if cp_path.is_file():
+            outfit = (json.loads(cp_path.read_text(encoding="utf-8")).get("outfit") or "").strip().rstrip(".")
+            break
+    else:
+        return descriptor
+    pattern = r"She is wearing[^.]*\.(?:\s*She is holding[^.]*\.)?"
+    if not outfit or not re.search(pattern, descriptor):
+        return descriptor
+    return re.sub(pattern, lambda _: f"She is wearing {outfit}.", descriptor, count=1)
+
+
 def time_marker(t0: float, t1: float) -> str:
     return f"{t0:g}–{t1:g}s"
 
@@ -54,11 +75,16 @@ def compile_i2v_prompt(pkg: dict, chunk: dict) -> str:
         identity_clause = identity.rstrip()
     else:
         identity_clause = f"{identity}, wearing {pkg['wardrobe_assigned']}"
+    secondary = "".join(
+        f" Secondary character ({c['role']}), identical in every clip: {c['descriptor'].rstrip('.')}."
+        for c in pkg.get("secondary_characters", []))
+    if chunk.get("secondary_state") and pkg.get("secondary_characters"):
+        secondary += f" In this clip: {chunk['secondary_state'].rstrip('.')}."
     header = (
         f"Hyper-realistic vertical 9:16 smartphone UGC video. Use the canonical {env}. "
-        f"{identity_clause.rstrip('.')}. "
+        f"{identity_clause.rstrip('.')}.{secondary} "
         "Preserve her identity, clothing, lighting, environment, table position, props and camera style "
-        "throughout the entire clip."
+        "throughout the entire clip, and keep every other person's face, hair and clothing identical."
     )
     lines = ["*ACTION:*"]
     spoke = False
@@ -70,6 +96,24 @@ def compile_i2v_prompt(pkg: dict, chunk: dict) -> str:
         lines.append(line)
     sfx = chunk.get("sfx") or DEFAULT_SFX
     return "\n\n".join([header, "\n\n".join(lines), REALISM, f"*SFX:* {sfx}"])
+
+
+MJ_LOCK_MARK = "SECONDARY CHARACTERS (lock"
+
+
+def lock_first_frame_prompt(pkg: dict, chunk: dict) -> str:
+    """Append the secondary-character lock to the Midjourney prompt (idempotent), before the --ar params."""
+    prompt = chunk.get("midjourney_prompt_9_16", "")
+    chars = pkg.get("secondary_characters", [])
+    if not chars or not prompt:
+        return prompt
+    prompt = re.sub(r"\s*" + re.escape(MJ_LOCK_MARK) + r".*?\.(?= --|$)", "", prompt, flags=re.DOTALL)
+    lock = MJ_LOCK_MARK + ", identical in every frame): " + " ".join(
+        f"{c['role']}: {c['descriptor'].rstrip('.')}." for c in chars)
+    if chunk.get("secondary_state"):
+        lock += f" State in this frame: {chunk['secondary_state'].rstrip('.')}."
+    head, sep, params = prompt.partition(" --ar")
+    return f"{head.rstrip()} {lock}{sep}{params}"
 
 
 def render_md(data: dict, json_path: Path) -> None:
@@ -152,6 +196,7 @@ def compile_package(json_path: Path) -> int:
     # whatever was hand-written in the JSON is overridden on every compile run.
     dna_descriptor = _load_dna_descriptor(path)
     if dna_descriptor:
+        dna_descriptor = _apply_outfit_override(dna_descriptor, path)
         if data.get("avatar_visual_descriptor") != dna_descriptor:
             print(f"  [DNA sync] avatar_visual_descriptor updated from *_CHARACTER_DNA.md")
         data["avatar_visual_descriptor"] = dna_descriptor
@@ -160,6 +205,7 @@ def compile_package(json_path: Path) -> int:
     for chunk in data.get("chunks", []):
         if chunk.get("action_timeline"):
             chunk["video_motion_prompt_i2v"] = compile_i2v_prompt(data, chunk)
+            chunk["midjourney_prompt_9_16"] = lock_first_frame_prompt(data, chunk)
             count += 1
     if count > 0:
         path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")

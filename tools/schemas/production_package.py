@@ -50,6 +50,8 @@ class ChunkItem(BaseModel):
     ref_window: Optional[Tuple[float, float]] = Field(None, description="Ventana [t0, t1] de la referencia que reemplaza")
     action_timeline: List[ActionStep] = Field(default_factory=list)
     voiceover_reference: str = Field("", description="Diálogo original literal del segmento")
+    secondary_state: str = Field("", description="Estado de los personajes secundarios en ESTE clip (ej: 'client's hair wet and slicked back'). "
+                                                 "Solo puede variar el estado, nunca la identidad definida en secondary_characters.")
     sfx: str = Field("", description="Capa acústica/Foley del clip")
 
 class PostCopy(BaseModel):
@@ -58,6 +60,12 @@ class PostCopy(BaseModel):
     caption: str = Field(..., description="Cuerpo del post para Reels / TikTok / FB")
     manychat_keyword: str = Field(..., description="Palabra clave disparadora de ManyChat")
     hashtags: List[str] = Field(..., description="Lista de hashtags optimizados")
+
+class SecondaryCharacter(BaseModel):
+    role: str = Field(..., description="Rol en escena (ej: client, background stylist)")
+    descriptor: str = Field(..., description="Descriptor físico y de vestuario inmutable, SIN nombre propio. Se inyecta en el header de cada prompt I2V "
+                                              "para que el personaje sea idéntico en todos los chunks (igual que el avatar).")
+
 
 class ProductionPackage(BaseModel):
     project_id: str
@@ -74,6 +82,8 @@ class ProductionPackage(BaseModel):
                         "Kling en vez de avatar_name — nombrar a una persona con nombre y apellido en un prompt "
                         "hiperrealista dispara los filtros de 'personas destacadas/reales' de estos generadores. "
                         "avatar_name se mantiene solo para continuidad/documentación interna (asset_tags, notas).")
+    secondary_characters: List[SecondaryCharacter] = Field(
+        default_factory=list, description="Personajes secundarios recurrentes (clienta, extras) con descriptor bloqueado para consistencia entre chunks")
     wardrobe_previous: str
     wardrobe_assigned: str
     audio_voice_direction_anchor: str

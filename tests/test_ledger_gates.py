@@ -376,3 +376,56 @@ def test_compile_package_count_zero_leaves_file_untouched(tmp_path):
     p.write_bytes(raw.encode("utf-8"))
     assert compile_package(p) == 0
     assert p.read_bytes() == raw.encode("utf-8")
+
+
+# ---- Personajes secundarios: consistencia entre chunks ----
+CLIENT = {"role": "salon client", "descriptor": "a fair-skinned woman in her 60s with shoulder-length silver-blonde hair"}
+
+
+def _two_person_chunk():
+    ch = _ledger_chunk()
+    ch["composition_audit"]["right_subject"] = {
+        "role": "client", "orientation": "o", "pose": "p", "hands_interaction": "h",
+        "facial_expression": "f", "skin_condition_exaggerated": "s"}
+    ch["secondary_state"] = "the client's hair is wet"
+    ch["midjourney_prompt_9_16"] = "a stylist at a sink --ar 9:16 --v 6.1"
+    return ch
+
+
+def test_compiler_injects_secondary_characters_in_i2v_and_first_frame_idempotently():
+    pkg = _package([_two_person_chunk()])
+    pkg["secondary_characters"] = [CLIENT]
+    ch = pkg["chunks"][0]
+    prompt = compile_i2v_prompt(pkg, ch)
+    assert "Secondary character (salon client), identical in every clip: a fair-skinned woman" in prompt
+    assert "In this clip: the client's hair is wet." in prompt
+    from tools.prompt_compiler import lock_first_frame_prompt
+    ch["midjourney_prompt_9_16"] = once = lock_first_frame_prompt(pkg, ch)
+    assert "a fair-skinned woman" in once and once.endswith("--ar 9:16 --v 6.1")
+    assert lock_first_frame_prompt(pkg, ch) == once  # idempotente
+
+
+def _gate1(tmp_path, pkg, lock):
+    proj = tmp_path / "PROD_001_x"
+    (proj / "02_First_Frames").mkdir(parents=True)
+    (proj / "checkpoint1.json").write_text(json.dumps({"secondary_lock_required": lock}), encoding="utf-8")
+    pj = proj / "02_First_Frames" / "pkg.json"
+    pj.write_text(json.dumps(pkg), encoding="utf-8")
+    return UGCHarness.audit_package_json(pj)[0]
+
+
+def test_gate1_requires_secondary_characters_when_other_person_in_scene(tmp_path):
+    pkg = _package([_two_person_chunk()])
+    assert not _gate1(tmp_path, pkg, lock=True).passed
+    pkg["secondary_characters"] = [CLIENT]
+    assert _gate1(tmp_path / "b", pkg, lock=True).passed
+
+
+def test_gate1_does_not_break_legacy_projects_without_lock_flag(tmp_path):
+    assert _gate1(tmp_path, _package([_two_person_chunk()]), lock=False).passed
+
+
+def test_new_checkpoints_require_secondary_lock(tmp_path):
+    proj = _project(tmp_path)
+    cp = json.loads((write_checkpoint(proj, "adapt_to_brand", "o", "GLOW", "Stop Doing This")).read_text(encoding="utf-8"))
+    assert cp["secondary_lock_required"] is True
