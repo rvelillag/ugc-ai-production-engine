@@ -90,12 +90,40 @@ def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_
             durations.append(end - timestamps[i])
         return min(durations) if durations else 0.0
 
-    # Reject an FFmpeg result whose shortest take < 2.5s — those micro-cuts are noise in
-    # same-room talking-head UGC where every take is a continuous spoken sentence (≥ ~3s).
+    def _merge_short_takes(timestamps, total_dur, min_take=2.5):
+        """Iteratively merge the shortest take with its smaller neighbor until all takes >= min_take.
+
+        For videos where real camera cuts happen mid-sentence, FFmpeg often detects the correct
+        cut boundaries but also adds noise micro-cuts (< min_take) nearby. Rather than discarding
+        the entire FFmpeg result, we fuse each micro-take with whichever adjacent take is shorter —
+        this removes the spurious boundary while keeping the real ones as close as possible.
+        """
+        cuts = [round(float(t), 2) for t in timestamps]
+        while True:
+            ends = cuts[1:] + [total_dur]
+            durs = [e - s for s, e in zip(cuts, ends)]
+            if min(durs) >= min_take:
+                break
+            idx = durs.index(min(durs))
+            if idx == 0:
+                cuts.pop(1)                # merge into next: remove first interior boundary
+            elif idx == len(durs) - 1:
+                cuts.pop(idx)              # merge into prev: remove last interior boundary
+            else:
+                # Merge with the smaller neighbor (remove the shared boundary)
+                if durs[idx - 1] <= durs[idx + 1]:
+                    cuts.pop(idx)          # absorb into left take
+                else:
+                    cuts.pop(idx + 1)      # absorb into right take
+        return cuts
+
+    # Minimum take duration. Takes below this are treated as FFmpeg noise, not real cuts.
     MIN_TAKE = 2.5
 
     if len(cut_timestamps) < 4 or _min_take_dur(cut_timestamps, total_duration) < MIN_TAKE:
-        # Fallback 1: lower scene threshold (catches subtle same-room UGC cuts)
+        # Fallback 1: lower scene threshold (catches subtle same-room UGC cuts).
+        # Merge any micro-takes first before deciding whether to accept the result —
+        # this handles videos where real cuts happen mid-sentence alongside brightness noise.
         scene_cmd2 = [
             "ffmpeg", "-i", str(video_path),
             "-filter:v", "select='gt(scene,0.10)',showinfo",
@@ -110,9 +138,14 @@ def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_
                     ts2 = float(m2.group(1))
                     if ts2 - low_thresh_cuts[-1] >= 1.5 and ts2 < total_duration - 0.8:
                         low_thresh_cuts.append(round(ts2, 2))
-        if len(low_thresh_cuts) >= 4 and _min_take_dur(low_thresh_cuts, total_duration) >= MIN_TAKE:
-            cut_timestamps = low_thresh_cuts
-            print(f"  (low-threshold scene detection: {len(cut_timestamps)} cuts found)")
+        if len(low_thresh_cuts) >= 4:
+            merged = _merge_short_takes(low_thresh_cuts, total_duration, MIN_TAKE)
+            if len(merged) >= 4 and _min_take_dur(merged, total_duration) >= MIN_TAKE:
+                cut_timestamps = merged
+                n_raw = len(low_thresh_cuts)
+                n_merged = len(merged)
+                note = f", merged {n_raw - n_merged} micro-cut(s)" if n_merged < n_raw else ""
+                print(f"  (low-threshold scene detection: {n_merged} cuts{note})")
 
     if len(cut_timestamps) < 4 or _min_take_dur(cut_timestamps, total_duration) < MIN_TAKE:
         # Fallback 2: ledger action boundaries (if ledger was pre-built)
