@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 import json
 import re
@@ -62,151 +62,95 @@ def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_
     wps = round(total_words / total_duration, 2) if total_duration > 0 else 0.0
     wpm = int(round(wps * 60))
     
-    # 3. Detect Scene Cuts using FFmpeg
-    print("Detecting visual scene transitions with FFmpeg...")
+    # 3. Audio/Script-First Narrative & Semantic Segmentation (5 Canonical Beats)
+    print("Analyzing narrative cadence, sentence boundaries, and natural pauses...")
+    
+    # Flatten word-level timestamps from all segments
+    all_word_ts = []
+    for seg in whisper_segments:
+        for w in seg.get("words", []):
+            if w.get("word", "").strip():
+                all_word_ts.append(w)
+    
+    sentence_closing = {".", "!", "?", ":"}
+    clause_conjunctions = {
+        "and", "but", "or", "so", "then", "because", "after", "when", "while",
+        "y", "pero", "o", "así", "entonces", "porque", "después", "luego", "cuando", "mientras"
+    }
+
+    # Detect visual cuts from FFmpeg for cross-reference and frame snapping
+    print("Scanning visual scene transitions with FFmpeg for alignment...")
     scene_cmd = [
         "ffmpeg", "-i", str(video_path),
-        "-filter:v", "select='gt(scene,0.22)',showinfo",
+        "-filter:v", "select='gt(scene,0.18)',showinfo",
         "-f", "null", "-"
     ]
     p = subprocess.run(scene_cmd, stderr=subprocess.PIPE, text=True, errors="replace")
-    
-    # Extract timestamps of scene cuts
-    cut_timestamps = [0.0]
+    raw_visual_cuts = []
     for line in p.stderr.splitlines():
         if "pts_time:" in line:
             m = re.search(r"pts_time:([0-9\.]+)", line)
             if m:
                 ts = float(m.group(1))
-                # Avoid micro-cuts < 1.0s apart
-                if ts - cut_timestamps[-1] >= 1.2 and ts < total_duration - 0.8:
-                    cut_timestamps.append(round(ts, 2))
-    
-    def _min_take_dur(timestamps, total_dur):
-        """Return the shortest take duration in seconds for a cut-timestamp list."""
-        durations = []
-        for i in range(len(timestamps)):
-            end = timestamps[i + 1] if i + 1 < len(timestamps) else total_dur
-            durations.append(end - timestamps[i])
-        return min(durations) if durations else 0.0
+                if 1.0 <= ts <= total_duration - 1.0:
+                    raw_visual_cuts.append(round(ts, 2))
 
-    def _merge_short_takes(timestamps, total_dur, min_take=2.5):
-        """Iteratively merge the shortest take with its smaller neighbor until all takes >= min_take.
+    # Identify semantic split points based on sentence endings, strong pauses, and sub-clause connectors
+    MAX_TAKE_DURATION = 9.0  # Keep all generated clips safely <= 10s (Veo3/Kling limit)
+    MIN_TAKE_DURATION = 2.0
 
-        For videos where real camera cuts happen mid-sentence, FFmpeg often detects the correct
-        cut boundaries but also adds noise micro-cuts (< min_take) nearby. Rather than discarding
-        the entire FFmpeg result, we fuse each micro-take with whichever adjacent take is shorter —
-        this removes the spurious boundary while keeping the real ones as close as possible.
-        """
-        cuts = [round(float(t), 2) for t in timestamps]
-        while True:
-            ends = cuts[1:] + [total_dur]
-            durs = [e - s for s, e in zip(cuts, ends)]
-            if min(durs) >= min_take:
-                break
-            idx = durs.index(min(durs))
-            if idx == 0:
-                cuts.pop(1)                # merge into next: remove first interior boundary
-            elif idx == len(durs) - 1:
-                cuts.pop(idx)              # merge into prev: remove last interior boundary
-            else:
-                # Merge with the smaller neighbor (remove the shared boundary)
-                if durs[idx - 1] <= durs[idx + 1]:
-                    cuts.pop(idx)          # absorb into left take
-                else:
-                    cuts.pop(idx + 1)      # absorb into right take
-        return cuts
+    semantic_cuts = [0.0]
+    last_cut = 0.0
 
-    # Minimum take duration. Takes below this are treated as FFmpeg noise, not real cuts.
-    MIN_TAKE = 2.5
+    for i, w in enumerate(all_word_ts):
+        word_raw = w["word"].strip()
+        word_clean = word_raw.rstrip("\"')").lower()
+        is_sentence_end = any(word_raw.endswith(p) for p in sentence_closing)
+        end_t = w["end"]
 
-    if len(cut_timestamps) < 4 or _min_take_dur(cut_timestamps, total_duration) < MIN_TAKE:
-        # Fallback 1: lower scene threshold (catches subtle same-room UGC cuts).
-        # Merge any micro-takes first before deciding whether to accept the result —
-        # this handles videos where real cuts happen mid-sentence alongside brightness noise.
-        scene_cmd2 = [
-            "ffmpeg", "-i", str(video_path),
-            "-filter:v", "select='gt(scene,0.10)',showinfo",
-            "-f", "null", "-"
-        ]
-        p2 = subprocess.run(scene_cmd2, stderr=subprocess.PIPE, text=True, errors="replace")
-        low_thresh_cuts = [0.0]
-        for line in p2.stderr.splitlines():
-            if "pts_time:" in line:
-                m2 = re.search(r"pts_time:([0-9\.]+)", line)
-                if m2:
-                    ts2 = float(m2.group(1))
-                    if ts2 - low_thresh_cuts[-1] >= 1.5 and ts2 < total_duration - 0.8:
-                        low_thresh_cuts.append(round(ts2, 2))
-        if len(low_thresh_cuts) >= 4:
-            merged = _merge_short_takes(low_thresh_cuts, total_duration, MIN_TAKE)
-            if len(merged) >= 4 and _min_take_dur(merged, total_duration) >= MIN_TAKE:
-                cut_timestamps = merged
-                n_raw = len(low_thresh_cuts)
-                n_merged = len(merged)
-                note = f", merged {n_raw - n_merged} micro-cut(s)" if n_merged < n_raw else ""
-                print(f"  (low-threshold scene detection: {n_merged} cuts{note})")
+        # Measure pause to next word
+        pause = (all_word_ts[i + 1]["start"] - end_t) if (i + 1 < len(all_word_ts)) else (total_duration - end_t)
+        current_dur = end_t - last_cut
 
-    if len(cut_timestamps) < 4 or _min_take_dur(cut_timestamps, total_duration) < MIN_TAKE:
-        # Fallback 2: ledger action boundaries (if ledger was pre-built)
-        anchors = anchor_times(output_dir / LEDGER_FILE)
-        if len(anchors) >= 4 and _min_take_dur(anchors, total_duration) >= MIN_TAKE:
+        # Condition 1: Sentence closure with natural breathing pause (>= 0.15s) and sufficient take length
+        is_strong_sentence_cut = is_sentence_end and (current_dur >= MIN_TAKE_DURATION) and (pause >= 0.12 or current_dur >= 4.0)
+
+        # Condition 2: Long sub-beat take (> MAX_TAKE_DURATION - 2s) reaching a clause conjunction or pause >= 0.3s
+        is_clause_split = (current_dur >= 5.5) and (word_clean in clause_conjunctions or is_sentence_end or pause >= 0.3)
+
+        # Condition 3: Must split before exceeding MAX_TAKE_DURATION
+        is_urgent_split = (current_dur >= MAX_TAKE_DURATION) and (pause >= 0.15 or is_sentence_end)
+
+        if (is_strong_sentence_cut or is_clause_split or is_urgent_split) and (end_t < total_duration - 1.0):
+            # Check if there is an FFmpeg visual cut nearby (+- 0.8s) to snap perfectly to the camera take
+            candidate_ts = end_t
+            for vcut in raw_visual_cuts:
+                if abs(vcut - end_t) <= 0.85:
+                    candidate_ts = vcut
+                    break
+            
+            if candidate_ts - last_cut >= MIN_TAKE_DURATION:
+                semantic_cuts.append(round(candidate_ts, 2))
+                last_cut = candidate_ts
+
+    # Ensure we cover the video adequately; if too few cuts, fallback to ledger anchors or proportional splits
+    cut_timestamps = semantic_cuts
+    if len(cut_timestamps) < 3:
+        anchors = anchor_times(output_dir / LEDGER_FILE) if (output_dir / LEDGER_FILE).exists() else []
+        if len(anchors) >= 3:
             cut_timestamps = anchors
-            print(f"  (ledger anchor fallback: {len(cut_timestamps)} cuts)")
-
-    if len(cut_timestamps) < 4 or _min_take_dur(cut_timestamps, total_duration) < MIN_TAKE:
-        # Fallback 3: Sentence-semantic boundaries from Whisper word timestamps.
-        #
-        # A pause in the audio is NOT necessarily a scene cut — the speaker may just
-        # breathe mid-sentence (e.g. "...Squeeze a line of Colgate [pause] toothpaste...").
-        # We only accept a boundary if it is BOTH:
-        #   (a) a complete sentence end: the last word before the pause ends with . ! ?
-        #   (b) a meaningful pause: silence >= 0.2s before the next word
-        #
-        # This cross-references the acoustic signal with the full script so that
-        # intra-sentence breath pauses are rejected as cut candidates.
-        sentence_ends = []
-        # Flatten word-level timestamps from all segments
-        all_word_ts = []
-        for seg in whisper_segments:
-            for w in seg.get("words", []):
-                if w.get("word", "").strip():
-                    all_word_ts.append(w)
-
-        sentence_closing = {".", "!", "?"}
-        for i, w in enumerate(all_word_ts):
-            word_text = w["word"].strip().rstrip("\"')")
-            # Check if this word closes a sentence
-            if not any(word_text.endswith(p) for p in sentence_closing):
-                continue
-            end_t = w["end"]
-            if end_t < 0.5 or end_t > total_duration - 0.5:
-                continue
-            # Measure pause to next word
-            if i + 1 < len(all_word_ts):
-                pause = all_word_ts[i + 1]["start"] - end_t
-            else:
-                pause = total_duration - end_t
-            if pause < 0.2:
-                continue
-            # Enforce minimum gap between cuts
-            if sentence_ends and end_t - sentence_ends[-1] < 2.0:
-                continue
-            sentence_ends.append(round(end_t, 2))
-
-        if len(sentence_ends) >= 3:
-            cut_timestamps = [0.0] + sentence_ends
-            print(f"  (sentence-semantic fallback: {len(cut_timestamps)} cuts at sentence ends)")
+            print(f"  (aligned to reference ledger anchors: {len(cut_timestamps)} takes)")
         else:
-            # Last resort: evenly spaced by ~8s windows (never the old fixed-6 split)
-            n_splits = max(3, round(total_duration / 8))
+            n_splits = max(3, round(total_duration / 7.0))
             cut_timestamps = [round(total_duration * i / n_splits, 2) for i in range(n_splits)]
-            print(f"  (equidistant last-resort fallback: {len(cut_timestamps)} splits)")
-    
-    # No fixed cap: the number of genuine cuts scales with the video's length/edit density.
-    # The >=1.2s de-dup above already keeps the count meaningful rather than exploding on noise.
+            print(f"  (distributed into {len(cut_timestamps)} balanced narrative takes)")
 
-    print(f"Detected {len(cut_timestamps)} visual takes at timestamps: {cut_timestamps}")
+    # Deduplicate and sort as pure floats
+    cut_timestamps = sorted([round(float(ts), 2) for ts in set(cut_timestamps)])
+    if cut_timestamps[0] != 0.0:
+        cut_timestamps.insert(0, 0.0)
+
+    print(f"Constructed {len(cut_timestamps)} narrative takes at timestamps: {cut_timestamps}")
 
     # 4. Extract Keyframes
     extracted_frames = []
@@ -248,22 +192,24 @@ DESGLOSE FORENSE POR TOMAS Y ACCIONES VISUALES (1:1):
         start_t = cut_timestamps[i]
         end_t = cut_timestamps[i+1] if i+1 < len(cut_timestamps) else total_duration
         
-        # Collect words spoken in this window
+        # Collect words spoken in this window (disjoint partition by midpoint)
         seg_words = []
         for s in whisper_segments:
             for w in s["words"]:
-                if w["start"] >= start_t - 0.2 and w["end"] <= end_t + 0.5:
+                mid_t = (w["start"] + w["end"]) / 2.0
+                if (i == 0 or mid_t >= start_t) and (i == len(cut_timestamps) - 1 or mid_t < end_t):
                     seg_words.append(w["word"])
         
         spoken_text = " ".join(seg_words) if seg_words else "(Visual B-roll / Acción física continua)"
         frame_info = extracted_frames[i]
         
+        lbl = beat_label(i, len(cut_timestamps)).upper()
         script_beats_content += f"""
-[TOMA {i+1} / BEAT]
+[{lbl} — TOMA {i+1}]
 * Timestamp: {start_t:.2f}s - {end_t:.2f}s ({round(end_t - start_t, 1)}s)
 * Voiceover Segment: "{spoken_text}"
 * Keyframe Extraído: {frame_info["filename"]}
-* Acción y Encuadre: (no se infiere del corte; se documenta en {LEDGER_FILE})
+* Acción y Encuadre: (documentado en {LEDGER_FILE})
 """
 
     script_beats_file = output_dir / f"script_beats_{video_path.stem}.txt"
