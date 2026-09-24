@@ -82,8 +82,19 @@ def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_
                 if ts - cut_timestamps[-1] >= 1.2 and ts < total_duration - 0.8:
                     cut_timestamps.append(round(ts, 2))
     
-    # Few genuine cuts detected — cascade through smarter fallbacks before using percentages.
-    if len(cut_timestamps) < 4:
+    def _min_take_dur(timestamps, total_dur):
+        """Return the shortest take duration in seconds for a cut-timestamp list."""
+        durations = []
+        for i in range(len(timestamps)):
+            end = timestamps[i + 1] if i + 1 < len(timestamps) else total_dur
+            durations.append(end - timestamps[i])
+        return min(durations) if durations else 0.0
+
+    # Reject an FFmpeg result whose shortest take < 2.5s — those micro-cuts are noise in
+    # same-room talking-head UGC where every take is a continuous spoken sentence (≥ ~3s).
+    MIN_TAKE = 2.5
+
+    if len(cut_timestamps) < 4 or _min_take_dur(cut_timestamps, total_duration) < MIN_TAKE:
         # Fallback 1: lower scene threshold (catches subtle same-room UGC cuts)
         scene_cmd2 = [
             "ffmpeg", "-i", str(video_path),
@@ -99,18 +110,18 @@ def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_
                     ts2 = float(m2.group(1))
                     if ts2 - low_thresh_cuts[-1] >= 1.5 and ts2 < total_duration - 0.8:
                         low_thresh_cuts.append(round(ts2, 2))
-        if len(low_thresh_cuts) >= 4:
+        if len(low_thresh_cuts) >= 4 and _min_take_dur(low_thresh_cuts, total_duration) >= MIN_TAKE:
             cut_timestamps = low_thresh_cuts
             print(f"  (low-threshold scene detection: {len(cut_timestamps)} cuts found)")
 
-    if len(cut_timestamps) < 4:
+    if len(cut_timestamps) < 4 or _min_take_dur(cut_timestamps, total_duration) < MIN_TAKE:
         # Fallback 2: ledger action boundaries (if ledger was pre-built)
         anchors = anchor_times(output_dir / LEDGER_FILE)
-        if len(anchors) >= 4:
+        if len(anchors) >= 4 and _min_take_dur(anchors, total_duration) >= MIN_TAKE:
             cut_timestamps = anchors
             print(f"  (ledger anchor fallback: {len(cut_timestamps)} cuts)")
 
-    if len(cut_timestamps) < 4:
+    if len(cut_timestamps) < 4 or _min_take_dur(cut_timestamps, total_duration) < MIN_TAKE:
         # Fallback 3: Sentence-semantic boundaries from Whisper word timestamps.
         #
         # A pause in the audio is NOT necessarily a scene cut — the speaker may just
