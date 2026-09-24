@@ -298,3 +298,10 @@ def test_compiler_outfit_override_replaces_dna_wardrobe(tmp_path):
     assert "burgundy satin blouse" in out and "navy" not in out and "apron" not in out
     assert "shears" not in out and "Warm expression." in out
     assert _apply_outfit_override(dna, tmp_path / "sub" / "x" / "pkg.json") == dna
+
+
+def test_compiler_outfit_reads_as_natural_noun_phrase():
+    from tools.prompt_compiler import _as_noun_phrase
+    assert _as_noun_phrase("Burgundy satin blouse, gold hoop earrings, delicate gold necklace, ring.") ==         "a burgundy satin blouse, gold hoop earrings, delicate gold necklace, and a ring"
+    assert _as_noun_phrase("a navy silk blouse and small earrings") == "a navy silk blouse and small earrings"
+    assert _as_noun_phrase("Ivory silk blouse") == "an ivory silk blouse"

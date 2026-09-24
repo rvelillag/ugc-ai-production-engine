@@ -36,6 +36,20 @@ def _load_dna_descriptor(json_path: Path) -> str | None:
     return None
 
 
+def _as_noun_phrase(outfit: str) -> str:
+    """Make a free-text outfit read naturally after 'She is wearing': lowercase first word, add an article, join the last item with 'and'."""
+    text = outfit.strip().rstrip(".")
+    if not re.match(r"(?i)(a|an|the|her)\s", text):
+        text = text[:1].lower() + text[1:]
+        text = ("an " if text[:1] in "aeiou" else "a ") + text
+    head, sep, last = text.rpartition(", ")
+    if sep and " and " not in text:
+        if len(last.split()) == 1:  # a lone noun such as "ring" needs its article
+            last = "a " + last
+        text = f"{head}, and {last}"
+    return text
+
+
 def _apply_outfit_override(descriptor: str, json_path: Path) -> str:
     """Replace the DNA's wardrobe/props sentences with the outfit confirmed in checkpoint1.json.
 
@@ -54,7 +68,7 @@ def _apply_outfit_override(descriptor: str, json_path: Path) -> str:
     pattern = r"She is wearing[^.]*\.(?:\s*She is holding[^.]*\.)?"
     if not outfit or not re.search(pattern, descriptor):
         return descriptor
-    return re.sub(pattern, lambda _: f"She is wearing {outfit}.", descriptor, count=1)
+    return re.sub(pattern, lambda _: f"She is wearing {_as_noun_phrase(outfit)}.", descriptor, count=1)
 
 
 def time_marker(t0: float, t1: float) -> str:
