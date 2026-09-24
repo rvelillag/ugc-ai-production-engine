@@ -1,6 +1,7 @@
 """Compila video_motion_prompt_i2v desde el action_timeline (plantilla canónica de CLAUDE.md, Fase 3 punto 6)."""
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -9,6 +10,30 @@ if hasattr(sys.stdout, "reconfigure"):
 
 REALISM = "Natural realistic hand movements. No cuts. No exaggerated acting."
 DEFAULT_SFX = "Natural room ambience with subtle sounds of the props being handled."
+
+
+def _load_dna_descriptor(json_path: Path) -> str | None:
+    """Read the PROMPT ANCHOR VERBATIM block from the brand's *_CHARACTER_DNA.md.
+
+    Walks up from json_path until it finds 02_AVATAR_ASSETS/01_Character/. Strips the avatar's
+    full name from the descriptor per CLAUDE.md anti-filter rule (Fase 3, punto 6 header).
+    Returns None if no DNA file is found.
+    """
+    for parent in json_path.resolve().parents:
+        dna_dir = parent / "02_AVATAR_ASSETS" / "01_Character"
+        if dna_dir.is_dir():
+            dna_files = list(dna_dir.glob("*_CHARACTER_DNA.md"))
+            if not dna_files:
+                return None
+            text = dna_files[0].read_text(encoding="utf-8")
+            m = re.search(r"##\s*6\..*?VERBATIM.*?```text\s*\n(.*?)```", text, re.DOTALL | re.IGNORECASE)
+            if not m:
+                return None
+            raw = m.group(1).strip()
+            # Strip "First Last, " prefix — never inject full names into generative prompts
+            stripped = re.sub(r"^[A-Z][a-zA-ZÀ-ÖØ-öø-ÿ]+(?:\s+[A-Z][a-zA-ZÀ-ÖØ-öø-ÿ]+)+,\s*", "", raw)
+            return (stripped[0].upper() + stripped[1:]) if stripped else None
+    return None
 
 
 def time_marker(t0: float, t1: float) -> str:
@@ -22,9 +47,16 @@ def compile_i2v_prompt(pkg: dict, chunk: dict) -> str:
     # el descriptor físico sin nombre; avatar_name queda solo para continuidad/documentación.
     identity = pkg.get("avatar_visual_descriptor") or f"a {pkg['avatar_age']}-year-old woman"
     identity = identity[:1].upper() + identity[1:] if identity else identity
+    # If identity is a self-contained DNA block (ends with punctuation), it already carries
+    # wardrobe info — appending ", wearing wardrobe_assigned" would be redundant.
+    # Only add the wardrobe suffix for short descriptors that don't include clothing.
+    if identity.rstrip().endswith((".", "!", "?")):
+        identity_clause = identity.rstrip()
+    else:
+        identity_clause = f"{identity}, wearing {pkg['wardrobe_assigned']}"
     header = (
         f"Hyper-realistic vertical 9:16 smartphone UGC video. Use the canonical {env}. "
-        f"{identity}, wearing {pkg['wardrobe_assigned']}. "
+        f"{identity_clause.rstrip('.')}. "
         "Preserve her identity, clothing, lighting, environment, table position, props and camera style "
         "throughout the entire clip."
     )
@@ -114,6 +146,16 @@ def render_md(data: dict, json_path: Path) -> None:
 def compile_package(json_path: Path) -> int:
     path = Path(json_path)
     data = json.loads(path.read_text(encoding="utf-8"))
+
+    # Sync avatar_visual_descriptor from the brand's Character DNA file.
+    # The DNA is the single source of truth for visual identity across all projects;
+    # whatever was hand-written in the JSON is overridden on every compile run.
+    dna_descriptor = _load_dna_descriptor(path)
+    if dna_descriptor:
+        if data.get("avatar_visual_descriptor") != dna_descriptor:
+            print(f"  [DNA sync] avatar_visual_descriptor updated from *_CHARACTER_DNA.md")
+        data["avatar_visual_descriptor"] = dna_descriptor
+
     count = 0
     for chunk in data.get("chunks", []):
         if chunk.get("action_timeline"):
