@@ -40,6 +40,77 @@ def compile_i2v_prompt(pkg: dict, chunk: dict) -> str:
     return "\n\n".join([header, "\n\n".join(lines), REALISM, f"*SFX:* {sfx}"])
 
 
+def render_md(data: dict, json_path: Path) -> None:
+    """Renders prompts_and_script_[ID].md alongside the JSON (Fase 3, CLAUDE.md)."""
+    pid = data.get("project_id", json_path.stem)
+    pc = data.get("post_copy", {})
+    lines = [
+        f"# {pid} — Prompts & Script",
+        "",
+        f"**Referencia:** {data.get('reference_video', '')} ({data.get('reference_duration_s', '')}s)  ",
+        f"**Marca:** {data.get('brand', '')}  ",
+        f"**Avatar:** {data.get('avatar_name', '')}, {data.get('avatar_age', '')}yo  ",
+        f"**Tema:** {data.get('topic', '')}  ",
+        f"**Wardrobe:** {data.get('wardrobe_assigned', '')}",
+        "",
+        "---",
+        "",
+        "## Audio Voice Direction Anchor",
+        "",
+        data.get("audio_voice_direction_anchor", ""),
+        "",
+        "---",
+        "",
+        "## Guion Completo (TTS — una sola pasada)",
+        "",
+        "> " + " ".join(c.get("voiceover_clean_tts", "") for c in data.get("chunks", [])),
+        "",
+        "---",
+        "",
+    ]
+    for chunk in data.get("chunks", []):
+        cid = chunk.get("chunk_id", "?")
+        ref = chunk.get("ref_window", [0, 0])
+        lines += [
+            f"## Chunk {cid} — {chunk.get('beat_name', '')}",
+            "",
+            f"**Duración:** {chunk.get('recommended_duration_s')}s | **Palabras:** {chunk.get('word_count')} | "
+            f"**Ref window:** {ref[0]}s – {ref[1]}s | **Ledger rows:** {', '.join(chunk.get('ledger_rows', []))}",
+            "",
+            "### Voiceover (TTS)",
+            "",
+            f"> {chunk.get('voiceover_clean_tts', '')}",
+            "",
+            "### First Frame Prompt (Midjourney / Imagen — 9:16)",
+            "",
+            chunk.get("midjourney_prompt_9_16", ""),
+            "",
+            "### Video Motion Prompt I2V (Veo3 / Kling)",
+            "",
+            chunk.get("video_motion_prompt_i2v", ""),
+            "",
+            "---",
+            "",
+        ]
+    lines += [
+        "## Post Copy",
+        "",
+        f"**Cover Headline:** {pc.get('cover_headline', '')}",
+        "",
+        f"**Title:** {pc.get('title', '')}",
+        "",
+        "**Caption:**",
+        "",
+        pc.get("caption", ""),
+        "",
+        f"**Hashtags:** {' '.join(pc.get('hashtags', []))}",
+        "",
+    ]
+    md_path = json_path.parent / f"prompts_and_script_{pid}.md"
+    md_path.write_text("\n".join(lines), encoding="utf-8")
+    print(f"Rendered: {md_path.name}")
+
+
 def compile_package(json_path: Path) -> int:
     path = Path(json_path)
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -50,6 +121,7 @@ def compile_package(json_path: Path) -> int:
             count += 1
     if count > 0:
         path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        render_md(data, path)
     return count
 
 
