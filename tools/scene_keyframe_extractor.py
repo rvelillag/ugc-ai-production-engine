@@ -82,20 +82,51 @@ def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_
                 if ts - cut_timestamps[-1] >= 1.2 and ts < total_duration - 0.8:
                     cut_timestamps.append(round(ts, 2))
     
-    # Few genuine cuts (typical single-take UGC): prefer the ledger's action boundaries over arbitrary percentages
+    # Few genuine cuts detected — cascade through smarter fallbacks before using percentages.
     if len(cut_timestamps) < 4:
+        # Fallback 1: lower scene threshold (catches subtle same-room UGC cuts)
+        scene_cmd2 = [
+            "ffmpeg", "-i", str(video_path),
+            "-filter:v", "select='gt(scene,0.10)',showinfo",
+            "-f", "null", "-"
+        ]
+        p2 = subprocess.run(scene_cmd2, stderr=subprocess.PIPE, text=True, errors="replace")
+        low_thresh_cuts = [0.0]
+        for line in p2.stderr.splitlines():
+            if "pts_time:" in line:
+                m2 = re.search(r"pts_time:([0-9\.]+)", line)
+                if m2:
+                    ts2 = float(m2.group(1))
+                    if ts2 - low_thresh_cuts[-1] >= 1.5 and ts2 < total_duration - 0.8:
+                        low_thresh_cuts.append(round(ts2, 2))
+        if len(low_thresh_cuts) >= 4:
+            cut_timestamps = low_thresh_cuts
+            print(f"  (low-threshold scene detection: {len(cut_timestamps)} cuts found)")
+
+    if len(cut_timestamps) < 4:
+        # Fallback 2: ledger action boundaries (if ledger was pre-built)
         anchors = anchor_times(output_dir / LEDGER_FILE)
         if len(anchors) >= 4:
             cut_timestamps = anchors
+            print(f"  (ledger anchor fallback: {len(cut_timestamps)} cuts)")
+
+    if len(cut_timestamps) < 4:
+        # Fallback 3: Whisper sentence-end boundaries — far better than fixed percentages
+        # because they align with natural speech pauses and action changes in UGC content.
+        sentence_ends = []
+        for seg in whisper_segments:
+            end_t = seg["end"]
+            if end_t > 0.5 and end_t < total_duration - 0.5:
+                if not sentence_ends or end_t - sentence_ends[-1] >= 2.0:
+                    sentence_ends.append(round(end_t, 2))
+        if len(sentence_ends) >= 3:
+            cut_timestamps = [0.0] + sentence_ends
+            print(f"  (Whisper sentence-boundary fallback: {len(cut_timestamps)} cuts)")
         else:
-            cut_timestamps = [
-                0.0,
-                round(total_duration * 0.18, 2),
-                round(total_duration * 0.36, 2),
-                round(total_duration * 0.54, 2),
-                round(total_duration * 0.72, 2),
-                round(total_duration * 0.88, 2)
-            ]
+            # Last resort: evenly spaced — only for very short or near-silent videos
+            n_splits = max(3, round(total_duration / 8))
+            cut_timestamps = [round(total_duration * i / n_splits, 2) for i in range(n_splits)]
+            print(f"  (equidistant last-resort fallback: {len(cut_timestamps)} splits)")
     
     # No fixed cap: the number of genuine cuts scales with the video's length/edit density.
     # The >=1.2s de-dup above already keeps the count meaningful rather than exploding on noise.
