@@ -111,19 +111,50 @@ def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_
             print(f"  (ledger anchor fallback: {len(cut_timestamps)} cuts)")
 
     if len(cut_timestamps) < 4:
-        # Fallback 3: Whisper sentence-end boundaries — far better than fixed percentages
-        # because they align with natural speech pauses and action changes in UGC content.
+        # Fallback 3: Sentence-semantic boundaries from Whisper word timestamps.
+        #
+        # A pause in the audio is NOT necessarily a scene cut — the speaker may just
+        # breathe mid-sentence (e.g. "...Squeeze a line of Colgate [pause] toothpaste...").
+        # We only accept a boundary if it is BOTH:
+        #   (a) a complete sentence end: the last word before the pause ends with . ! ?
+        #   (b) a meaningful pause: silence >= 0.2s before the next word
+        #
+        # This cross-references the acoustic signal with the full script so that
+        # intra-sentence breath pauses are rejected as cut candidates.
         sentence_ends = []
+        # Flatten word-level timestamps from all segments
+        all_word_ts = []
         for seg in whisper_segments:
-            end_t = seg["end"]
-            if end_t > 0.5 and end_t < total_duration - 0.5:
-                if not sentence_ends or end_t - sentence_ends[-1] >= 2.0:
-                    sentence_ends.append(round(end_t, 2))
+            for w in seg.get("words", []):
+                if w.get("word", "").strip():
+                    all_word_ts.append(w)
+
+        sentence_closing = {".", "!", "?"}
+        for i, w in enumerate(all_word_ts):
+            word_text = w["word"].strip().rstrip("\"')")
+            # Check if this word closes a sentence
+            if not any(word_text.endswith(p) for p in sentence_closing):
+                continue
+            end_t = w["end"]
+            if end_t < 0.5 or end_t > total_duration - 0.5:
+                continue
+            # Measure pause to next word
+            if i + 1 < len(all_word_ts):
+                pause = all_word_ts[i + 1]["start"] - end_t
+            else:
+                pause = total_duration - end_t
+            if pause < 0.2:
+                continue
+            # Enforce minimum gap between cuts
+            if sentence_ends and end_t - sentence_ends[-1] < 2.0:
+                continue
+            sentence_ends.append(round(end_t, 2))
+
         if len(sentence_ends) >= 3:
             cut_timestamps = [0.0] + sentence_ends
-            print(f"  (Whisper sentence-boundary fallback: {len(cut_timestamps)} cuts)")
+            print(f"  (sentence-semantic fallback: {len(cut_timestamps)} cuts at sentence ends)")
         else:
-            # Last resort: evenly spaced — only for very short or near-silent videos
+            # Last resort: evenly spaced by ~8s windows (never the old fixed-6 split)
             n_splits = max(3, round(total_duration / 8))
             cut_timestamps = [round(total_duration * i / n_splits, 2) for i in range(n_splits)]
             print(f"  (equidistant last-resort fallback: {len(cut_timestamps)} splits)")
