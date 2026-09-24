@@ -105,7 +105,10 @@ When executing or assisting in a production run, follow these 4 canonical phases
    - **Bloques `*ACTION:*` con Timestamps de Milisegundo:** Segmentos temporales exactos (`0–3s:`, `3–8s:`, etc.) con plano de cámara, interacción física con props, dirección de mirada y diálogo literal entrecomillado (`says: "..."` / `while continuing: "..."`).
    - **Restricción de Realismo:** `"Natural realistic hand movements. No cuts. No exaggerated acting."`
    - **Capa Acústica y Foley (`*SFX:*`):** Ambiance de la sala, contacto con superficies y sonidos de manipulación de objetos.
-7. Validate with Pydantic model (`tools/schemas/production_package.py`) and render `prompts_and_script_[ID].md`.
+7. **Formato Canónico de Prompts (Cajas de Copiado Rápido 1-Click y Duración Sugerida):**
+   - Tanto en el archivo markdown (`prompts_and_script_[ID].md`) como en las respuestas en chat, los prompts de imagen (`midjourney_prompt_9_16`) y de video (`video_motion_prompt_i2v`) DEBEN formatearse siempre dentro de bloques de código dedicados (` ```text `) limpios y sin sangría para permitir copiarlos con un solo clic.
+   - Cada prompt de video debe indicar explícitamente el tiempo sugerido del clip (`⏱️ Tiempo sugerido del video: X segundos`) para facilitar la configuración en Kling / Veo3 / Grok.
+8. Validate with Pydantic model (`tools/schemas/production_package.py`) and render `prompts_and_script_[ID].md` with `python tools/render_package_markdown.py --json ...`.
 
 ### Fase 4: QA Governance & Ensamblaje Canónico (auto-captions-service + ugc_harness.py)
 1. Operator places generated raw clips `1.mp4` to `N.mp4` in `03_Raw_Clips/`.

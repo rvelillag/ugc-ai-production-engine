@@ -76,15 +76,17 @@ def render_markdown(json_path: Path, output_md_path: Path = None):
         if right:
             md.append(f"> * **Sujeto Derecho ({right.get('role')}):** {right.get('orientation')} | Pose: {right.get('pose')} | Síntoma: {right.get('skin_condition_exaggerated')}")
         
-        md.append(f"\n* **Prompt de Imagen (First Frame en Midjourney/Flux — 9:16):**")
-        md.append("  ```text")
-        md.append(f"  {ch.get('midjourney_prompt_9_16', '').strip()}")
-        md.append("  ```")
+        md.append(f"\n#### 📸 Prompt de Imagen (First Frame en Midjourney / Flux — 9:16):")
+        md.append("```text")
+        md.append(ch.get('midjourney_prompt_9_16', '').strip())
+        md.append("```")
 
-        md.append(f"* **Prompt de Video / Animación (Image-to-Video para Kling / Veo3 / Grok / Luma):**")
-        md.append("  ```text")
-        md.append(f"  {ch.get('video_motion_prompt_i2v', '').strip()}")
-        md.append("  ```")
+        dur = ch.get('recommended_duration_s', 5)
+        md.append(f"\n#### 🎬 Prompt de Video (Image-to-Video en Kling / Veo3 / Grok):")
+        md.append(f"> ⏱️ **Tiempo sugerido del video:** `{dur} segundos` (ajustar a `{dur}s` en el generador de video)\n")
+        md.append("```text")
+        md.append(ch.get('video_motion_prompt_i2v', '').strip())
+        md.append("```\n")
 
         tags_str = ", ".join([f"`{t}`" for t in ch.get("asset_tags", [])])
         md.append(f"* **Asset Tags:** {tags_str}")
