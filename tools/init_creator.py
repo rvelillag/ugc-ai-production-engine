@@ -98,6 +98,14 @@ def init_creator():
         new_dna.write_text(dna_content, encoding="utf-8")
         old_dna.unlink()
 
+    # Personalizar y renombrar ENVIRONMENT_DNA_TEMPLATE.md (locacion constante de la marca)
+    env_dir = target_dir / "02_AVATAR_ASSETS" / "02_Environments"
+    old_env = env_dir / "ENVIRONMENT_DNA_TEMPLATE.md"
+    if old_env.exists():
+        (env_dir / f"{args.brand.upper().replace(' ', '_')}_ENVIRONMENT_DNA.md").write_text(
+            old_env.read_text(encoding="utf-8").replace("[NOMBRE_MARCA]", args.brand), encoding="utf-8")
+        old_env.unlink()
+
     print(f"\n[OK] ¡Creador '{creator_folder_name}' inicializado con éxito!")
     print(f"Ubicación: {target_dir}")
     print(f"\nDirectorios listos:")

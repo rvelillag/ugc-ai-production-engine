@@ -36,6 +36,24 @@ def _load_dna_descriptor(json_path: Path) -> str | None:
     return None
 
 
+def _load_environment_descriptor(json_path: Path) -> str | None:
+    """Read the ENVIRONMENT PROMPT ANCHOR VERBATIM block from the brand's *_ENVIRONMENT_DNA.md.
+
+    The brand's location (e.g. the salon) is a constant across videos, like the avatar. Returns None
+    if the brand has no environment DNA (older creators): the chunk's own environment text is used.
+    """
+    for parent in json_path.resolve().parents:
+        env_dir = parent / "02_AVATAR_ASSETS" / "02_Environments"
+        if env_dir.is_dir():
+            files = list(env_dir.glob("*_ENVIRONMENT_DNA.md"))
+            if not files:
+                return None
+            pattern = r"##[^\n]*VERBATIM[^\n]*\n.*?```text\s*\n(.*?)```"
+            m = re.search(pattern, files[0].read_text(encoding="utf-8"), re.DOTALL | re.IGNORECASE)
+            return m.group(1).strip() if m else None
+    return None
+
+
 def _as_noun_phrase(outfit: str) -> str:
     """Make a free-text outfit read naturally after 'She is wearing': lowercase first word, add an article, join the last item with 'and'."""
     text = outfit.strip().rstrip(".")
@@ -77,6 +95,9 @@ def time_marker(t0: float, t1: float) -> str:
 
 def compile_i2v_prompt(pkg: dict, chunk: dict) -> str:
     env = chunk["composition_audit"]["environment_background"].rstrip(".")
+    if pkg.get("environment_descriptor"):
+        # Brand-locked location; the chunk's environment text only says which area/angle of the set is framed.
+        env = f"{pkg['environment_descriptor'].rstrip('.')}. In this clip, framed on: {env}"
     # No usar avatar_name (nombre y apellido) en el prompt literal: combinado con lenguaje
     # hiperrealista, dispara los filtros de "personas destacadas/reales" de Veo3/Kling. Se usa
     # el descriptor físico sin nombre; avatar_name queda solo para continuidad/documentación.
@@ -112,22 +133,30 @@ def compile_i2v_prompt(pkg: dict, chunk: dict) -> str:
     return "\n\n".join([header, "\n\n".join(lines), REALISM, f"*SFX:* {sfx}"])
 
 
-MJ_LOCK_MARK = "SECONDARY CHARACTERS (lock"
+MJ_LOCK_MARKS = ("LOCKS (", "SECONDARY CHARACTERS (lock")
 
 
 def lock_first_frame_prompt(pkg: dict, chunk: dict) -> str:
-    """Append the secondary-character lock to the Midjourney prompt (idempotent), before the --ar params."""
+    """Append the identity locks to the Midjourney prompt (idempotent), before the --ar params.
+
+    Avatar and environment are brand constants (from the DNA files); secondary characters are
+    constant within this video. The hand-written prompt should only describe the scene.
+    """
     prompt = chunk.get("midjourney_prompt_9_16", "")
-    chars = pkg.get("secondary_characters", [])
-    if not chars or not prompt:
+    parts = []
+    if pkg.get("avatar_visual_descriptor"):
+        parts.append(f"AVATAR: {pkg['avatar_visual_descriptor'].rstrip('.')}.")
+    if pkg.get("environment_descriptor"):
+        parts.append(f"ENVIRONMENT: {pkg['environment_descriptor'].rstrip('.')}.")
+    parts += [f"{c['role'].upper()}: {c['descriptor'].rstrip('.')}." for c in pkg.get("secondary_characters", [])]
+    if chunk.get("secondary_state") and pkg.get("secondary_characters"):
+        parts.append(f"State in this frame: {chunk['secondary_state'].rstrip('.')}.")
+    if not parts or not prompt:
         return prompt
-    prompt = re.sub(r"\s*" + re.escape(MJ_LOCK_MARK) + r".*?\.(?= --|$)", "", prompt, flags=re.DOTALL)
-    lock = MJ_LOCK_MARK + ", identical in every frame): " + " ".join(
-        f"{c['role']}: {c['descriptor'].rstrip('.')}." for c in chars)
-    if chunk.get("secondary_state"):
-        lock += f" State in this frame: {chunk['secondary_state'].rstrip('.')}."
+    for mark in MJ_LOCK_MARKS:
+        prompt = re.sub(r"\s*" + re.escape(mark) + r".*?\.(?= --|$)", "", prompt, flags=re.DOTALL)
     head, sep, params = prompt.partition(" --ar")
-    return f"{head.rstrip()} {lock}{sep}{params}"
+    return f"{head.rstrip()} LOCKS (identical in every frame and video): {' '.join(parts)}{sep}{params}"
 
 
 def render_md(data: dict, json_path: Path) -> None:
@@ -214,6 +243,10 @@ def compile_package(json_path: Path) -> int:
         if data.get("avatar_visual_descriptor") != dna_descriptor:
             print(f"  [DNA sync] avatar_visual_descriptor updated from *_CHARACTER_DNA.md")
         data["avatar_visual_descriptor"] = dna_descriptor
+
+    env_descriptor = _load_environment_descriptor(path)
+    if env_descriptor:
+        data["environment_descriptor"] = env_descriptor
 
     count = 0
     for chunk in data.get("chunks", []):

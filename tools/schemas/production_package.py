@@ -82,6 +82,9 @@ class ProductionPackage(BaseModel):
                         "Kling en vez de avatar_name — nombrar a una persona con nombre y apellido en un prompt "
                         "hiperrealista dispara los filtros de 'personas destacadas/reales' de estos generadores. "
                         "avatar_name se mantiene solo para continuidad/documentación interna (asset_tags, notas).")
+    environment_descriptor: str = Field(
+        "", description="Descriptor bloqueado de la locación de la marca (de *_ENVIRONMENT_DNA.md). Lo sincroniza prompt_compiler; "
+                        "la locación es constante entre videos igual que el avatar.")
     secondary_characters: List[SecondaryCharacter] = Field(
         default_factory=list, description="Personajes secundarios recurrentes (clienta, extras) con descriptor bloqueado para consistencia entre chunks")
     wardrobe_previous: str

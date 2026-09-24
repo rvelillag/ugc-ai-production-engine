@@ -429,3 +429,56 @@ def test_new_checkpoints_require_secondary_lock(tmp_path):
     proj = _project(tmp_path)
     cp = json.loads((write_checkpoint(proj, "adapt_to_brand", "o", "GLOW", "Stop Doing This")).read_text(encoding="utf-8"))
     assert cp["secondary_lock_required"] is True
+
+
+# ---- Locacion de marca (constante entre videos) y locks del first frame ----
+ENV_DNA = """# X ENVIRONMENT DNA
+
+## 1. ENVIRONMENT PROMPT ANCHOR VERBATIM
+
+```text
+Bennett Studio, a luxury salon with beige plaster walls and oval backlit mirrors.
+```
+"""
+
+
+def _brand_with_env(tmp_path):
+    env_dir = tmp_path / "Brand" / "02_AVATAR_ASSETS" / "02_Environments"
+    env_dir.mkdir(parents=True)
+    (env_dir / "BRAND_ENVIRONMENT_DNA.md").write_text(ENV_DNA, encoding="utf-8")
+    pj = tmp_path / "Brand" / "04_IN_PRODUCTION" / "PROD_001_x" / "02_First_Frames" / "pkg.json"
+    pj.parent.mkdir(parents=True)
+    return pj
+
+
+def test_environment_descriptor_is_read_from_brand_dna(tmp_path):
+    from tools.prompt_compiler import _load_environment_descriptor
+    pj = _brand_with_env(tmp_path)
+    assert _load_environment_descriptor(pj).startswith("Bennett Studio, a luxury salon")
+    assert _load_environment_descriptor(tmp_path / "other" / "pkg.json") is None  # marca sin DNA: no rompe
+
+
+def test_compile_package_locks_brand_environment_over_chunk_environment(tmp_path):
+    pj = _brand_with_env(tmp_path)
+    ch = _ledger_chunk()
+    ch["composition_audit"]["environment_background"] = "the shampoo area"
+    pj.write_text(json.dumps(_package([ch])), encoding="utf-8")
+    compile_package(pj)
+    out = json.loads(pj.read_text(encoding="utf-8"))
+    prompt = out["chunks"][0]["video_motion_prompt_i2v"]
+    assert "Use the canonical Bennett Studio, a luxury salon with beige plaster walls" in prompt
+    assert "In this clip, framed on: the shampoo area" in prompt
+    assert "ENVIRONMENT: Bennett Studio" in out["chunks"][0]["midjourney_prompt_9_16"]
+
+
+def test_first_frame_locks_avatar_environment_and_secondary_without_duplicates():
+    from tools.prompt_compiler import lock_first_frame_prompt
+    pkg = _package([_two_person_chunk()])
+    pkg.update(avatar_visual_descriptor="a 47-year-old woman with a bob", environment_descriptor="Bennett Studio salon",
+               secondary_characters=[CLIENT])
+    ch = pkg["chunks"][0]
+    once = lock_first_frame_prompt(pkg, ch)
+    assert "AVATAR: a 47-year-old woman with a bob." in once and "ENVIRONMENT: Bennett Studio salon." in once
+    assert "SALON CLIENT: a fair-skinned woman" in once and once.endswith("--ar 9:16 --v 6.1")
+    ch["midjourney_prompt_9_16"] = once
+    assert lock_first_frame_prompt(pkg, ch) == once and once.count("LOCKS (") == 1
