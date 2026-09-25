@@ -71,7 +71,10 @@ When executing or assisting in a production run, follow these 4 canonical phases
    - **B. Outfit & Estilismo del Avatar:** Ropa, colores y accesorios acordes a la escena.
    - **C. ManyChat Keyword:** Palabra clave segura para la llamada a la acción (ej. HAIR, LIFT, GLOW).
    - **D. Cover Headline:** Titular gancho de curiosidad de máximo 7 palabras para la portada/miniatura.
-   - **E. Ledger de Referencia:** Muestra la tabla del ledger (acción + diálogo por fila) para que el usuario la confirme.
+   - **E. Ledger de Referencia / Guion Adaptado por Chunks:**
+      - En modo 
+eplicate_1to1: Muestra la tabla del ledger (acción + diálogo por fila) para que el usuario la confirme.
+      - En modo derivative_concept: **OBLIGATORIO:** Muestra el desglose detallado chunk por chunk con el **guion adaptado propuesto en inglés, acción visual, duración y conteo de palabras** para que el usuario valide y ajuste el guion antes de generar los prompts.
    - **F. Exageración del hook (opt-in):** Por defecto la acción del hook es idéntica a la referencia; solo se exagera si el usuario lo pide.
    - **G. WPS Objetivo y Estrategia de Duración (ambos variables, dependen del WPS real de CADA referencia):**
      - **WPS objetivo (`wps_target`):** **sin techo artificial** — usa el WPS real de la referencia tal cual (campo `CADENCIA PROMEDIO` en `script_beats_[video].txt`), sin recortarlo. `checkpoint1.py`/`ugc_harness.py` solo rechazan valores fuera de `[0.5, 10.0]` como guardarraíl de cordura ante datos corruptos (ej. un WPS mal calculado en un video casi mudo) — eso no es una política de velocidad, es una validación de sanidad de datos.
@@ -79,7 +82,7 @@ When executing or assisting in a production run, follow these 4 canonical phases
      - **`full_verbatim` (por defecto):** conserva el 100% del guion a `wps_target`.
      - **`trim_to_min`:** además de fijar `wps_target`, recorta el guion dentro del margen de fidelidad permitido (≥85% por fila, GATE_7) si aun así se quiere acortar más.
      - **Si en Fase 4 el clip generado suena distorsionado o con el lip-sync forzado** a ese `wps_target`, es una señal para bajarlo y regenerar ese chunk — el sistema no lo bloquea de antemano porque no hay evidencia empírica de un techo universal para Veo3/Kling.
-6. **Registro del Checkpoint 1:** Solo después de que el usuario confirme A-G, ejecuta `python tools/checkpoint1.py --project [PROJECT] --scene [replicate_1to1|adapt_to_brand] --outfit "..." --keyword [KEYWORD] --headline "..." --confirmed-by-user --ledger-confirmed --fidelity-target [full_verbatim|trim_to_min] --wps-target [WPS real de la referencia]` (añade `--hook-exaggeration` solo si el usuario lo pidió). GATE_2 usa este `wps_target` (no un 2.4 fijo) para validar la cadencia de cada chunk. GATE_8 exige que el hash del ledger coincida con el confirmado aquí. GATE_1 exige `checkpoint1.json` y que keyword y headline del paquete coincidan con lo confirmado. Nunca lo ejecutes sin confirmación real.
+6. **Registro del Checkpoint 1:** Solo después de que el usuario confirme A-G, ejecuta `python tools/checkpoint1.py --project [PROJECT] --scene [replicate_1to1|adapt_to_brand|derivative_concept] --outfit "..." --keyword [KEYWORD] --headline "..." --confirmed-by-user --ledger-confirmed --fidelity-target [full_verbatim|trim_to_min] --wps-target [WPS real de la referencia]` (añade `--hook-exaggeration` solo si el usuario lo pidió). GATE_2 usa este `wps_target` (no un 2.4 fijo) para validar la cadencia de cada chunk. GATE_8 exige que el hash del ledger coincida con el confirmado aquí. GATE_1 exige `checkpoint1.json` y que keyword y headline del paquete coincidan con lo confirmado. Nunca lo ejecutes sin confirmación real.
 
 ### Fase 3: Generación JSON-First & Prompts Dinámicos (ugc-viral-video-generator)
 1. **Escenario y Hook (gobierna `scene_mode` del Checkpoint 1):**
