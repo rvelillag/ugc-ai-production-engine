@@ -42,7 +42,15 @@ python tools/audio_cadence_analyzer.py --video "[PATH_TO_REFERENCE_VIDEO]"
 
 ## 4-Phase Production Pipeline
 
-When executing or assisting in a production run, follow these 4 canonical phases strictly:
+### 0. Decisión Inicial Mandatoria: Clonar vs Modelar (Modo de Producción)
+Cuando el usuario proporciona un nuevo video de referencia o solicita procesar un video de la bandeja de entrada:
+- **SI EL USUARIO NO ESPECIFICA SU OBJETIVO**, el sistema DEBE detenerse inmediatamente y preguntar al usuario qué modalidad desea aplicar:
+  1. **Opción A: Clonar / Réplica 1:1 (`replicate_1to1` o `adapt_to_brand`)**  
+     Replicar con máxima fidelidad forense el video original (mismo guion verbatim ≥85%, mismas acciones y props en orden cronológico), adaptado al avatar y estética de la marca.
+  2. **Opción B: Modelar / Concepto Propio y Único (`derivative_concept` / `concept_remixer.py`)**  
+     Extraer el **blueprint estructural y ritmo viral** del video de referencia (duración, conteo de tomas, progresión Hook -> Dolor -> Mecanismo -> CTA), proponiendo 2 a 3 conceptos de video totalmente originales y propios de la marca. Tras la elección del usuario, se presenta el desglose chunk-por-chunk con el guion propuesto para su validación previa en Checkpoint 1.E antes de generar prompts.
+
+---
 
 ### Fase 1: Ingesta Forense & Análisis de Cadencia (ugc-pipeline-orchestrator)
 1. Create project folder: `[BRAND]/04_IN_PRODUCTION/PROD_[XXX]_[reference_name]/` with 5 standard subfolders:
@@ -72,9 +80,8 @@ When executing or assisting in a production run, follow these 4 canonical phases
    - **C. ManyChat Keyword:** Palabra clave segura para la llamada a la acción (ej. HAIR, LIFT, GLOW).
    - **D. Cover Headline:** Titular gancho de curiosidad de máximo 7 palabras para la portada/miniatura.
    - **E. Ledger de Referencia / Guion Adaptado por Chunks:**
-      - En modo 
-eplicate_1to1: Muestra la tabla del ledger (acción + diálogo por fila) para que el usuario la confirme.
-      - En modo derivative_concept: **OBLIGATORIO:** Muestra el desglose detallado chunk por chunk con el **guion adaptado propuesto en inglés, acción visual, duración y conteo de palabras** para que el usuario valide y ajuste el guion antes de generar los prompts.
+      - En modo `replicate_1to1`: Muestra la tabla del ledger (acción + diálogo por fila) para que el usuario la confirme.
+      - En modo `derivative_concept`: **OBLIGATORIO:** Muestra el desglose detallado chunk por chunk con el **guion adaptado propuesto en inglés, acción visual, duración y conteo de palabras** para que el usuario valide y ajuste el guion antes de generar los prompts.
    - **F. Exageración del hook (opt-in):** Por defecto la acción del hook es idéntica a la referencia; solo se exagera si el usuario lo pide.
    - **G. WPS Objetivo y Estrategia de Duración (ambos variables, dependen del WPS real de CADA referencia):**
      - **WPS objetivo (`wps_target`):** **sin techo artificial** — usa el WPS real de la referencia tal cual (campo `CADENCIA PROMEDIO` en `script_beats_[video].txt`), sin recortarlo. `checkpoint1.py`/`ugc_harness.py` solo rechazan valores fuera de `[0.5, 10.0]` como guardarraíl de cordura ante datos corruptos (ej. un WPS mal calculado en un video casi mudo) — eso no es una política de velocidad, es una validación de sanidad de datos.
