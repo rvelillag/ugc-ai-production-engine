@@ -12,7 +12,7 @@ from tools.project_state import save_state
 from tools.ledger import LEDGER_FILE, ledger_hash, load_ledger
 
 CHECKPOINT_FILE = "checkpoint1.json"
-SCENE_MODES = ("replicate_1to1", "adapt_to_brand")
+SCENE_MODES = ("replicate_1to1", "adapt_to_brand", "derivative_concept")
 FIDELITY_TARGETS = ("full_verbatim", "trim_to_min")
 DEFAULT_WPS_TARGET = 2.4
 # Sin techo de politica: estos son solo guardarrailes de cordura contra datos corruptos
