@@ -30,6 +30,13 @@ def beat_label(idx: int, total: int) -> str:
 def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_size: str = "medium", language: str = None):
     if output_dir is None:
         output_dir = video_path.parent
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Ensure full standard 5-folder project tree exists if inside a PROD directory
+    proj_dir = output_dir if output_dir.name.startswith("PROD_") else (output_dir.parent if output_dir.parent.name.startswith("PROD_") else None)
+    if proj_dir:
+        for sub in ["01_Reference", "02_First_Frames", "03_Raw_Clips", "04_Audio", "05_Montage"]:
+            (proj_dir / sub).mkdir(parents=True, exist_ok=True)
     
     # 1. Get video duration
     cmd_dur = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(video_path)]
