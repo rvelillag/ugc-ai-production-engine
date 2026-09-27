@@ -72,6 +72,9 @@ ugc certify --project "[PROJECT_FOLDER_NAME]" [--deliverable "[DELIVERABLE_ID]"]
 
 # 4. Consultar estado del workspace activo
 ugc status
+
+# 5. Actualizar el motor a la última versión de Git (sin tocar avatares)
+ugc update
 ```
 
 ---

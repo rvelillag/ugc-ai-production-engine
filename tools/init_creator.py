@@ -67,7 +67,7 @@ def init_creator():
     creator_folder_name = args.name.strip()
     has_physical_product = not args.no_product
 
-    # Resolver destino: priorizar avatares/ si existe
+    # Resolver destino: priorizar avatares/ (existente o como carpeta hermana del motor)
     if args.dest:
         dest_dir = Path(args.dest)
     elif (base_dir.parent / "avatares").is_dir():
@@ -76,8 +76,12 @@ def init_creator():
         dest_dir = Path.cwd()
     elif (Path.cwd() / "avatares").is_dir():
         dest_dir = Path.cwd() / "avatares"
+    elif base_dir.name.lower() in ["sistema", "ugc-ai-production-engine", "engine"]:
+        dest_dir = base_dir.parent / "avatares"
+        dest_dir.mkdir(parents=True, exist_ok=True)
     else:
-        dest_dir = Path.cwd() if Path.cwd() != base_dir else base_dir
+        dest_dir = Path.cwd() / "avatares"
+        dest_dir.mkdir(parents=True, exist_ok=True)
 
     target_dir = dest_dir / creator_folder_name
 

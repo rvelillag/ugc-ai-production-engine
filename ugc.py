@@ -635,6 +635,39 @@ def cmd_setup_path(args):
     return 0
 
 
+def cmd_update(args):
+    """Actualizar el motor central a la última versión de Git y verificar dependencias."""
+    print("=" * 65)
+    print("        🔄 ACTUALIZADOR DEL MOTOR UGC PRODUCTION ENGINE")
+    print("=" * 65)
+    print(f"Motor central: {ENGINE_ROOT}\n")
+
+    if not (ENGINE_ROOT / ".git").is_dir():
+        print("[ERROR] El directorio del motor no es un repositorio Git.")
+        return 1
+
+    print("[1/3] Descargando últimas actualizaciones desde GitHub (git pull origin main)...")
+    res = subprocess.run(["git", "pull", "origin", "main"], cwd=str(ENGINE_ROOT))
+    if res.returncode != 0:
+        print("[WARN] 'git pull' no pudo completarse limpiamente.")
+        return res.returncode
+
+    print("\n[2/3] Verificando dependencias en requirements.txt...")
+    req_file = ENGINE_ROOT / "requirements.txt"
+    if req_file.exists():
+        subprocess.run([sys.executable, "-m", "pip", "install", "-r", str(req_file), "--quiet"], cwd=str(ENGINE_ROOT))
+        print("  [PASS] Dependencias al día.")
+
+    print("\n[3/3] Verificando comando global 'ugc'...")
+    cmd_setup_path(args)
+
+    print("\n" + "=" * 65)
+    print("  ¡MOTOR UGC ACTUALIZADO EXITOSAMENTE A LA ÚLTIMA VERSIÓN!")
+    print("=" * 65)
+    print("ℹ️ Tus avatares y entregables en 'avatares/' se mantienen 100% intactos.\n")
+    return 0
+
+
 def main():
     common_parser = argparse.ArgumentParser(add_help=False)
     common_parser.add_argument("--workspace", default=None, help="Ruta al workspace del avatar (auto-detectado si se omite)")
@@ -738,6 +771,10 @@ def main():
     # setup-path
     p_path = subparsers.add_parser("setup-path", parents=[common_parser], help="Registrar 'ugc' en el PATH de Windows para usarlo globalmente")
     p_path.set_defaults(func=cmd_setup_path)
+
+    # update
+    p_update = subparsers.add_parser("update", parents=[common_parser], help="Actualizar el motor central a la última versión de Git y verificar dependencias")
+    p_update.set_defaults(func=cmd_update)
 
     args = parser.parse_args()
     if not args.command:

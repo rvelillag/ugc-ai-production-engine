@@ -118,6 +118,7 @@ Una vez instalado, el comando `ugc` puede ejecutarse desde cualquier terminal o 
 | `ugc assemble` | **Fase 4:** Ensambla los clips generados con *Smart Silence Trimming* y subtítulos virales. |
 | `ugc certify` | **Auditoría de Agencia:** Evalúa los 8 Gates de calidad de agencia con el QA Harness. |
 | `ugc setup-path` | Registra el comando `ugc` en el PATH de Windows para uso global permanente. |
+| `ugc update` | **Actualiza el motor** a la última versión de Git y sincroniza dependencias (sin tocar tus avatares). |
 
 ---
 

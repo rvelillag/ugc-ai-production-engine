@@ -37,3 +37,14 @@ def test_detect_workspace_finds_creator_profile(tmp_path):
     
     found = detect_workspace(str(avatar_dir))
     assert found == avatar_dir
+
+
+def test_cli_subparsers_include_essential_commands():
+    from ugc import main
+    import subprocess
+    # Run ugc --help and verify commands are present
+    res = subprocess.run([sys.executable, str(REPO_ROOT / "ugc.py"), "--help"], capture_output=True, text=True)
+    assert "onboard" in res.stdout
+    assert "update" in res.stdout
+    assert "rename" in res.stdout
+    assert "doctor" in res.stdout

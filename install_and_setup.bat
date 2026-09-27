@@ -37,13 +37,21 @@ echo [3/5] Inicializando y verificando binarios de FFmpeg...
 python -c "import static_ffmpeg; static_ffmpeg.add_paths(); print('FFmpeg configurado correctamente')"
 echo.
 
-:: 4. Validacion del sistema
-echo [4/5] Verificando estructura de plantillas y modulos...
+:: 4. Validacion del sistema y estructura desacoplada
+echo [4/6] Verificando estructura de plantillas y carpetas...
 python -c "
 from pathlib import Path
 t = Path('_CREATOR_TEMPLATE')
 assert t.exists(), 'Plantilla _CREATOR_TEMPLATE no encontrada'
 print('Estructura de plantillas verificada exitosamente.')
+
+# Asegurar carpeta hermana 'avatares/' para alojar los espacios de trabajo
+av_dir = Path('..').resolve() / 'avatares'
+if not av_dir.exists():
+    av_dir.mkdir(parents=True, exist_ok=True)
+    print(f'Directorio hermano creado: {av_dir}')
+else:
+    print(f'Directorio hermano verificado: {av_dir}')
 "
 echo.
 
