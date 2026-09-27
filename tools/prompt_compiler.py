@@ -8,8 +8,10 @@ from pathlib import Path
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-REALISM = "Natural realistic hand movements. No cuts. No exaggerated acting."
+REALISM = "Natural realistic hand movements. No cuts. No exaggerated acting. Authentic unretouched smartphone UGC camera feel, natural room lighting, zero CGI or plastic sheen."
 DEFAULT_SFX = "Natural room ambience with subtle sounds of the props being handled."
+
+# ... helper functions ...
 
 
 def _load_dna_descriptor(json_path: Path) -> str | None:
@@ -84,9 +86,11 @@ def _apply_outfit_override(descriptor: str, json_path: Path) -> str:
     else:
         return descriptor
     pattern = r"She is wearing[^.]*\.(?:\s*She is holding[^.]*\.)?"
-    if not outfit or not re.search(pattern, descriptor):
-        return descriptor
-    return re.sub(pattern, lambda _: f"She is wearing {_as_noun_phrase(outfit)}.", descriptor, count=1)
+    if outfit and re.search(pattern, descriptor):
+        descriptor = re.sub(pattern, lambda _: f"She is wearing {_as_noun_phrase(outfit)}.", descriptor, count=1)
+    # Remove any hardcoded salon background from avatar identity so the environment lock governs background
+    descriptor = re.sub(r",?\s*high-end luxury hair salon background with warm lighting", "", descriptor, flags=re.IGNORECASE)
+    return descriptor
 
 
 def time_marker(t0: float, t1: float) -> str:
@@ -116,7 +120,7 @@ def compile_i2v_prompt(pkg: dict, chunk: dict) -> str:
     if chunk.get("secondary_state") and pkg.get("secondary_characters"):
         secondary += f" In this clip: {chunk['secondary_state'].rstrip('.')}."
     header = (
-        f"Hyper-realistic vertical 9:16 smartphone UGC video. Use the canonical {env}. "
+        f"Raw unedited vertical 9:16 smartphone UGC video recorded on iPhone 15 Pro 24mm f/1.8 main camera. Subtle natural handheld breathing motion, authentic natural lighting, no CGI. Use the canonical {env}. "
         f"{identity_clause.rstrip('.')}.{secondary} "
         "Preserve her identity, clothing, lighting, environment, table position, props and camera style "
         "throughout the entire clip, and keep every other person's face, hair and clothing identical."
@@ -141,11 +145,15 @@ def lock_first_frame_prompt(pkg: dict, chunk: dict) -> str:
 
     Avatar and environment are brand constants (from the DNA files); secondary characters are
     constant within this video. The hand-written prompt should only describe the scene.
+    Enforces authentic iPhone raw candid parameters (--ar 9:16 --style raw --v 6.1).
     """
     prompt = chunk.get("midjourney_prompt_9_16", "")
+    # Strip artificial AI buzzwords
+    prompt = re.sub(r",?\s*(?:8k\s*resolution|photorealistic(?:\s*portrait)?|hyper-realistic)", "", prompt, flags=re.IGNORECASE)
     parts = []
     if pkg.get("avatar_visual_descriptor"):
-        parts.append(f"AVATAR: {pkg['avatar_visual_descriptor'].rstrip('.')}.")
+        avatar_desc = re.sub(r",?\s*(?:8k\s*resolution|photorealistic(?:\s*portrait)?|hyper-realistic)", "", pkg['avatar_visual_descriptor'], flags=re.IGNORECASE)
+        parts.append(f"AVATAR: {avatar_desc.rstrip('.')}.")
     if pkg.get("environment_descriptor"):
         parts.append(f"ENVIRONMENT: {pkg['environment_descriptor'].rstrip('.')}.")
     parts += [f"{c['role'].upper()}: {c['descriptor'].rstrip('.')}." for c in pkg.get("secondary_characters", [])]
@@ -155,8 +163,9 @@ def lock_first_frame_prompt(pkg: dict, chunk: dict) -> str:
         return prompt
     for mark in MJ_LOCK_MARKS:
         prompt = re.sub(r"\s*" + re.escape(mark) + r".*?\.(?= --|$)", "", prompt, flags=re.DOTALL)
-    head, sep, params = prompt.partition(" --ar")
-    return f"{head.rstrip()} LOCKS (identical in every frame and video): {' '.join(parts)}{sep}{params}"
+    # Strip existing flags if any to standardize
+    head = re.sub(r"\s*--(?:ar\s+\d+:\d+|style\s+\w+|v\s+[\d.]+|s\s+\d+)\b.*", "", prompt).strip()
+    return f"{head.rstrip()} LOCKS (identical in every frame and video): {' '.join(parts)} --ar 9:16 --style raw --v 6.1 --s 50"
 
 
 def render_md(data: dict, json_path: Path) -> None:
@@ -251,7 +260,7 @@ def compile_package(json_path: Path) -> int:
         data["avatar_visual_descriptor"] = dna_descriptor
 
     env_descriptor = _load_environment_descriptor(path)
-    if env_descriptor:
+    if env_descriptor and not data.get("environment_descriptor"):
         data["environment_descriptor"] = env_descriptor
 
     count = 0
