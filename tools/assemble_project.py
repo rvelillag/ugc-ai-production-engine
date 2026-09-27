@@ -41,8 +41,7 @@ def build_trim_concat_cmd(ffmpeg_bin: str, segments, output_path: Path, fps: str
             f"aresample=48000,aformat=channel_layouts=stereo[a{i}]"
         )
     joined = "".join(f"[v{i}][a{i}]" for i in range(len(segments)))
-    parts.append(f"{joined}concat=n={len(segments)}:v=1:a=1[outv][raw_a]")
-    parts.append("[raw_a]loudnorm=I=-14:TP=-1.5:LRA=11[outa]")
+    parts.append(f"{joined}concat=n={len(segments)}:v=1:a=1[outv][outa]")
     cmd += [
         "-filter_complex", ";".join(parts),
         "-map", "[outv]", "-map", "[outa]",
