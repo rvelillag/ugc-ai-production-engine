@@ -15,27 +15,41 @@ This applies to every CLI agent working in this repo (Claude Code, Codex, Cursor
 
 ---
 
-## Quick Command Reference
+## Quick Command Reference (Master CLI `ugc` & Tools)
+
+El motor provee el comando CLI global `ugc` (ejecutable desde la carpeta de cualquier avatar) y sus equivalentes directos en `tools/`:
 
 ```bash
-# 1. Analyze video cadence & extract whisper transcript + scene keyframes (Fase 1 & 2)
-python tools/scene_keyframe_extractor.py --video "[PATH_TO_REFERENCE_VIDEO]"
+# 0. Crear un nuevo avatar / workspace de marca desacoplado
+ugc new --name "Sofia Torres" --brand "GlowLab" --niche "Skincare" [--dest "D:\Marcas"]
+# (Equivalente: python tools/init_creator.py --name ... --brand ...)
 
-# 1b. Draft the reference ledger (dialogue + contact frames), then fill in actions from the frames (Fase 2)
-python tools/reference_ledger.py --project "[PROJECT_FOLDER_NAME]" [--language es|en]
-# (If the video has few scene cuts, re-run step 1 AFTER the ledger is filled so keyframes land on the ledger's action boundaries.)
+# 1. Analizar cadencia & extraer transcripción Whisper + keyframes (Fase 1 & 2)
+ugc ingest --video "[PATH_TO_REFERENCE_VIDEO]"
+# (Equivalente: python tools/scene_keyframe_extractor.py --video "[PATH]")
 
-# 1c. Compile I2V prompts from each chunk's action_timeline (Fase 3)
-python tools/prompt_compiler.py --json "[PATH_TO_production_package.json]"
+# 1b. Generar borrador del reference ledger (Fase 2)
+ugc ledger --project "[PROJECT_FOLDER_NAME]" [--language es|en]
+# (Equivalente: python tools/reference_ledger.py --project "[PROJECT]" [--language es|en])
 
-# 2. Run QA Harness Audit (Fase 4 & Continuous QA)
-python tools/ugc_harness.py --project "[PROJECT_FOLDER_NAME]" [--deliverable "[DELIVERABLE_ID]"]
+# 1c. Registrar y confirmar Checkpoint 1 (Fase 2.5)
+ugc checkpoint1 --project "[PROJECT]" --scene [replicate_1to1|adapt_to_brand|derivative_concept] --outfit "..." --keyword [KEYWORD] --headline "..."
+# (Equivalente: python tools/checkpoint1.py --project "[PROJECT]" ...)
 
-# 3. Assemble final video + smart silence trimming + subtitles (viral yellow highlight style)
-python tools/assemble_project.py --project "[PROJECT_FOLDER_NAME]" [--language es|en|auto]
+# 1d. Compilar prompts I2V desde action_timeline (Fase 3)
+ugc compile --project "[PROJECT_FOLDER_NAME]"
+# (Equivalente: python tools/prompt_compiler.py --json "[PATH_TO_production_package.json]")
 
-# 4. (Optional) Standalone cadence analysis
-python tools/audio_cadence_analyzer.py --video "[PATH_TO_REFERENCE_VIDEO]"
+# 2. Ensamblar video final + Smart Silence Trimming + Subtítulos virales (Fase 4)
+ugc assemble --project "[PROJECT_FOLDER_NAME]" [--language es|en|auto]
+# (Equivalente: python tools/assemble_project.py --project "[PROJECT_FOLDER_NAME]" ...)
+
+# 3. Auditar con QA Harness (Fase 4 & Certificación 8/8 Gates)
+ugc certify --project "[PROJECT_FOLDER_NAME]" [--deliverable "[DELIVERABLE_ID]"]
+# (Equivalente: python tools/ugc_harness.py --project "[PROJECT_FOLDER_NAME]" ...)
+
+# 4. Consultar estado del workspace activo
+ugc status
 ```
 
 ---

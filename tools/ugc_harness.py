@@ -748,6 +748,7 @@ if __name__ == "__main__":
     parser.add_argument("--json", help="Path to production_package_PROD_XXX.json to audit Gates 1-4")
     parser.add_argument("--project", help="Name of project folder in 04_IN_PRODUCTION (e.g. PROD_001_cuenta_1)")
     parser.add_argument("--brand", default=None, help="Brand directory name (optional, auto-detected if omitted)")
+    parser.add_argument("--workspace", default=None, help="Direct path to brand workspace (optional, auto-detected from cwd)")
     parser.add_argument("--precheck", action="store_true",
                         help="Corre solo los gates 1-4, 7 y 8 (sin clips ni entregables) antes de gastar en generación de video")
     parser.add_argument("--deliverable", help="Deliverable folder name (optional, auto-detected if omitted)")
@@ -773,15 +774,24 @@ if __name__ == "__main__":
         }
         harness.print_scorecard(report)
     elif args.project:
-        if args.brand:
-            brand_path = base_dtc / args.brand
+        cwd = Path.cwd()
+        if args.workspace:
+            brand_path = Path(args.workspace)
+        elif (cwd / "04_IN_PRODUCTION" / args.project).exists():
+            brand_path = cwd
+        elif args.brand:
+            brand_path = (cwd / args.brand) if (cwd / args.brand).exists() else (base_dtc / args.brand)
         else:
             # Auto-detect brand directory containing this project
-            found = list(base_dtc.glob(f"*/04_IN_PRODUCTION/{args.project}"))
+            found = list(cwd.glob(f"*/04_IN_PRODUCTION/{args.project}"))
+            if not found:
+                found = list(base_dtc.glob(f"*/04_IN_PRODUCTION/{args.project}"))
             if found:
                 brand_path = found[0].parent.parent
             else:
-                candidates = [d for d in base_dtc.iterdir() if d.is_dir() and (d / "04_IN_PRODUCTION").exists()]
+                candidates = [d for d in cwd.iterdir() if d.is_dir() and (d / "04_IN_PRODUCTION").exists()]
+                if not candidates:
+                    candidates = [d for d in base_dtc.iterdir() if d.is_dir() and (d / "04_IN_PRODUCTION").exists()]
                 brand_path = candidates[0] if candidates else base_dtc
 
         report = harness.run_full_project_audit(brand_path, args.project, args.deliverable, precheck=args.precheck)

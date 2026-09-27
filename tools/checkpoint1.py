@@ -27,10 +27,20 @@ def find_project(name_or_path: str, base_dir: Path) -> Path:
     p = Path(name_or_path)
     if p.is_absolute() and p.exists():
         return p
+    cwd = Path.cwd()
+    if (cwd / "04_IN_PRODUCTION" / p.name).exists():
+        return cwd / "04_IN_PRODUCTION" / p.name
+    if (cwd / p.name).exists() and (cwd / p.name).is_dir() and (cwd.name == "04_IN_PRODUCTION" or (cwd / p.name / "01_Reference").exists()):
+        return cwd / p.name
+    if (base_dir / "04_IN_PRODUCTION" / p.name).exists():
+        return base_dir / "04_IN_PRODUCTION" / p.name
+    found = list(cwd.glob(f"*/04_IN_PRODUCTION/{p.name}"))
+    if found:
+        return found[0]
     found = list(base_dir.glob(f"*/04_IN_PRODUCTION/{p.name}"))
-    if not found:
-        raise FileNotFoundError(f"Proyecto no encontrado: {name_or_path}")
-    return found[0]
+    if found:
+        return found[0]
+    raise FileNotFoundError(f"Proyecto no encontrado: {name_or_path}")
 
 
 def write_checkpoint(project_dir: Path, scene_mode: str, outfit: str, keyword: str, headline: str,

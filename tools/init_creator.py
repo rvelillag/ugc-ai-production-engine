@@ -21,6 +21,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--keyword", default="GLOW", help="Keyword predeterminada para ManyChat")
     parser.add_argument("--archetype", default="Espejo", choices=ARCHETYPES,
                          help="Tipo de personaje: " + ", ".join(ARCHETYPES))
+    parser.add_argument("--dest", default=None, help="Directorio destino donde crear el espacio de trabajo (default: directorio actual o base)")
     parser.add_argument("--target-audience", default="", dest="target_audience",
                          help="Descripción de la audiencia objetivo (ej: 'Mujeres de 30 a 45 años')")
     return parser
@@ -50,8 +51,9 @@ def init_creator():
         print(f"Error: No se encontró la plantilla en {template_dir}")
         sys.exit(1)
 
-    creator_folder_name = args.name
-    target_dir = base_dir / creator_folder_name
+    creator_folder_name = f"{args.name} - {args.brand}" if args.brand and args.brand not in args.name else args.name
+    dest_dir = Path(args.dest) if args.dest else (Path.cwd() if Path.cwd() != base_dir else base_dir)
+    target_dir = dest_dir / creator_folder_name
 
     if target_dir.exists():
         print(f"Aviso: El directorio '{creator_folder_name}' ya existe en {target_dir}")

@@ -54,20 +54,26 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
     ffmpeg_bin, ffprobe_bin = FFmpegLocator.get_binaries()
     project_path = Path(project_path_str)
     
+    engine_root = Path(__file__).resolve().parent.parent
     if not project_path.is_absolute():
-        # Try finding it in brands
-        base_dir = Path.cwd()
-        if (base_dir / project_path).exists():
-            project_path = base_dir / project_path
+        # Try finding it in current directory or brand workspace
+        cwd = Path.cwd()
+        if (cwd / project_path).exists():
+            project_path = cwd / project_path
+        elif (cwd / "04_IN_PRODUCTION" / project_path.name).exists():
+            project_path = cwd / "04_IN_PRODUCTION" / project_path.name
         else:
-            # Search in subfolders
-            found = list(base_dir.glob(f"*/04_IN_PRODUCTION/{project_path.name}"))
+            # Search in subfolders of cwd
+            found = list(cwd.glob(f"*/04_IN_PRODUCTION/{project_path.name}"))
+            if not found:
+                # Fall back to searching in engine root
+                found = list(engine_root.glob(f"*/04_IN_PRODUCTION/{project_path.name}"))
             if found:
                 project_path = found[0]
             else:
                 raise FileNotFoundError(f"Project folder not found: {project_path_str}")
 
-    brand_dir = project_path.parent.parent
+    brand_dir = Path(brand_dir_str) if brand_dir_str else project_path.parent.parent
     prod_name = project_path.name
     name_parts = prod_name.split("_")
     if len(name_parts) < 2 or not name_parts[1]:
@@ -80,7 +86,7 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
     
     montage_dir.mkdir(parents=True, exist_ok=True)
     
-    job_dir = Path.cwd() / "scratch" / f"{prod_name}_assembly"
+    job_dir = engine_root / "scratch" / f"{prod_name}_assembly"
     job_dir.mkdir(parents=True, exist_ok=True)
 
     deliv_dir = brand_dir / "05_PROCESSED_DELIVERABLES" / deliv_id

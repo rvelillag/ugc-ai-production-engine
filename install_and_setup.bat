@@ -48,7 +48,7 @@ print('Estructura de plantillas verificada exitosamente.')
 echo.
 
 :: 5. Registrar marca de instalacion completa
-echo [5/5] Registrando marca de instalacion completa...
+echo [5/6] Registrando marca de instalacion completa...
 python -c "
 import hashlib
 from pathlib import Path
@@ -59,10 +59,16 @@ print('Marca de instalacion creada: .setup_complete')
 "
 echo.
 
+:: 6. Registrar comando global 'ugc' en el PATH de Windows
+echo [6/6] Configurando comando global 'ugc' en el sistema...
+python ugc.py setup-path
+echo.
+
 echo ========================================================
 echo   ¡INSTALACION Y CONFIGURACION COMPLETADAS CON EXITO!
 echo ========================================================
 echo.
-echo Para abrir el menu principal interactivo ejecuta: ugc_studio.bat
+echo Ahora puedes ejecutar 'ugc' desde cualquier carpeta o terminal.
+echo Para abrir el menu interactivo tradicional ejecuta: ugc_studio.bat
 echo.
 pause
