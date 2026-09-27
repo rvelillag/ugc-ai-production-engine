@@ -200,3 +200,6 @@ Before approving any project or deliverable, verify that `tools/ugc_harness.py` 
 4. **NO Censored Trigger Words:** Never use 'age' or 'DM' in video scripts.
 5. **NO Unreferenced File Clutter:** Keep project directories clean according to the canonical folder structure.
 6. **NO Raw Unicode Crashes on Windows:** Always ensure UTF-8 output formatting in Python scripts.
+7. **Mandatory Avatar & Spatial Consistency Rule:**
+   - **Character Sheet Ground Truth:** El prompt del Character Sheet DEBE basarse 1:1 en la imagen de referencia del Frontal Canónico (mismo corte de pelo, distribución de canas, micro-arrugas, tejido exacto de ropa, botones, accesorios y joyas). En Midjourney debe usarse `--cref <URL_FRONTAL> --cw 100`.
+   - **Architectural & Material Spatial Continuity:** Todas las locaciones de un personaje (casa, laboratorio, clínica, estudio, cocina) deben compartir la misma estructura arquitectónica base: mismos muros, mismo suelo, misma madera, mismas ventanas y la misma temperatura de luz natural diurna, evitando generar tres espacios inconexos.
