@@ -13,6 +13,7 @@ Usage:
   ugc setup-path
 """
 import os
+import re
 import sys
 import subprocess
 import argparse
@@ -56,12 +57,44 @@ def run_tool(script_name: str, args: list[str], cwd: Path = None):
     return result.returncode
 
 
+def suggest_avatar_names(niche: str, gender: str) -> list[str]:
+    """Genera sugerencias de nombres con alta recordación acordes al nicho."""
+    niche_lower = niche.lower()
+    if gender.lower() == "male":
+        if any(w in niche_lower for w in ["hair", "capilar", "barba"]):
+            return ["Marcus Bennett", "Julian Vance", "Mateo Silva", "Liam Ross"]
+        elif any(w in niche_lower for w in ["tech", "ia", "crypto", "business", "finan"]):
+            return ["David Mercer", "Adrian Holt", "Lucas Vance", "Gabriel Rios"]
+        else:
+            return ["Mateo Vargas", "Lucas Silva", "Daniel Rios", "Julian Vance"]
+    else:
+        if any(w in niche_lower for w in ["hair", "capilar", "cabello"]):
+            return ["Rachel Bennett", "Camila Vega", "Chloe Mercier", "Elena Rostova"]
+        elif any(w in niche_lower for w in ["skin", "piel", "glow", "dermo"]):
+            return ["Sofia Torres", "Elena Rostova", "Camila Vega", "Clara Lindqvist"]
+        elif any(w in niche_lower for w in ["home", "organiz", "hogar", "receta", "cocina"]):
+            return ["Laura Morales", "Elena Rostova", "Valentina Rios", "Camila Vega"]
+        else:
+            return ["Sofia Torres", "Camila Vega", "Elena Rostova", "Valeria Silva"]
+
+
+def evaluate_name(name: str, niche: str) -> str:
+    """Evalúa el nombre propuesto y retorna una sugerencia optimizada si aplica."""
+    clean = re.sub(r'[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]', '', name).strip()
+    words = clean.split()
+    if len(words) == 1:
+        first = words[0].capitalize()
+        return f"{first} Bennett" if "hair" in niche.lower() else f"{first} Torres"
+    return clean.title()
+
+
 def cmd_new(args):
     """Crear un nuevo avatar / workspace de marca."""
     tool_args = [
         "--name", args.name,
-        "--brand", args.brand,
     ]
+    if args.brand:
+        tool_args.extend(["--brand", args.brand])
     if args.age:
         tool_args.extend(["--age", str(args.age)])
     if args.gender:
@@ -76,8 +109,220 @@ def cmd_new(args):
         tool_args.extend(["--dest", args.dest])
     if args.target_audience:
         tool_args.extend(["--target-audience", args.target_audience])
+    if getattr(args, "no_product", False):
+        tool_args.append("--no-product")
 
     return run_tool("init_creator.py", tool_args)
+
+
+def cmd_onboard(args):
+    """Asistente interactivo guiado para dar de alta un nuevo Avatar."""
+    print("=" * 65)
+    print("      🎬 ASISTENTE DE ONBOARDING - UGC AI PRODUCTION ENGINE")
+    print("=" * 65)
+    print("Este asistente te guiará paso a paso para configurar tu Avatar\n"
+          "y estructurar su espacio de trabajo de manera óptima.\n")
+
+    # Regla 1: ¿Crear personaje nuevo o ya tiene uno en mente?
+    print("Paso 1: Definición del Personaje")
+    print("  [1] Ya tengo un personaje en mente (nombre, nicho o referencias)")
+    print("  [2] Deseo crear un personaje nuevo desde cero (asistencia con nombre y arquetipo)")
+
+    choice = input("\nElige una opción [1 o 2, default: 1]: ").strip() or "1"
+
+    name = ""
+    brand = ""
+    niche = ""
+    archetype = "Espejo"
+    age = 45
+    gender = "female"
+
+    if choice == "2":
+        print("\n--- CREACIÓN DESDE CERO ---")
+        niche = input("¿Cuál es el nicho o temática principal? (ej: Cuidado capilar, Finanzas, Recetas caseras): ").strip()
+        if not niche:
+            niche = "Estilo de vida y bienestar"
+
+        print("\nArquetipos disponibles:")
+        for idx, arc in enumerate(["Especialista", "Espejo", "Familiar", "Insider", "Convertido"], 1):
+            print(f"  [{idx}] {arc}")
+        arc_choice = input("Selecciona arquetipo [1-5, default: 2 (Espejo)]: ").strip() or "2"
+        arc_map = {"1": "Especialista", "2": "Espejo", "3": "Familiar", "4": "Insider", "5": "Convertido"}
+        archetype = arc_map.get(arc_choice, "Espejo")
+
+        gender_in = input("Género del avatar ('female' / 'male', default: female): ").strip().lower() or "female"
+        gender = "male" if "m" in gender_in and "fe" not in gender_in else "female"
+
+        age_in = input("Edad aproximada (default: 38): ").strip()
+        age = int(age_in) if age_in.isdigit() else 38
+
+        suggestions = suggest_avatar_names(niche, gender)
+        print(f"\nSugerencias de nombres de alto impacto para nicho '{niche}':")
+        for idx, s in enumerate(suggestions, 1):
+            print(f"  [{idx}] {s}")
+        print(f"  [{len(suggestions)+1}] Escribir otro nombre personalizado")
+
+        name_choice = input(f"Selecciona opción [1-{len(suggestions)+1}, default: 1]: ").strip() or "1"
+        if name_choice.isdigit() and 1 <= int(name_choice) <= len(suggestions):
+            name = suggestions[int(name_choice) - 1]
+        else:
+            name = input("Ingresa el nombre deseado para el avatar: ").strip()
+            if not name:
+                name = suggestions[0]
+
+        brand = input(f"Nombre de la marca o proyecto (opcional, default: '{name}'): ").strip() or name
+    else:
+        print("\n--- PERSONAJE EN MENTE ---")
+        name = input("Ingresa el nombre del avatar (ej: Sofia Torres, Rachel Bennett): ").strip()
+        while not name:
+            name = input("El nombre es obligatorio. Por favor ingrésalo: ").strip()
+
+        niche = input("¿Cuál es el nicho o temática? (default: Skincare / Cuidado de la piel): ").strip() or "Skincare / Cuidado de la piel"
+        brand = input(f"Nombre de la marca o proyecto (opcional, default: '{name}'): ").strip() or name
+
+        suggested = evaluate_name(name, niche)
+        if suggested and suggested.lower() != name.lower():
+            print(f"\n💡 Sugerencia del sistema:")
+            print(f"   Para el nicho '{niche}', '{suggested}' tiene excelente impacto fonético.")
+            change = input(f"   ¿Deseas adoptar '{suggested}' o conservar '{name}'? [A = Adoptar, C = Conservar, default: C]: ").strip().upper()
+            if change == "A":
+                name = suggested
+
+    # Regla 2: ¿El avatar mostrará producto físico?
+    print("\nPaso 2: Requisitos de Producto Físico")
+    print("Muchos avatares hacen contenido educativo, consejos, servicios o recetas sin mostrar frascos ni envases.")
+    prod_in = input("¿El avatar mostrará algún producto físico en video? [S/N, default: S]: ").strip().upper()
+    has_product = prod_in != "N"
+
+    if not has_product:
+        print("  -> Modo SIN producto físico activado: los prompts omitirán frascos, goteros y packaging.")
+    else:
+        print("  -> Modo CON producto físico activado: se creará plantilla para catálogo de productos.")
+
+    # Confirmación final y creación
+    avatares_root = ENGINE_ROOT.parent / "avatares"
+    dest_path = (avatares_root / name) if avatares_root.is_dir() else (Path.cwd() / name)
+    print("\n" + "=" * 65)
+    print("RESUMEN DE CREACIÓN:")
+    print(f"  Avatar:               {name}")
+    print(f"  Carpeta destino:      {dest_path}")
+    print(f"  Marca / Proyecto:     {brand}")
+    print(f"  Nicho:                {niche}")
+    print(f"  Arquetipo:            {archetype}")
+    print(f"  Producto físico:      {'Sí' if has_product else 'No (Omitido)'}")
+    print("=" * 65)
+
+    confirm = input("\n¿Proceder con la inicialización? [S/N, default: S]: ").strip().upper()
+    if confirm == "N":
+        print("Operación cancelada por el usuario.")
+        return 0
+
+    tool_args = [
+        "--name", name,
+        "--brand", brand,
+        "--niche", niche,
+        "--archetype", archetype,
+        "--age", str(age),
+        "--gender", gender,
+    ]
+    if not has_product:
+        tool_args.append("--no-product")
+    if avatares_root.is_dir():
+        tool_args.extend(["--dest", str(avatares_root)])
+
+    ret = run_tool("init_creator.py", tool_args)
+    if ret == 0:
+        print("\n" + "*" * 65)
+        print(f"¡ONBOARDING COMPLETADO CON ÉXITO!")
+        print(f"El espacio de trabajo se ha creado en: {dest_path}")
+        print(f"Comandos útiles para empezar:")
+        print(f"  cd \"{dest_path}\"")
+        print(f"  ugc status")
+        print(f"  ugc doctor")
+        print("*" * 65)
+    return ret
+
+
+def cmd_rename(args):
+    """Renombrar un avatar de forma consistente: carpeta, creator_profile.yaml y *_CHARACTER_DNA.md."""
+    import re
+    new_name = args.new.strip()
+    if not new_name:
+        print("[ERROR] El nuevo nombre no puede estar vacío.")
+        return 1
+
+    avatares_root = ENGINE_ROOT.parent / "avatares"
+    old_folder = None
+
+    if args.old:
+        candidate = avatares_root / args.old.strip()
+        if candidate.is_dir():
+            old_folder = candidate
+        else:
+            candidate_cwd = Path.cwd() / args.old.strip()
+            if candidate_cwd.is_dir():
+                old_folder = candidate_cwd
+            else:
+                candidate_rel = Path(args.old.strip()).resolve()
+                if candidate_rel.is_dir():
+                    old_folder = candidate_rel
+    else:
+        ws = detect_workspace(args.workspace)
+        if (ws / "creator_profile.yaml").exists():
+            old_folder = ws
+
+    if not old_folder or not old_folder.is_dir():
+        print(f"[ERROR] No se pudo encontrar el directorio del avatar '{args.old or ''}'.")
+        print("Usa: ugc rename --old \"Nombre Anterior\" --new \"Nuevo Nombre\" o ejecuta desde la carpeta del avatar.")
+        return 1
+
+    old_name = old_folder.name
+    new_folder = old_folder.parent / new_name
+
+    if new_folder.exists() and new_folder.resolve() != old_folder.resolve():
+        print(f"[ERROR] La carpeta de destino ya existe: {new_folder}")
+        return 1
+
+    print(f"Renombrando avatar de '{old_name}' a '{new_name}'...")
+
+    # 1. Actualizar creator_profile.yaml
+    profile_p = old_folder / "creator_profile.yaml"
+    if profile_p.is_file():
+        text = profile_p.read_text(encoding="utf-8")
+        text = re.sub(r'(?m)^(\s*name:\s*)".*"', rf'\g<1>"{new_name}"', text)
+        profile_p.write_text(text, encoding="utf-8")
+        print(f"  [OK] Actualizado creator_profile.yaml con nombre '{new_name}'")
+
+    # 2. Renombrar y actualizar *_CHARACTER_DNA.md
+    char_dir = old_folder / "02_AVATAR_ASSETS" / "01_Character"
+    if char_dir.is_dir():
+        dna_files = list(char_dir.glob("*_CHARACTER_DNA.md"))
+        new_dna_file = char_dir / f"{new_name.upper().replace(' ', '_')}_CHARACTER_DNA.md"
+        for df in dna_files:
+            content = df.read_text(encoding="utf-8")
+            content = content.replace(old_name, new_name)
+            if df.name != new_dna_file.name:
+                new_dna_file.write_text(content, encoding="utf-8")
+                df.unlink()
+                print(f"  [OK] Renombrado DNA a: {new_dna_file.name}")
+            else:
+                df.write_text(content, encoding="utf-8")
+
+    # 3. Renombrar la carpeta si el nombre cambió
+    if new_folder.resolve() != old_folder.resolve():
+        try:
+            is_cwd = Path.cwd().resolve() == old_folder.resolve()
+            if is_cwd:
+                os.chdir(str(old_folder.parent))
+            old_folder.rename(new_folder)
+            if is_cwd:
+                os.chdir(str(new_folder))
+            print(f"  [OK] Carpeta renombrada con éxito a: {new_folder.name}")
+        except Exception as e:
+            print(f"  [WARN] No se pudo renombrar la carpeta automáticamente ({e}). Renómbrala manualmente.")
+
+    print(f"\n[OK] Avatar renombrado exitosamente a '{new_name}'.")
+    return 0
 
 
 def cmd_ingest(args):
@@ -245,16 +490,31 @@ def cmd_doctor(args):
         return 0
 
     profile_p = ws / "creator_profile.yaml"
+    has_product = True
     if profile_p.is_file():
         print("  [PASS] creator_profile.yaml encontrado")
+        import yaml
+        try:
+            p_data = yaml.safe_load(profile_p.read_text(encoding="utf-8")) or {}
+            brand_cfg = p_data.get("brand", {})
+            if brand_cfg.get("has_physical_product") is False:
+                has_product = False
+        except Exception:
+            pass
     else:
         print("  [WARN] Falta creator_profile.yaml")
 
     cat_p = ws / "PRODUCT_CATALOG.yaml"
     if cat_p.is_file():
-        print("  [PASS] PRODUCT_CATALOG.yaml encontrado")
+        if not has_product:
+            print("  [PASS] PRODUCT_CATALOG.yaml (Modo sin producto físico)")
+        else:
+            print("  [PASS] PRODUCT_CATALOG.yaml encontrado")
     else:
-        print("  [WARN] Falta PRODUCT_CATALOG.yaml")
+        if has_product:
+            print("  [WARN] Falta PRODUCT_CATALOG.yaml")
+        else:
+            print("  [INFO] PRODUCT_CATALOG.yaml omitido (Modo sin producto físico)")
 
     char_dir = ws / "02_AVATAR_ASSETS" / "01_Character"
     dna_files = list(char_dir.glob("*_CHARACTER_DNA.md")) if char_dir.is_dir() else []
@@ -387,10 +647,14 @@ def main():
     )
     subparsers = parser.add_subparsers(dest="command", help="Comandos disponibles")
 
-    # new / init
+    # onboard (asistente guiado interactivo)
+    p_onboard = subparsers.add_parser("onboard", parents=[common_parser], help="Asistente interactivo guiado para dar de alta un nuevo Avatar (Regla 1 y 2)")
+    p_onboard.set_defaults(func=cmd_onboard)
+
+    # new / init (creación directa por argumentos)
     p_new = subparsers.add_parser("new", aliases=["init"], parents=[common_parser], help="Inicializar un nuevo avatar / workspace de marca")
     p_new.add_argument("--name", required=True, help="Nombre del avatar / creador (ej: 'Sofia Torres')")
-    p_new.add_argument("--brand", required=True, help="Nombre de la marca (ej: 'GlowLab')")
+    p_new.add_argument("--brand", default="", help="Nombre de la marca (opcional, default: nombre del creador)")
     p_new.add_argument("--niche", default="Skincare / Cuidado de la piel", help="Nicho de la marca")
     p_new.add_argument("--age", type=int, default=45, help="Edad del avatar (default: 45)")
     p_new.add_argument("--gender", default="female", help="Genero ('female'/'male')")
@@ -398,7 +662,14 @@ def main():
     p_new.add_argument("--archetype", default="Espejo", help="Arquetipo (Especialista, Espejo, Familiar, Insider, Convertido)")
     p_new.add_argument("--dest", default=None, help="Directorio destino donde crear la carpeta del avatar")
     p_new.add_argument("--target-audience", default="", help="Descripcion de audiencia objetivo")
+    p_new.add_argument("--no-product", action="store_true", help="Omitir producto físico (marca personal, educación, servicios, recetas)")
     p_new.set_defaults(func=cmd_new)
+
+    # rename (renombrado consistente de carpeta, perfiles y DNA)
+    p_ren = subparsers.add_parser("rename", parents=[common_parser], help="Renombrar un avatar de forma consistente (carpeta, perfiles y DNA)")
+    p_ren.add_argument("--new", required=True, help="Nuevo nombre para el avatar")
+    p_ren.add_argument("--old", default=None, help="Nombre actual del avatar (si se omite, se usa el workspace activo)")
+    p_ren.set_defaults(func=cmd_rename)
 
     # ingest
     p_ingest = subparsers.add_parser("ingest", parents=[common_parser], help="Fase 1: Ingestar video de referencia y extraer beats/keyframes")

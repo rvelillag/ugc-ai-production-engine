@@ -71,3 +71,29 @@ def test_template_archetype_comment_lists_five_types():
     archetype_line = next(line for line in template.splitlines() if line.strip().startswith("archetype:"))
     for archetype in ARCHETYPES:
         assert archetype in archetype_line, f"{archetype} missing from archetype comment: {archetype_line}"
+
+
+def test_substitute_profile_fields_handles_no_product():
+    repo_root = Path(__file__).resolve().parent.parent
+    template = (repo_root / "_CREATOR_TEMPLATE" / "creator_profile.yaml").read_text(encoding="utf-8")
+    result = substitute_profile_fields(
+        template,
+        name="Elena Rostova",
+        brand="Elena Personal",
+        age=34,
+        gender="female",
+        archetype="Especialista",
+        niche="Home Organization",
+        keyword="ORGANIZED",
+        target_audience="Adultos ocupados",
+        has_physical_product=False,
+    )
+    assert "has_physical_product: false" in result
+
+
+def test_parser_accepts_no_product_flag():
+    parser = build_arg_parser()
+    args = parser.parse_args(["--name", "Elena Rostova", "--no-product"])
+    assert args.no_product is True
+    assert args.name == "Elena Rostova"
+    assert args.brand == ""

@@ -15,14 +15,33 @@ This applies to every CLI agent working in this repo (Claude Code, Codex, Cursor
 
 ---
 
+## Architecture & Workspace Layout
+
+The engine operates on a strictly decoupled 2-folder model:
+- `sistema/`: Central engine (git repository, python core, auto-captions, tools, tests).
+- `avatares/`: Workspaces for AI creators/brands (segregated from git binaries).
+  - Folder naming convention: **strictly the avatar's name** (e.g. `avatares/Rachel Bennett/`, `avatares/Sofia Torres/`), never combined with brand or product.
+  - Non-product avatars: Avatars without physical products (education, lifestyle, recipes, consulting) set `has_physical_product: false`, omitting dropper bottles, jars, and packaging across all I2V prompts and schemas.
+
+---
+
 ## Quick Command Reference (Master CLI `ugc` & Tools)
 
-El motor provee el comando CLI global `ugc` (ejecutable desde la carpeta de cualquier avatar) y sus equivalentes directos en `tools/`:
+The engine provides the global master CLI `ugc` (executable from any terminal or avatar directory):
 
 ```bash
-# 0. Crear un nuevo avatar / workspace de marca desacoplado
-ugc new --name "Sofia Torres" --brand "GlowLab" --niche "Skincare" [--dest "D:\Marcas"]
-# (Equivalente: python tools/init_creator.py --name ... --brand ...)
+# 0a. Onboarding interactivo guiado (Regla 1: definición de nombre; Regla 2: producto físico)
+ugc onboard
+
+# 0b. Crear nuevo avatar por línea de comandos directa
+ugc new --name "Sofia Torres" [--brand "GlowLab"] [--niche "Skincare"] [--no-product]
+# (Equivalente: python tools/init_creator.py --name ... [--no-product])
+
+# 0c. Renombrar un avatar de forma consistente (carpeta, perfiles y DNA)
+ugc rename --new "Sofia Vance" [--old "Sofia Torres"]
+
+# 0d. Diagnóstico de salud del motor y del workspace activo
+ugc doctor
 
 # 1. Analizar cadencia & extraer transcripción Whisper + keyframes (Fase 1 & 2)
 ugc ingest --video "[PATH_TO_REFERENCE_VIDEO]"
@@ -39,6 +58,9 @@ ugc checkpoint1 --project "[PROJECT]" --scene [replicate_1to1|adapt_to_brand|der
 # 1d. Compilar prompts I2V desde action_timeline (Fase 3)
 ugc compile --project "[PROJECT_FOLDER_NAME]"
 # (Equivalente: python tools/prompt_compiler.py --json "[PATH_TO_production_package.json]")
+
+# 1e. Ver o copiar prompts compilados al portapapeles de Windows (Fase 3)
+ugc prompt --project "[PROJECT_FOLDER_NAME]" --chunk 1 --type i2v --copy
 
 # 2. Ensamblar video final + Smart Silence Trimming + Subtítulos virales (Fase 4)
 ugc assemble --project "[PROJECT_FOLDER_NAME]" [--language es|en|auto]

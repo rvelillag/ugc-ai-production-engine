@@ -13,6 +13,7 @@ creator:
 brand:
   name: "Nombre de la Marca"          # Ej: "GlowLab"
   niche: "Skincare / Cuidado de la piel"
+  has_physical_product: true          # true si muestra producto fisico en video; false si es marca personal/educacion
   social_handle: "@tumarca"
 
 voice:

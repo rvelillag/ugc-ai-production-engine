@@ -60,45 +60,74 @@ Esto instalará todas las librerías (*faster-whisper, PyTorch, FFmpeg estático
 
 ---
 
-## 🎮 Arquitectura Desacoplada (Un Solo Motor, Múltiples Avatares)
+---
 
-El motor vive **una sola vez** en tu máquina. Tus marcas o avatares pueden estar en cualquier carpeta de tu disco o en repositorios Git separados (pesan solo 500 KB y no duplican librerías):
+## 🎮 Arquitectura Desacoplada (2 Carpetas: Motor y Avatares)
 
-### 1. Crear un Nuevo Avatar en Cualquier Ubicación
-Abre cualquier terminal y ejecuta:
-```bash
-ugc new --name "Sofia Torres" --brand "GlowLab" --niche "Skincare" [--dest "D:\Mis_Marcas"]
+El sistema opera bajo un desacoplamiento total en dos carpetas hermanas para mantener el repositorio limpio y permitir múltiples marcas/creadores sin duplicar código ni dependencias:
+
 ```
-Esto creará el workspace `Sofia Torres - GlowLab/` con su plantilla completa y sus instrucciones para agentes de IA (`CLAUDE.md`).
-
-### 2. Operar desde la Carpeta del Avatar
-Entra a la carpeta de tu marca:
-```bash
-cd "D:\Mis_Marcas\Sofia Torres - GlowLab"
+c:\...\DTC\
+├── 📁 sistema/                 # El Motor Central (Git repo, scripts, auto-captions, tests)
+└── 📁 avatares/                # Espacio de Trabajo de Creadores y Marcas
+    ├── 📁 Rachel Bennett/      # Carpeta exclusiva con el nombre del avatar
+    └── 📁 Sofia Torres/        # Carpeta exclusiva con el nombre del avatar
 ```
-El comando `ugc` detectará automáticamente tu avatar y marca:
 
-| Fase | Comando | Descripción |
-| :--- | :--- | :--- |
-| **Status** | `ugc status` | Muestra estado del avatar, proyectos activos y entregables |
-| **Fase 1** | `ugc ingest --video "03_INBOX_REFERENCES/ref.mp4"` | Ingesta de video viral y extracción de beats/keyframes |
-| **Fase 2** | `ugc ledger --project PROD_001 [--language es]` | Genera borrador del reference ledger |
-| **Fase 2.5** | `ugc checkpoint1 --project PROD_001 --scene adapt_to_brand --outfit "..." --keyword KEYWORD --headline "..."` | Registra Checkpoint 1 |
-| **Fase 3** | `ugc compile --project PROD_001` | Compila prompts I2V con gatillos ópticos iPhone 15 Pro |
-| **Fase 4** | `ugc assemble --project PROD_001` | Ensambla con Smart Silence Trimming y subtítulos virales |
-| **Fase 4** | `ugc certify --project PROD_001` | Audita y certifica calidad de agencia (8/8 QA Gates) |
-1. Coloca los videos virales de TikTok/Reels en `<Tu_Creador>/03_INBOX_REFERENCES/<cuenta>/`.
-2. El orquestador extraerá los beats técnicos, adaptará el guion a tu producto, generará los prompts de First Frame y Video Motion, y entregará el video final con subtítulos quemados en `<Tu_Creador>/05_PROCESSED_DELIVERABLES/<ID>/`.
+> **Regla de Nomenclatura de Carpetas:**  
+> La carpeta de cada avatar lleva **únicamente el nombre del personaje** (ej: `avatares/Rachel Bennett/`, `avatares/Sofia Torres/`), nunca el sufijo de producto o marca (`- Botanique`). Si el nombre del avatar cambia en el futuro, se utiliza `ugc rename` para sincronizar la carpeta, perfiles y DNA sin errores.
+
+---
+
+## 🧭 Onboarding de Nuevos Avatares (`ugc onboard`)
+
+El motor incluye un asistente guiado interactivo que garantiza la configuración perfecta de cada avatar siguiendo dos reglas fundamentales:
+
+```bash
+ugc onboard
+```
+
+### 1. Regla 1: Definición Inteligente del Personaje (Creación vs. Personaje en Mente)
+* **Si ya tienes un personaje en mente:** Ingresas nombre, nicho y marca. El sistema analiza la sonoridad fonética y la memorabilidad del nombre para el nicho. Si detecta una optimización, te sugiere alternativas de alto impacto publicitario. Si decides adoptarla, la carpeta se crea inmediatamente con ese nombre optimizado.
+* **Si creas un personaje desde cero:** El sistema te asiste seleccionando arquetipo publicitario (Especialista, Espejo, Familiar, Insider, Convertido), rango de edad, género y nicho, y genera un abanico de sugerencias de nombres con alta recordación para que elijas tu favorito.
+
+### 2. Regla 2: Soporte para Avatares Sin Producto Físico
+* Muchos creadores de contenido generan videos educativos, consejos prácticos, recetas caseras, estilo de vida o servicios sin manipular productos físicos.
+* El asistente pregunta: *¿El avatar mostrará algún producto físico en video?*
+  * **Caso Sí:** Configura el catálogo en `PRODUCT_CATALOG.yaml` para mapear envases, texturas y fórmulas.
+  * **Caso No (`--no-product`):** Activa el modo `has_physical_product: false`. Los prompts generados omiten automáticamente frascos, goteros, botellas y empaques. `PRODUCT_CATALOG.yaml` queda limpio y `ugc doctor` certifica el workspace sin emitir advertencias de catálogo ausente.
+
+---
+
+## 🛠️ Guía Completa de Comandos Globales (`ugc`)
+
+Una vez instalado, el comando `ugc` puede ejecutarse desde cualquier terminal o dentro de la carpeta de cualquier avatar:
+
+| Comando | Descripción |
+| :--- | :--- |
+| `ugc onboard` | **Asistente interactivo guiado** para dar de alta nuevos avatares aplicando Regla 1 y Regla 2. |
+| `ugc new` / `ugc init` | Inicializa un nuevo avatar por línea de comandos rápida (`--name "Sofia Torres"` `[--no-product]`). |
+| `ugc rename` | **Renombra de forma consistente** un avatar (carpeta, `creator_profile.yaml` y Character DNA). |
+| `ugc doctor` | **Diagnóstico de salud** del motor (FFmpeg, Whisper) y auditoría del workspace activo. |
+| `ugc status` | Muestra el estado del avatar activo, nicho, ManyChat keyword, proyectos y entregables. |
+| `ugc ingest` | **Fase 1:** Ingesta de video de referencia viral y extracción de transcripción + keyframes. |
+| `ugc ledger` | **Fase 2:** Genera o actualiza el borrador del Reference Ledger estructurado. |
+| `ugc checkpoint1` | **Fase 2.5:** Registra y confirma el Checkpoint 1 (escenario, vestuario, keyword y headline). |
+| `ugc compile` | **Fase 3:** Compila los prompts de imagen y video I2V desde el action timeline. |
+| `ugc prompt` | Consulta o copia al portapapeles de Windows prompts individuales listos para Kling / Veo3. |
+| `ugc assemble` | **Fase 4:** Ensambla los clips generados con *Smart Silence Trimming* y subtítulos virales. |
+| `ugc certify` | **Auditoría de Agencia:** Evalúa los 8 Gates de calidad de agencia con el QA Harness. |
+| `ugc setup-path` | Registra el comando `ugc` en el PATH de Windows para uso global permanente. |
 
 ---
 
 ## 📦 Formato Canónico de Entrega
 
-Cada video procesado en `05_PROCESSED_DELIVERABLES/` contiene estrictamente:
-1. `<ID>_Final_1080x1920.mp4` (Video maestro con subtítulos quemados a 18% de margen).
-2. `<ID>_Subtitles.srt` (Subtítulos sincronizados palabra por palabra).
-3. `<ID>_Cover.jpg` (Portada en alta resolución).
-4. `post_copy_title_and_caption.txt` (Título gancho + Copy con Follow-Gate).
+Cada video procesado en `05_PROCESSED_DELIVERABLES/[ID]/` contiene estrictamente los 4 archivos de certificación:
+1. `[ID]_Final_1080x1920.mp4` (Video maestro ensamblado con audio original y subtítulos virales).
+2. `[ID]_Subtitles.srt` (Subtítulos sincronizados palabra por palabra con Whisper).
+3. `[ID]_Cover.jpg` (Portada optimizada con titular de curiosidad <= 7 palabras).
+4. `post_copy_title_and_caption.txt` (Título gancho + Copy para redes con llamado a ManyChat).
 
 ---
 
