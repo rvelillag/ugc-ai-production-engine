@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import json
 import shutil
 import argparse
@@ -40,7 +41,8 @@ def build_trim_concat_cmd(ffmpeg_bin: str, segments, output_path: Path, fps: str
             f"aresample=48000,aformat=channel_layouts=stereo[a{i}]"
         )
     joined = "".join(f"[v{i}][a{i}]" for i in range(len(segments)))
-    parts.append(f"{joined}concat=n={len(segments)}:v=1:a=1[outv][outa]")
+    parts.append(f"{joined}concat=n={len(segments)}:v=1:a=1[outv][raw_a]")
+    parts.append("[raw_a]loudnorm=I=-14:TP=-1.5:LRA=11[outa]")
     cmd += [
         "-filter_complex", ";".join(parts),
         "-map", "[outv]", "-map", "[outa]",
@@ -92,8 +94,12 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
     deliv_dir = brand_dir / "05_PROCESSED_DELIVERABLES" / deliv_id
     deliv_dir.mkdir(parents=True, exist_ok=True)
 
-    # 1. Detect Raw Clips
-    raw_clips = sorted(list(raw_clips_dir.glob("*.mp4")), key=lambda x: int(x.stem) if x.stem.isdigit() else 999)
+    # 1. Detect Raw Clips (robust numeric sorting: supports 1.mp4, 01.mp4, clip_1.mp4, etc.)
+    def _clip_sort_key(p: Path):
+        m = re.search(r'\d+', p.stem)
+        return (int(m.group(0)) if m else 999, p.stem)
+
+    raw_clips = sorted(list(raw_clips_dir.glob("*.mp4")), key=_clip_sort_key)
     if not raw_clips:
         raise FileNotFoundError(f"No raw clips found in {raw_clips_dir}")
 

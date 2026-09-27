@@ -24,6 +24,9 @@ if hasattr(sys.stdout, "reconfigure"):
 ENGINE_ROOT = Path(__file__).resolve().parent
 TOOLS_DIR = ENGINE_ROOT / "tools"
 
+sys.path.insert(0, str(ENGINE_ROOT))
+sys.path.insert(0, str(ENGINE_ROOT / "auto-captions-service"))
+
 
 def detect_workspace(explicit_path: str = None) -> Path:
     if explicit_path:
@@ -205,6 +208,138 @@ def cmd_status(args):
     return 0
 
 
+def cmd_doctor(args):
+    """Diagnostico de salud del motor y del avatar workspace."""
+    ws = detect_workspace(args.workspace)
+    print("=" * 65)
+    print("           UGC AI PRODUCTION ENGINE - DIAGNOSTIC DOCTOR")
+    print("=" * 65)
+
+    # 1. System dependencies check
+    print("\n[+] DIAGNOSTICO DEL MOTOR (SISTEMA):")
+    py_ver = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    py_pass = sys.version_info >= (3, 10)
+    print(f"  {'[PASS]' if py_pass else '[FAIL]'} Python {py_ver} (Requerido >= 3.10)")
+
+    try:
+        from app.core.ffmpeg_utils import FFmpegLocator
+        ff_bin, pr_bin = FFmpegLocator.get_binaries()
+        print(f"  [PASS] FFmpeg estatico detectado ({Path(ff_bin).name})")
+    except Exception as e:
+        print(f"  [FAIL] FFmpeg no disponible: {e}")
+
+    try:
+        from faster_whisper import WhisperModel
+        print("  [PASS] Faster-Whisper disponible")
+    except Exception as e:
+        print(f"  [FAIL] Faster-Whisper no disponible: {e}")
+
+    template_ok = (ENGINE_ROOT / "_CREATOR_TEMPLATE").is_dir()
+    print(f"  {'[PASS]' if template_ok else '[FAIL]'} Plantilla _CREATOR_TEMPLATE presente")
+
+    # 2. Workspace check
+    print(f"\n[+] DIAGNOSTICO DEL WORKSPACE ({ws.name}):")
+    if ws == ENGINE_ROOT:
+        print("  [INFO] Te encuentras en la raiz del motor. Para auditar un avatar, pasa --workspace o navega a su carpeta.")
+        print("=" * 65)
+        return 0
+
+    profile_p = ws / "creator_profile.yaml"
+    if profile_p.is_file():
+        print("  [PASS] creator_profile.yaml encontrado")
+    else:
+        print("  [WARN] Falta creator_profile.yaml")
+
+    cat_p = ws / "PRODUCT_CATALOG.yaml"
+    if cat_p.is_file():
+        print("  [PASS] PRODUCT_CATALOG.yaml encontrado")
+    else:
+        print("  [WARN] Falta PRODUCT_CATALOG.yaml")
+
+    char_dir = ws / "02_AVATAR_ASSETS" / "01_Character"
+    dna_files = list(char_dir.glob("*_CHARACTER_DNA.md")) if char_dir.is_dir() else []
+    if dna_files:
+        print(f"  [PASS] Character DNA configurado ({dna_files[0].name})")
+    else:
+        print("  [WARN] Falta *_CHARACTER_DNA.md en 02_AVATAR_ASSETS/01_Character")
+
+    env_dir = ws / "02_AVATAR_ASSETS" / "02_Environments"
+    env_files = list(env_dir.glob("*_ENVIRONMENT_DNA.md")) if env_dir.is_dir() else []
+    if env_files:
+        print(f"  [PASS] Environment DNA configurado ({env_files[0].name})")
+    else:
+        print("  [WARN] Falta *_ENVIRONMENT_DNA.md en 02_AVATAR_ASSETS/02_Environments")
+
+    for d in ["01_KNOWLEDGE_BASE", "03_INBOX_REFERENCES", "04_IN_PRODUCTION", "05_PROCESSED_DELIVERABLES"]:
+        exists = (ws / d).is_dir()
+        print(f"  {'[PASS]' if exists else '[WARN]'} Directorio {d}/")
+
+    print("=" * 65)
+    return 0
+
+
+def cmd_prompt(args):
+    """Ver o copiar prompts compilados de un proyecto."""
+    ws = detect_workspace(args.workspace)
+    proj_dir = None
+    if (ws / "04_IN_PRODUCTION" / args.project).is_dir():
+        proj_dir = ws / "04_IN_PRODUCTION" / args.project
+    else:
+        found = list(ws.glob(f"**/04_IN_PRODUCTION/{args.project}"))
+        if not found:
+            found = list(ENGINE_ROOT.parent.glob(f"**/04_IN_PRODUCTION/{args.project}"))
+        if found:
+            proj_dir = found[0]
+
+    if not proj_dir:
+        print(f"[ERROR] Proyecto no encontrado: {args.project}")
+        sys.exit(1)
+
+    pkg_files = list(proj_dir.glob("production_package_*.json"))
+    if not pkg_files:
+        print(f"[ERROR] No hay production_package.json en {proj_dir}")
+        sys.exit(1)
+
+    import json
+    data = json.loads(pkg_files[0].read_text(encoding="utf-8"))
+    chunks = data.get("chunks", [])
+    if not chunks:
+        print("[ERROR] Paquete sin chunks")
+        sys.exit(1)
+
+    chunk_idx = args.chunk - 1 if args.chunk and 1 <= args.chunk <= len(chunks) else 0
+    target_chunk = chunks[chunk_idx]
+
+    cid = target_chunk.get("chunk_id", f"chunk_{chunk_idx+1}")
+    prompt_i2v = target_chunk.get("video_motion_prompt_i2v", "")
+    prompt_mj = target_chunk.get("midjourney_prompt_9_16", "")
+
+    selected_text = ""
+    if args.type == "first-frame":
+        selected_text = prompt_mj
+        print(f"\n--- PROMPT FIRST FRAME (Midjourney) [{cid}] ---")
+        print(prompt_mj)
+    elif args.type == "i2v":
+        selected_text = prompt_i2v
+        print(f"\n--- PROMPT VIDEO MOTION I2V (Kling / Veo3) [{cid}] ---")
+        print(prompt_i2v)
+    else:
+        selected_text = f"FIRST FRAME:\n{prompt_mj}\n\nVIDEO MOTION:\n{prompt_i2v}"
+        print(f"\n--- PROMPT COMPLETO [{cid}] ---")
+        print(f"\n[FIRST FRAME - Midjourney]:\n{prompt_mj}")
+        print(f"\n[VIDEO MOTION - Kling / Veo3]:\n{prompt_i2v}")
+
+    if args.copy and selected_text:
+        try:
+            import subprocess
+            subprocess.run("clip", input=selected_text, text=True, check=True)
+            print("\n[OK] Prompt copiado exitosamente al portapapeles de Windows!")
+        except Exception as e:
+            print(f"\n[AVISO] No se pudo copiar al portapapeles: {e}")
+
+    return 0
+
+
 def cmd_setup_path(args):
     """Registrar el motor UGC en el PATH de Windows para usarlo globalmente."""
     if os.name != "nt":
@@ -316,6 +451,18 @@ def main():
     # status
     p_stat = subparsers.add_parser("status", parents=[common_parser], help="Consultar estado del workspace y proyectos")
     p_stat.set_defaults(func=cmd_status)
+
+    # doctor / check
+    p_doc = subparsers.add_parser("doctor", aliases=["check"], parents=[common_parser], help="Diagnosticar dependencias y salud del workspace")
+    p_doc.set_defaults(func=cmd_doctor)
+
+    # prompt
+    p_prompt = subparsers.add_parser("prompt", parents=[common_parser], help="Ver o copiar prompts compilados (I2V / Midjourney)")
+    p_prompt.add_argument("--project", required=True, help="Nombre del proyecto (ej: PROD_022_xxx)")
+    p_prompt.add_argument("--chunk", type=int, default=1, help="Numero del chunk / clip a consultar (default: 1)")
+    p_prompt.add_argument("--type", default="all", choices=["all", "i2v", "first-frame"], help="Tipo de prompt a consultar")
+    p_prompt.add_argument("--copy", action="store_true", help="Copiar el prompt seleccionado directamente al portapapeles")
+    p_prompt.set_defaults(func=cmd_prompt)
 
     # setup-path
     p_path = subparsers.add_parser("setup-path", parents=[common_parser], help="Registrar 'ugc' en el PATH de Windows para usarlo globalmente")
