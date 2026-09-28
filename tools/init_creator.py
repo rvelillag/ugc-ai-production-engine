@@ -100,6 +100,7 @@ def init_creator():
     (target_dir / "03_INBOX_REFERENCES").mkdir(parents=True, exist_ok=True)
     (target_dir / "04_IN_PRODUCTION").mkdir(parents=True, exist_ok=True)
     (target_dir / "05_PROCESSED_DELIVERABLES").mkdir(parents=True, exist_ok=True)
+    (target_dir / "06_ARCHIVE").mkdir(parents=True, exist_ok=True)
 
     # Personalizar creator_profile.yaml
     profile_file = target_dir / "creator_profile.yaml"

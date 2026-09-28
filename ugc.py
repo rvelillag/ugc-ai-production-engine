@@ -399,6 +399,8 @@ def cmd_assemble(args):
         tool_args.extend(["--start-pad", str(args.start_pad)])
     if args.end_pad is not None:
         tool_args.extend(["--end-pad", str(args.end_pad)])
+    if getattr(args, "archive", False):
+        tool_args.append("--archive")
     return run_tool("assemble_project.py", tool_args)
 
 
@@ -839,6 +841,7 @@ def main():
     p_assemble.add_argument("--language", default="auto", help="Idioma de subtitulos")
     p_assemble.add_argument("--start-pad", type=float, default=0.12, help="Padding de silencio inicial")
     p_assemble.add_argument("--end-pad", type=float, default=0.22, help="Padding de silencio final")
+    p_assemble.add_argument("--archive", action="store_true", help="Mover automáticamente a 06_ARCHIVE tras el ensamblado exitoso")
     p_assemble.set_defaults(func=cmd_assemble)
 
     # certify / audit

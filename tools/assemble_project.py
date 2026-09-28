@@ -228,6 +228,24 @@ Caption:
         f.write(copy_content)
 
     print(f"\n[SUCCESS] Project {prod_name} assembled with Smart Silence Trimming!")
+
+    if archive:
+        archive_dir = brand_dir / "06_ARCHIVE"
+        archive_dir.mkdir(parents=True, exist_ok=True)
+        dest_archive = archive_dir / prod_name
+        if dest_archive.exists():
+            shutil.rmtree(dest_archive, ignore_errors=True)
+        try:
+            shutil.move(str(project_path), str(dest_archive))
+            print(f"  [ARCHIVADO] Carpeta de producción movida a: 06_ARCHIVE/{prod_name}")
+        except Exception:
+            try:
+                shutil.copytree(str(project_path), str(dest_archive), dirs_exist_ok=True)
+                shutil.rmtree(str(project_path), ignore_errors=True)
+                print(f"  [ARCHIVADO] Carpeta de producción movida a: 06_ARCHIVE/{prod_name}")
+            except Exception as e2:
+                print(f"  [WARN] No se pudo archivar automáticamente ({e2}). Usa 'ugc archive'.")
+
     return {
         "burned_video": str(output_burned_video),
         "srt": str(output_srt),
@@ -239,5 +257,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Assemble raw clips with Smart Silence Trimming into canonical deliverable.")
     parser.add_argument("--project", required=True, help="Project directory name or path (e.g., PROD_001_cuenta_1)")
     parser.add_argument("--language", default="auto", help="Caption language code (es, en, ...) or 'auto' to detect")
+    parser.add_argument("--archive", action="store_true", help="Mover automáticamente a 06_ARCHIVE tras el ensamblado exitoso")
     args = parser.parse_args()
-    assemble_project(args.project, language=args.language)
+    assemble_project(args.project, language=args.language, archive=args.archive)
