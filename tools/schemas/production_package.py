@@ -30,7 +30,13 @@ class ActionStep(BaseModel):
     t0: float = Field(..., ge=0, description="Inicio del paso dentro del clip (s)")
     t1: float = Field(..., description="Fin del paso dentro del clip (s)")
     ledger_row: str = Field(..., description="Id de la fila del ledger de referencia que replica")
-    action: str = Field(..., min_length=1, description="Acción física exacta (misma que la referencia)")
+    action: str = Field(
+        ...,
+        min_length=1,
+        description="Acción física detallada y granular (UGC Script Writing System v2): describe explícitamente "
+                    "la mecánica táctil, posición de manos/dedos, manipulación de props, mirada a cámara y sincronización "
+                    "visual con lo que se dice en ese segundo (cero descripciones genéricas como 'talks to camera')."
+    )
     props: List[str] = Field(default_factory=list)
     dialogue: str = ""
 

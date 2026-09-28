@@ -8,7 +8,13 @@ from pathlib import Path
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-REALISM = "Natural realistic hand movements. No cuts. No exaggerated acting. Authentic unretouched smartphone UGC camera feel, natural room lighting, zero CGI or plastic sheen."
+REALISM = (
+    "Natural realistic hand movements. No cuts. No exaggerated acting. "
+    "Authentic unretouched smartphone UGC camera feel, natural room lighting, zero CGI or plastic sheen. "
+    "Skin/Hair Condition Lock: The creator must always be depicted with healthy, glowing, flawless skin and hair in the aspirational after-state, preserving natural visible pore texture. "
+    "Application Lock: Any product applied glides on invisibly and translucent, without artificial white cast, chalkiness, or cakey residue. "
+    "UGC Realism: Phone propped at eye level with subtle natural handheld micro-shake, relaxed open-palm gestures, and unhurried tactile prop handling."
+)
 DEFAULT_SFX = "Natural room ambience with subtle sounds of the props being handled."
 
 # ... helper functions ...
