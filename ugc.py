@@ -569,59 +569,68 @@ def cmd_doctor(args):
     template_ok = (ENGINE_ROOT / "_CREATOR_TEMPLATE").is_dir()
     print(f"  {'[PASS]' if template_ok else '[FAIL]'} Plantilla _CREATOR_TEMPLATE presente")
 
+    def _audit_single_workspace(w_path: Path):
+        print(f"\n[+] DIAGNOSTICO DEL WORKSPACE ({w_path.name}):")
+        profile_p = w_path / "creator_profile.yaml"
+        has_product = True
+        if profile_p.is_file():
+            print("  [PASS] creator_profile.yaml encontrado")
+            import yaml
+            try:
+                p_data = yaml.safe_load(profile_p.read_text(encoding="utf-8")) or {}
+                brand_cfg = p_data.get("brand", {})
+                if brand_cfg.get("has_physical_product") is False:
+                    has_product = False
+            except Exception:
+                pass
+        else:
+            print("  [WARN] Falta creator_profile.yaml")
+
+        cat_p = w_path / "PRODUCT_CATALOG.yaml"
+        if cat_p.is_file():
+            if not has_product:
+                print("  [PASS] PRODUCT_CATALOG.yaml (Modo sin producto físico)")
+            else:
+                print("  [PASS] PRODUCT_CATALOG.yaml encontrado")
+        else:
+            if has_product:
+                print("  [WARN] Falta PRODUCT_CATALOG.yaml")
+            else:
+                print("  [INFO] PRODUCT_CATALOG.yaml omitido (Modo sin producto físico)")
+
+        char_dir = w_path / "02_AVATAR_ASSETS" / "01_Character"
+        dna_files = list(char_dir.glob("*_CHARACTER_DNA.md")) if char_dir.is_dir() else []
+        if dna_files:
+            print(f"  [PASS] Character DNA configurado ({dna_files[0].name})")
+        else:
+            print("  [WARN] Falta *_CHARACTER_DNA.md en 02_AVATAR_ASSETS/01_Character")
+
+        env_dir = w_path / "02_AVATAR_ASSETS" / "02_Environments"
+        env_files = list(env_dir.glob("*_ENVIRONMENT_DNA.md")) if env_dir.is_dir() else []
+        if env_files:
+            print(f"  [PASS] Environment DNA configurado ({env_files[0].name})")
+        else:
+            print("  [WARN] Falta *_ENVIRONMENT_DNA.md en 02_AVATAR_ASSETS/02_Environments")
+
+        for d in ["01_KNOWLEDGE_BASE", "03_INBOX_REFERENCES", "04_IN_PRODUCTION", "05_PROCESSED_DELIVERABLES"]:
+            exists = (w_path / d).is_dir()
+            print(f"  {'[PASS]' if exists else '[WARN]'} Directorio {d}/")
+
     # 2. Workspace check
-    print(f"\n[+] DIAGNOSTICO DEL WORKSPACE ({ws.name}):")
-    if ws == ENGINE_ROOT:
-        print("  [INFO] Te encuentras en la raiz del motor. Para auditar un avatar, pasa --workspace o navega a su carpeta.")
-        print("=" * 65)
-        return 0
-
-    profile_p = ws / "creator_profile.yaml"
-    has_product = True
-    if profile_p.is_file():
-        print("  [PASS] creator_profile.yaml encontrado")
-        import yaml
-        try:
-            p_data = yaml.safe_load(profile_p.read_text(encoding="utf-8")) or {}
-            brand_cfg = p_data.get("brand", {})
-            if brand_cfg.get("has_physical_product") is False:
-                has_product = False
-        except Exception:
-            pass
-    else:
-        print("  [WARN] Falta creator_profile.yaml")
-
-    cat_p = ws / "PRODUCT_CATALOG.yaml"
-    if cat_p.is_file():
-        if not has_product:
-            print("  [PASS] PRODUCT_CATALOG.yaml (Modo sin producto físico)")
+    avatares_dir = ws / "avatares" if (ws / "avatares").is_dir() else (ENGINE_ROOT.parent / "avatares")
+    if (ws / "creator_profile.yaml").exists() or (ws / "04_IN_PRODUCTION").exists():
+        _audit_single_workspace(ws)
+    elif avatares_dir and avatares_dir.is_dir():
+        avatars = [d for d in avatares_dir.iterdir() if d.is_dir()]
+        if avatars:
+            for av in avatars:
+                _audit_single_workspace(av)
         else:
-            print("  [PASS] PRODUCT_CATALOG.yaml encontrado")
+            print(f"\n[INFO] No hay avatares creados en {avatares_dir}. Usa 'ugc new' para crear uno.")
     else:
-        if has_product:
-            print("  [WARN] Falta PRODUCT_CATALOG.yaml")
-        else:
-            print("  [INFO] PRODUCT_CATALOG.yaml omitido (Modo sin producto físico)")
+        _audit_single_workspace(ws)
 
-    char_dir = ws / "02_AVATAR_ASSETS" / "01_Character"
-    dna_files = list(char_dir.glob("*_CHARACTER_DNA.md")) if char_dir.is_dir() else []
-    if dna_files:
-        print(f"  [PASS] Character DNA configurado ({dna_files[0].name})")
-    else:
-        print("  [WARN] Falta *_CHARACTER_DNA.md en 02_AVATAR_ASSETS/01_Character")
-
-    env_dir = ws / "02_AVATAR_ASSETS" / "02_Environments"
-    env_files = list(env_dir.glob("*_ENVIRONMENT_DNA.md")) if env_dir.is_dir() else []
-    if env_files:
-        print(f"  [PASS] Environment DNA configurado ({env_files[0].name})")
-    else:
-        print("  [WARN] Falta *_ENVIRONMENT_DNA.md en 02_AVATAR_ASSETS/02_Environments")
-
-    for d in ["01_KNOWLEDGE_BASE", "03_INBOX_REFERENCES", "04_IN_PRODUCTION", "05_PROCESSED_DELIVERABLES"]:
-        exists = (ws / d).is_dir()
-        print(f"  {'[PASS]' if exists else '[WARN]'} Directorio {d}/")
-
-    print("=" * 65)
+    print("\n" + "=" * 65)
     return 0
 
 
