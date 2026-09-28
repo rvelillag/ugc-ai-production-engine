@@ -40,6 +40,11 @@ def find_project(name_or_path: str, base_dir: Path) -> Path:
     found = list(base_dir.glob(f"*/04_IN_PRODUCTION/{p.name}"))
     if found:
         return found[0]
+    # Search in avatares/ or parent workspaces recursively
+    for root in (cwd, base_dir, base_dir.parent):
+        found = list(root.glob(f"**/04_IN_PRODUCTION/{p.name}"))
+        if found:
+            return found[0]
     raise FileNotFoundError(f"Proyecto no encontrado: {name_or_path}")
 
 
