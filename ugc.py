@@ -97,6 +97,13 @@ def cmd_new(args):
         tool_args.extend(["--brand", args.brand])
     if args.age:
         tool_args.extend(["--age", str(args.age)])
+def cmd_new(args):
+    """Crear un nuevo avatar / creador en avatares/ a partir de la plantilla oficial."""
+    tool_args = ["--name", args.name]
+    if args.brand:
+        tool_args.extend(["--brand", args.brand])
+    if args.age:
+        tool_args.extend(["--age", str(args.age)])
     if args.gender:
         tool_args.extend(["--gender", args.gender])
     if args.niche:
@@ -109,22 +116,34 @@ def cmd_new(args):
         tool_args.extend(["--dest", args.dest])
     if args.target_audience:
         tool_args.extend(["--target-audience", args.target_audience])
-    if getattr(args, "no_product", False):
+    if getattr(args, "product_type", None):
+        tool_args.extend(["--product-type", args.product_type])
+    elif getattr(args, "no_product", False):
         tool_args.append("--no-product")
+    if getattr(args, "digital_product_name", None):
+        tool_args.extend(["--digital-product-name", args.digital_product_name])
+    if getattr(args, "ethnicity", None):
+        tool_args.extend(["--ethnicity", args.ethnicity])
+    if getattr(args, "avatar_prompt", None):
+        tool_args.extend(["--avatar-prompt", args.avatar_prompt])
+    if getattr(args, "environment_prompt", None):
+        tool_args.extend(["--environment-prompt", args.environment_prompt])
+    if getattr(args, "environment_type", None):
+        tool_args.extend(["--environment-type", args.environment_type])
 
     return run_tool("init_creator.py", tool_args)
 
 
 def cmd_onboard(args):
-    """Asistente interactivo guiado para dar de alta un nuevo Avatar."""
-    print("=" * 65)
+    """Asistente interactivo guiado para dar de alta un nuevo Avatar con prompts canónicos completos."""
+    print("=" * 70)
     print("      🎬 ASISTENTE DE ONBOARDING - UGC AI PRODUCTION ENGINE")
-    print("=" * 65)
-    print("Este asistente te guiará paso a paso para configurar tu Avatar\n"
-          "y estructurar su espacio de trabajo de manera óptima.\n")
+    print("=" * 70)
+    print("Este asistente te guiará paso a paso para configurar tu Avatar,\n"
+          "definir su producto (Físico/Digital/Servicio) y generar sus prompts maestros.\n")
 
-    # Regla 1: ¿Crear personaje nuevo o ya tiene uno en mente?
-    print("Paso 1: Definición del Personaje")
+    # Paso 1: Definición del Personaje
+    print("\n--- PASO 1: DEFINICIÓN DEL PERSONAJE ---")
     print("  [1] Ya tengo un personaje en mente (nombre, nicho o referencias)")
     print("  [2] Deseo crear un personaje nuevo desde cero (asistencia con nombre y arquetipo)")
 
@@ -136,10 +155,11 @@ def cmd_onboard(args):
     archetype = "Espejo"
     age = 45
     gender = "female"
+    ethnicity = "Caucasian"
 
     if choice == "2":
         print("\n--- CREACIÓN DESDE CERO ---")
-        niche = input("¿Cuál es el nicho o temática principal? (ej: Cuidado capilar, Finanzas, Recetas caseras): ").strip()
+        niche = input("¿Cuál es el nicho o temática principal? (ej: Cuidado capilar, Skincare, Finanzas, Recetas): ").strip()
         if not niche:
             niche = "Estilo de vida y bienestar"
 
@@ -153,8 +173,8 @@ def cmd_onboard(args):
         gender_in = input("Género del avatar ('female' / 'male', default: female): ").strip().lower() or "female"
         gender = "male" if "m" in gender_in and "fe" not in gender_in else "female"
 
-        age_in = input("Edad aproximada (default: 38): ").strip()
-        age = int(age_in) if age_in.isdigit() else 38
+        age_in = input("Edad aproximada (default: 42): ").strip()
+        age = int(age_in) if age_in.isdigit() else 42
 
         suggestions = suggest_avatar_names(niche, gender)
         print(f"\nSugerencias de nombres de alto impacto para nicho '{niche}':")
@@ -180,37 +200,98 @@ def cmd_onboard(args):
         niche = input("¿Cuál es el nicho o temática? (default: Skincare / Cuidado de la piel): ").strip() or "Skincare / Cuidado de la piel"
         brand = input(f"Nombre de la marca o proyecto (opcional, default: '{name}'): ").strip() or name
 
-        suggested = evaluate_name(name, niche)
-        if suggested and suggested.lower() != name.lower():
-            print(f"\n💡 Sugerencia del sistema:")
-            print(f"   Para el nicho '{niche}', '{suggested}' tiene excelente impacto fonético.")
-            change = input(f"   ¿Deseas adoptar '{suggested}' o conservar '{name}'? [A = Adoptar, C = Conservar, default: C]: ").strip().upper()
-            if change == "A":
-                name = suggested
+        age_in = input("Edad aproximada (default: 45): ").strip()
+        age = int(age_in) if age_in.isdigit() else 45
 
-    # Regla 2: ¿El avatar mostrará producto físico?
-    print("\nPaso 2: Requisitos de Producto Físico")
-    print("Muchos avatares hacen contenido educativo, consejos, servicios o recetas sin mostrar frascos ni envases.")
-    prod_in = input("¿El avatar mostrará algún producto físico en video? [S/N, default: S]: ").strip().upper()
-    has_product = prod_in != "N"
+        gender_in = input("Género ('female' / 'male', default: female): ").strip().lower() or "female"
+        gender = "male" if "m" in gender_in and "fe" not in gender_in else "female"
 
-    if not has_product:
-        print("  -> Modo SIN producto físico activado: los prompts omitirán frascos, goteros y packaging.")
+        print("\nArquetipos disponibles:")
+        for idx, arc in enumerate(["Especialista", "Espejo", "Familiar", "Insider", "Convertido"], 1):
+            print(f"  [{idx}] {arc}")
+        arc_choice = input("Selecciona arquetipo [1-5, default: 2 (Espejo)]: ").strip() or "2"
+        arc_map = {"1": "Especialista", "2": "Espejo", "3": "Familiar", "4": "Insider", "5": "Convertido"}
+        archetype = arc_map.get(arc_choice, "Espejo")
+
+    # Rasgos visuales / Etnia
+    print("\nRasgos visuales / Etnia:")
+    print("  [1] Caucasian (Piel clara, castaño/rubio/gris)")
+    print("  [2] Latina / Hispanic (Piel trigueña o cálida, cabello castaño u oscuro)")
+    print("  [3] African American / Black")
+    print("  [4] Asian")
+    print("  [5] Personalizado")
+    eth_choice = input("Selecciona opción [1-5, default: 1]: ").strip() or "1"
+    eth_map = {"1": "Caucasian", "2": "Latina / Hispanic", "3": "African American", "4": "Asian"}
+    if eth_choice in eth_map:
+        ethnicity = eth_map[eth_choice]
+    elif eth_choice == "5":
+        ethnicity = input("Ingresa la etnia / rasgos deseados: ").strip() or "Caucasian"
     else:
-        print("  -> Modo CON producto físico activado: se creará plantilla para catálogo de productos.")
+        ethnicity = "Caucasian"
 
-    # Confirmación final y creación
+    # Paso 2: Requisitos de Producto (Físico, Digital o Servicio)
+    print("\n--- PASO 2: MODALIDAD DE PRODUCTO ---")
+    print("Selecciona el tipo de oferta o producto que promocionará el avatar:")
+    print("  [1] Producto Físico (Cosméticos, goteros, cremas, botellas, packaging visible en mano)")
+    print("  [2] Producto Digital (Ebook, Guía PDF, Curso online, Recetario digital, Suscripción)")
+    print("  [3] Sin Producto / Marca Personal & Servicios (Educación pura, tips, recetas caseras)")
+
+    prod_choice = input("\nElige una opción [1, 2 o 3, default: 1]: ").strip() or "1"
+    product_type = "physical"
+    digital_product_name = ""
+
+    if prod_choice == "2":
+        product_type = "digital"
+        default_dig = f"Guía Digital de {niche} (PDF)"
+        digital_product_name = input(f"Nombre del producto digital (default: '{default_dig}'): ").strip() or default_dig
+        print(f"  -> Modo PRODUCTO DIGITAL configurado: '{digital_product_name}'. Los videos enfocarán valor educativo y la conversión será vía ManyChat.")
+    elif prod_choice == "3":
+        product_type = "none"
+        print("  -> Modo SIN PRODUCTO configurado: los prompts omitirán frascos, botellas y empaques físicos.")
+    else:
+        product_type = "physical"
+        print("  -> Modo PRODUCTO FÍSICO configurado: se generará plantilla de catálogo para cosméticos / envases.")
+
+    # Paso 3: Entorno / Set de Grabación
+    print("\n--- PASO 3: ENTORNO & LOCACIÓN CANÓNICA ---")
+    print("Selecciona el set principal donde grabará el avatar:")
+    print("  [1] Salón de Belleza / Studio de Peluquería Boutique (Fluted walnut wood, golden mirrors, marble)")
+    print("  [2] Cocina Moderna y Elegante (Open-plan, quartzite counters, natural oak, warm window light)")
+    print("  [3] Consultorio Médico / Clínica Estética Minimalista (Warm limestone, white oak, soft cove lights)")
+    print("  [4] Oficina Ejecutiva / Estudio Profesional (Fluted dark wood, sleek desk, warm reading lamp)")
+    print("  [5] Estudio Minimalista de Lifestyle (Textured plaster, organic oak, warm linen drapes)")
+    print("  [6] Personalizado (Escribir descripción personalizada)")
+
+    env_choice = input("\nElige una opción [1-6, default según nicho]: ").strip()
+    environment_type = ""
+    if env_choice == "1":
+        environment_type = "high-end luxury boutique hair salon interior"
+    elif env_choice == "2":
+        environment_type = "warm, upscale domestic open-plan kitchen and dining area"
+    elif env_choice == "3":
+        environment_type = "modern aesthetic dermatology clinic consultation studio"
+    elif env_choice == "4":
+        environment_type = "modern high-end home executive office"
+    elif env_choice == "5":
+        environment_type = "contemporary minimalist lifestyle studio"
+    elif env_choice == "6":
+        environment_type = input("Describe el set de grabación deseado: ").strip()
+
+    keyword = input(f"\nPalabra clave predeterminada para ManyChat (default: 'INFO' o 'GUIA'): ").strip().upper() or ("GUIA" if product_type == "digital" else "INFO")
+
+    # Resumen y Confirmación
     avatares_root = ENGINE_ROOT.parent / "avatares"
     dest_path = (avatares_root / name) if avatares_root.is_dir() else (Path.cwd() / name)
-    print("\n" + "=" * 65)
-    print("RESUMEN DE CREACIÓN:")
-    print(f"  Avatar:               {name}")
-    print(f"  Carpeta destino:      {dest_path}")
+    print("\n" + "=" * 70)
+    print("RESUMEN DE CREACIÓN DEL AVATAR:")
+    print(f"  Avatar:               {name} ({age} años, {gender}, {ethnicity})")
     print(f"  Marca / Proyecto:     {brand}")
     print(f"  Nicho:                {niche}")
     print(f"  Arquetipo:            {archetype}")
-    print(f"  Producto físico:      {'Sí' if has_product else 'No (Omitido)'}")
-    print("=" * 65)
+    print(f"  Modalidad Producto:   {product_type.upper()} {f'({digital_product_name})' if digital_product_name else ''}")
+    print(f"  Keyword ManyChat:     {keyword}")
+    print(f"  Carpeta destino:      {dest_path}")
+    print("=" * 70)
 
     confirm = input("\n¿Proceder con la inicialización? [S/N, default: S]: ").strip().upper()
     if confirm == "N":
@@ -224,22 +305,24 @@ def cmd_onboard(args):
         "--archetype", archetype,
         "--age", str(age),
         "--gender", gender,
+        "--ethnicity", ethnicity,
+        "--keyword", keyword,
+        "--product-type", product_type,
     ]
-    if not has_product:
-        tool_args.append("--no-product")
+    if digital_product_name:
+        tool_args.extend(["--digital-product-name", digital_product_name])
+    if environment_type:
+        tool_args.extend(["--environment-type", environment_type])
     if avatares_root.is_dir():
         tool_args.extend(["--dest", str(avatares_root)])
 
     ret = run_tool("init_creator.py", tool_args)
     if ret == 0:
-        print("\n" + "*" * 65)
-        print(f"¡ONBOARDING COMPLETADO CON ÉXITO!")
-        print(f"El espacio de trabajo se ha creado en: {dest_path}")
-        print(f"Comandos útiles para empezar:")
-        print(f"  cd \"{dest_path}\"")
-        print(f"  ugc status")
-        print(f"  ugc doctor")
-        print("*" * 65)
+        print("\n" + "*" * 70)
+        print(f"🎉 ¡ONBOARDING COMPLETADO CON ÉXITO!")
+        print(f"Espacio de trabajo listo en: {dest_path}")
+        print(f"Copia los prompts de arriba en Midjourney / Flux para generar tus retratos y fondos.")
+        print("*" * 70)
     return ret
 
 
@@ -793,7 +876,13 @@ def main():
     p_new.add_argument("--archetype", default="Espejo", help="Arquetipo (Especialista, Espejo, Familiar, Insider, Convertido)")
     p_new.add_argument("--dest", default=None, help="Directorio destino donde crear la carpeta del avatar")
     p_new.add_argument("--target-audience", default="", help="Descripcion de audiencia objetivo")
-    p_new.add_argument("--no-product", action="store_true", help="Omitir producto físico (marca personal, educación, servicios, recetas)")
+    p_new.add_argument("--product-type", choices=["physical", "digital", "none"], default=None, help="Tipo de producto: 'physical' (físico), 'digital' (ebooks/guías/cursos), 'none' (servicios/marca personal)")
+    p_new.add_argument("--no-product", action="store_true", help="Omitir producto físico (equivalente a --product-type none)")
+    p_new.add_argument("--digital-product-name", default="", help="Nombre del producto digital si aplica (ej: 'Guía de Recetas Naturales (PDF)')")
+    p_new.add_argument("--ethnicity", default="Caucasian", help="Etnia / rasgos visuales del avatar")
+    p_new.add_argument("--avatar-prompt", default="", help="Prompt canónico de imagen para el Character DNA")
+    p_new.add_argument("--environment-prompt", default="", help="Prompt canónico de locación para el Environment DNA")
+    p_new.add_argument("--environment-type", default="", help="Tipo de locación (ej: 'luxury salon', 'modern domestic kitchen')")
     p_new.set_defaults(func=cmd_new)
 
     # rename (renombrado consistente de carpeta, perfiles y DNA)

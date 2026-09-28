@@ -28,7 +28,10 @@ The engine operates on a strictly decoupled 2-folder model:
     - `04_IN_PRODUCTION/`: Active projects undergoing prompt compilation, raw clips, and assembly.
     - `05_PROCESSED_DELIVERABLES/`: Final certified packages ready for publishing (`[ID]_Final_1080x1920.mp4`, cover, SRT, copy).
     - `06_ARCHIVE/`: Safely archived production source folders of completed and certified deliverables.
-  - Non-product avatars: Avatars without physical products (education, lifestyle, recipes, consulting) set `has_physical_product: false`, omitting dropper bottles, jars, and packaging across all I2V prompts and schemas.
+  - **Modalidades de Producto del Avatar (`product_type`):**
+    1. `physical`: Cosméticos, botellas, cremas, goteros o packaging físico visible en tomas de video (`has_physical_product: true`).
+    2. `digital`: Ebooks, guías PDF, cursos, recetarios digitales o suscripciones (`has_digital_product: true`, `has_physical_product: false`, conversión educativa vía ManyChat sin botellas físicas en mano).
+    3. `none`: Marca personal, servicios, educación pura o recetas caseras sin producto propio (`has_physical_product: false`).
 
 ---
 
@@ -37,12 +40,12 @@ The engine operates on a strictly decoupled 2-folder model:
 The engine provides the global master CLI `ugc` (executable from any terminal or avatar directory):
 
 ```bash
-# 0a. Onboarding interactivo guiado (Regla 1: definición de nombre; Regla 2: producto físico)
+# 0a. Onboarding interactivo guiado (Paso 1: Personaje/Etnia; Paso 2: Producto Físico/Digital/Servicio; Paso 3: Set/Locación; Paso 4: Generación de Prompts Midjourney/Flux)
 ugc onboard
 
 # 0b. Crear nuevo avatar por línea de comandos directa
-ugc new --name "Sofia Torres" [--brand "GlowLab"] [--niche "Skincare"] [--no-product]
-# (Equivalente: python tools/init_creator.py --name ... [--no-product])
+ugc new --name "Sofia Torres" [--brand "GlowLab"] [--niche "Skincare"] [--product-type physical|digital|none] [--digital-product-name "..."] [--ethnicity "..."]
+# (Equivalente: python tools/init_creator.py --name ... [--product-type ...])
 
 # 0c. Renombrar un avatar de forma consistente (carpeta, perfiles y DNA con límites de palabra seguros)
 ugc rename --new "Sofia Vance" [--old "Sofia Torres"]
