@@ -19,7 +19,8 @@ def _load_dna_descriptor(json_path: Path) -> str | None:
 
     Walks up from json_path until it finds 02_AVATAR_ASSETS/01_Character/. Strips the avatar's
     full name from the descriptor per CLAUDE.md anti-filter rule (Fase 3, punto 6 header).
-    Returns None if no DNA file is found.
+    Raises ValueError if a DNA file exists but cannot be parsed, to prevent silent fallback bugs.
+    Returns None only if no DNA directory or file exists.
     """
     for parent in json_path.resolve().parents:
         dna_dir = parent / "02_AVATAR_ASSETS" / "01_Character"
@@ -30,7 +31,15 @@ def _load_dna_descriptor(json_path: Path) -> str | None:
             text = dna_files[0].read_text(encoding="utf-8")
             m = re.search(r"##\s*6\..*?VERBATIM.*?```text\s*\n(.*?)```", text, re.DOTALL | re.IGNORECASE)
             if not m:
-                return None
+                # Flexible fallback pattern for variations in heading
+                m = re.search(r"##[^\n]*(?:VERBATIM|PROMPT ANCHOR)[^\n]*\n.*?```text\s*\n(.*?)```", text, re.DOTALL | re.IGNORECASE)
+            if not m:
+                raise ValueError(
+                    f"[ERROR DNA] Archivo de Character DNA encontrado ({dna_files[0]}) "
+                    "pero no contiene la sección canónica obligatoria con bloque de texto: "
+                    "'## 6. PROMPT ANCHOR (VERBATIM)' con ```text ... ```. "
+                    "Corrige el formato del archivo de DNA."
+                )
             raw = m.group(1).strip()
             # Strip "First Last, " prefix — never inject full names into generative prompts
             stripped = re.sub(r"^[A-Z][a-zA-ZÀ-ÖØ-öø-ÿ]+(?:\s+[A-Z][a-zA-ZÀ-ÖØ-öø-ÿ]+)+,\s*", "", raw)
@@ -41,8 +50,9 @@ def _load_dna_descriptor(json_path: Path) -> str | None:
 def _load_environment_descriptor(json_path: Path) -> str | None:
     """Read the ENVIRONMENT PROMPT ANCHOR VERBATIM block from the brand's *_ENVIRONMENT_DNA.md.
 
-    The brand's location (e.g. the salon) is a constant across videos, like the avatar. Returns None
-    if the brand has no environment DNA (older creators): the chunk's own environment text is used.
+    The brand's location (e.g. the salon) is a constant across videos, like the avatar.
+    Raises ValueError if an environment file exists but cannot be parsed.
+    Returns None if the brand has no environment DNA (older creators): the chunk's own environment text is used.
     """
     for parent in json_path.resolve().parents:
         env_dir = parent / "02_AVATAR_ASSETS" / "02_Environments"
@@ -51,7 +61,16 @@ def _load_environment_descriptor(json_path: Path) -> str | None:
             if not files:
                 return None
             pattern = r"##[^\n]*VERBATIM[^\n]*\n.*?```text\s*\n(.*?)```"
-            m = re.search(pattern, files[0].read_text(encoding="utf-8"), re.DOTALL | re.IGNORECASE)
+            text = files[0].read_text(encoding="utf-8")
+            m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
+            if not m:
+                # Flexible fallback
+                m = re.search(r"##[^\n]*(?:VERBATIM|PROMPT ANCHOR|ENVIRONMENT ANCHOR)[^\n]*\n.*?```text\s*\n(.*?)```", text, re.DOTALL | re.IGNORECASE)
+            if not m:
+                raise ValueError(
+                    f"[ERROR ENVIRONMENT DNA] Archivo encontrado ({files[0]}) pero no contiene "
+                    "el bloque obligatorio ```text ... ``` bajo una cabecera VERBATIM."
+                )
             return m.group(1).strip() if m else None
     return None
 
@@ -271,6 +290,10 @@ def compile_package(json_path: Path) -> int:
             count += 1
     if count > 0:
         path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        if (path.parent / "02_First_Frames").is_dir():
+            (path.parent / "02_First_Frames" / path.name).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        elif path.parent.name == "02_First_Frames":
+            (path.parent.parent / path.name).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
         render_md(data, path)
     return count
 

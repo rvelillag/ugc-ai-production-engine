@@ -65,13 +65,38 @@ def tokenize(text: str) -> List[str]:
     return re.findall(r"[a-záéíóúñü0-9']+", text.lower())
 
 
+def _lcs_length(a: List[str], b: List[str]) -> int:
+    """Longest Common Subsequence length for token lists."""
+    m, n = len(a), len(b)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    for i in range(m):
+        for j in range(n):
+            if a[i] == b[j]:
+                dp[i + 1][j + 1] = dp[i][j] + 1
+            else:
+                dp[i + 1][j + 1] = max(dp[i + 1][j], dp[i][j + 1])
+    return dp[m][n]
+
+
 def fidelity(ref_text: str, gen_text: str) -> float:
-    """Fracción de las palabras de la referencia que se conservan en el texto generado (con multiplicidad)."""
-    ref, gen = Counter(tokenize(ref_text)), Counter(tokenize(gen_text))
-    total = sum(ref.values())
+    """Calcula la fidelidad del texto generado respecto a la referencia.
+
+    Combina la retención léxica de vocabulario (unigram overlap) con la preservación
+    del orden secuencial sintáctico (Longest Common Subsequence / ROUGE-L).
+    """
+    ref_tokens = tokenize(ref_text)
+    gen_tokens = tokenize(gen_text)
+    total = len(ref_tokens)
     if not total:
         return 1.0
-    return sum((ref & gen).values()) / total
+
+    ref_counter = Counter(ref_tokens)
+    gen_counter = Counter(gen_tokens)
+    unigram_score = sum((ref_counter & gen_counter).values()) / total
+    lcs_score = _lcs_length(ref_tokens, gen_tokens) / total
+
+    # 50% retención léxica + 50% preservación del orden sintáctico
+    return round(0.5 * unigram_score + 0.5 * lcs_score, 3)
 
 
 def build_draft_rows(words: List[dict], duration_s: float, max_gap: float = 0.6, max_len: float = 4.0) -> List[LedgerRow]:

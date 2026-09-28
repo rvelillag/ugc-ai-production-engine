@@ -300,7 +300,9 @@ def cmd_rename(args):
         new_dna_file = char_dir / f"{new_name.upper().replace(' ', '_')}_CHARACTER_DNA.md"
         for df in dna_files:
             content = df.read_text(encoding="utf-8")
-            content = content.replace(old_name, new_name)
+            # Word-boundary replacement to avoid replacing substrings (e.g. 'Banana' -> 'BNewName')
+            content = re.sub(rf"\b{re.escape(old_name)}\b", new_name, content)
+            content = re.sub(rf"\b{re.escape(old_name.upper())}\b", new_name.upper(), content)
             if df.name != new_dna_file.name:
                 new_dna_file.write_text(content, encoding="utf-8")
                 df.unlink()
@@ -449,7 +451,92 @@ def cmd_status(args):
         for d in delivs:
             print(f"    * {d}")
 
+    archive_dir = ws / "06_ARCHIVE"
+    if archive_dir.exists():
+        archived = [a.name for a in archive_dir.iterdir() if a.is_dir()]
+        if archived:
+            print(f"\n  Proyectos Archivados ({len(archived)}):")
+            for a in archived:
+                print(f"    * {a}")
+
     print("=" * 65)
+    return 0
+
+
+def cmd_archive(args):
+    """Mover proyectos completados desde 04_IN_PRODUCTION hacia 06_ARCHIVE."""
+    ws = detect_workspace(args.workspace)
+    in_prod_dir = ws / "04_IN_PRODUCTION"
+    deliverables_dir = ws / "05_PROCESSED_DELIVERABLES"
+    archive_dir = ws / "06_ARCHIVE"
+
+    if not in_prod_dir.is_dir():
+        print(f"[ERROR] No se encontró la carpeta 04_IN_PRODUCTION en {ws}")
+        return 1
+
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    target_project = args.project.strip() if args.project else None
+
+    projects_to_check = []
+    if target_project:
+        candidate = in_prod_dir / target_project
+        if not candidate.is_dir():
+            print(f"[ERROR] Proyecto '{target_project}' no encontrado en {in_prod_dir}")
+            return 1
+        projects_to_check.append(candidate)
+    else:
+        projects_to_check = [d for d in in_prod_dir.iterdir() if d.is_dir()]
+
+    if not projects_to_check:
+        print("[INFO] No hay proyectos en 04_IN_PRODUCTION para archivar.")
+        return 0
+
+    print("=" * 65)
+    print("        📦 ARCHIVADOR DE PROYECTOS UGC FINALIZADOS")
+    print("=" * 65)
+    print(f"Workspace: {ws.name}")
+    print(f"Destino:   {archive_dir}\n")
+
+    archived_count = 0
+    for proj in sorted(projects_to_check, key=lambda x: x.name):
+        prod_name = proj.name
+        name_parts = prod_name.split("_")
+        has_deliverable = False
+        deliv_id = None
+        if len(name_parts) >= 2 and name_parts[1]:
+            from tools.deliverable_naming import resolve_deliverable_id
+            try:
+                deliv_id = resolve_deliverable_id(ws, name_parts[1])
+                deliv_path = deliverables_dir / deliv_id
+                if deliv_path.is_dir() and list(deliv_path.glob("*_Final_1080x1920.mp4")):
+                    has_deliverable = True
+            except Exception:
+                has_deliverable = False
+
+        if not has_deliverable and not getattr(args, "force", False):
+            print(f"  [OMITIDO] {proj.name} (No tiene entregable final en 05_PROCESSED_DELIVERABLES; usa --force para forzar)")
+            continue
+
+        dest = archive_dir / proj.name
+        if dest.exists():
+            import shutil
+            shutil.rmtree(dest, ignore_errors=True)
+        try:
+            import shutil
+            shutil.move(str(proj), str(dest))
+            print(f"  [ARCHIVADO] {proj.name} -> 06_ARCHIVE/{proj.name} (Entregable: {deliv_id or 'N/A'})")
+            archived_count += 1
+        except Exception as e:
+            try:
+                import shutil
+                shutil.copytree(str(proj), str(dest), dirs_exist_ok=True)
+                shutil.rmtree(str(proj), ignore_errors=True)
+                print(f"  [ARCHIVADO] {proj.name} -> 06_ARCHIVE/{proj.name} (Entregable: {deliv_id or 'N/A'})")
+                archived_count += 1
+            except Exception as e2:
+                print(f"  [ERROR] No se pudo mover {proj.name}: {e2}")
+
+    print(f"\n[OK] Total de proyectos archivados: {archived_count}")
     return 0
 
 
@@ -771,6 +858,12 @@ def main():
     # setup-path
     p_path = subparsers.add_parser("setup-path", parents=[common_parser], help="Registrar 'ugc' en el PATH de Windows para usarlo globalmente")
     p_path.set_defaults(func=cmd_setup_path)
+
+    # archive
+    p_arch = subparsers.add_parser("archive", parents=[common_parser], help="Mover proyectos completados desde 04_IN_PRODUCTION hacia 06_ARCHIVE")
+    p_arch.add_argument("--project", default=None, help="Nombre de un proyecto especifico a archivar (si se omite, archiva todos los completados)")
+    p_arch.add_argument("--force", action="store_true", help="Forzar archivado aunque no se detecte entregable final")
+    p_arch.set_defaults(func=cmd_archive)
 
     # update
     p_update = subparsers.add_parser("update", parents=[common_parser], help="Actualizar el motor central a la última versión de Git y verificar dependencias")

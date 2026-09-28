@@ -21,6 +21,13 @@ The engine operates on a strictly decoupled 2-folder model:
 - `sistema/`: Central engine (git repository, python core, auto-captions, tools, tests).
 - `avatares/`: Workspaces for AI creators/brands (segregated from git binaries).
   - Folder naming convention: **strictly the avatar's name** (e.g. `avatares/Rachel Bennett/`, `avatares/Sofia Torres/`), never combined with brand or product.
+  - Standard avatar workspace structure:
+    - `01_KNOWLEDGE_BASE/`: Brand profile (`creator_profile.yaml`), voice tone, product catalog, rules.
+    - `02_AVATAR_ASSETS/`: `01_Character/*_CHARACTER_DNA.md`, `02_Environments/*_ENVIRONMENT_DNA.md`, reference portraits.
+    - `03_INBOX_REFERENCES/`: Incoming viral video references organized by creator handle.
+    - `04_IN_PRODUCTION/`: Active projects undergoing prompt compilation, raw clips, and assembly.
+    - `05_PROCESSED_DELIVERABLES/`: Final certified packages ready for publishing (`[ID]_Final_1080x1920.mp4`, cover, SRT, copy).
+    - `06_ARCHIVE/`: Safely archived production source folders of completed and certified deliverables.
   - Non-product avatars: Avatars without physical products (education, lifestyle, recipes, consulting) set `has_physical_product: false`, omitting dropper bottles, jars, and packaging across all I2V prompts and schemas.
 
 ---
@@ -37,7 +44,7 @@ ugc onboard
 ugc new --name "Sofia Torres" [--brand "GlowLab"] [--niche "Skincare"] [--no-product]
 # (Equivalente: python tools/init_creator.py --name ... [--no-product])
 
-# 0c. Renombrar un avatar de forma consistente (carpeta, perfiles y DNA)
+# 0c. Renombrar un avatar de forma consistente (carpeta, perfiles y DNA con límites de palabra seguros)
 ugc rename --new "Sofia Vance" [--old "Sofia Torres"]
 
 # 0d. Diagnóstico de salud del motor y del workspace activo
@@ -55,7 +62,7 @@ ugc ledger --project "[PROJECT_FOLDER_NAME]" [--language es|en]
 ugc checkpoint1 --project "[PROJECT]" --scene [replicate_1to1|adapt_to_brand|derivative_concept] --outfit "..." --keyword [KEYWORD] --headline "..."
 # (Equivalente: python tools/checkpoint1.py --project "[PROJECT]" ...)
 
-# 1d. Compilar prompts I2V desde action_timeline (Fase 3)
+# 1d. Compilar prompts I2V desde action_timeline (Fase 3 - Sincronización canónica estricta con Character DNA)
 ugc compile --project "[PROJECT_FOLDER_NAME]"
 # (Equivalente: python tools/prompt_compiler.py --json "[PATH_TO_production_package.json]")
 
@@ -66,14 +73,17 @@ ugc prompt --project "[PROJECT_FOLDER_NAME]" --chunk 1 --type i2v --copy
 ugc assemble --project "[PROJECT_FOLDER_NAME]" [--language es|en|auto]
 # (Equivalente: python tools/assemble_project.py --project "[PROJECT_FOLDER_NAME]" ...)
 
-# 3. Auditar con QA Harness (Fase 4 & Certificación 8/8 Gates)
+# 3. Auditar con QA Harness (Fase 4 & Certificación 8/8 Gates con fidelidad léxica y orden sintáctico LCS)
 ugc certify --project "[PROJECT_FOLDER_NAME]" [--deliverable "[DELIVERABLE_ID]"]
 # (Equivalente: python tools/ugc_harness.py --project "[PROJECT_FOLDER_NAME]" ...)
 
-# 4. Consultar estado del workspace activo
+# 4. Archivar proyectos completados de 04_IN_PRODUCTION hacia 06_ARCHIVE
+ugc archive [--project "[PROJECT_FOLDER_NAME]"] [--force]
+
+# 5. Consultar estado del workspace activo (en producción, entregables y archivados)
 ugc status
 
-# 5. Actualizar el motor a la última versión de Git (sin tocar avatares)
+# 6. Actualizar el motor a la última versión de Git (sin tocar avatares)
 ugc update
 ```
 

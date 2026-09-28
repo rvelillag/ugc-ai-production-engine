@@ -775,26 +775,44 @@ if __name__ == "__main__":
         harness.print_scorecard(report)
     elif args.project:
         cwd = Path.cwd()
-        if args.workspace:
-            brand_path = Path(args.workspace)
-        elif (cwd / "04_IN_PRODUCTION" / args.project).exists():
-            brand_path = cwd
-        elif args.brand:
-            brand_path = (cwd / args.brand) if (cwd / args.brand).exists() else (base_dtc / args.brand)
+        raw_proj = Path(args.project)
+        
+        # If user passed a direct valid path to the project directory
+        if raw_proj.exists() and raw_proj.is_dir() and raw_proj.parent.name == "04_IN_PRODUCTION":
+            brand_path = raw_proj.parent.parent
+            proj_name = raw_proj.name
+        elif (cwd / raw_proj).exists() and (cwd / raw_proj).is_dir() and (cwd / raw_proj).parent.name == "04_IN_PRODUCTION":
+            brand_path = (cwd / raw_proj).resolve().parent.parent
+            proj_name = (cwd / raw_proj).name
+        elif (base_dtc.parent / raw_proj).exists() and (base_dtc.parent / raw_proj).is_dir() and (base_dtc.parent / raw_proj).parent.name == "04_IN_PRODUCTION":
+            brand_path = (base_dtc.parent / raw_proj).resolve().parent.parent
+            proj_name = (base_dtc.parent / raw_proj).name
         else:
-            # Auto-detect brand directory containing this project
-            found = list(cwd.glob(f"*/04_IN_PRODUCTION/{args.project}"))
-            if not found:
-                found = list(base_dtc.glob(f"*/04_IN_PRODUCTION/{args.project}"))
-            if found:
-                brand_path = found[0].parent.parent
+            proj_name = raw_proj.name
+            if args.workspace:
+                brand_path = Path(args.workspace)
+            elif (cwd / "04_IN_PRODUCTION" / proj_name).exists():
+                brand_path = cwd
+            elif args.brand:
+                brand_path = (cwd / args.brand) if (cwd / args.brand).exists() else (base_dtc / args.brand)
             else:
-                candidates = [d for d in cwd.iterdir() if d.is_dir() and (d / "04_IN_PRODUCTION").exists()]
-                if not candidates:
-                    candidates = [d for d in base_dtc.iterdir() if d.is_dir() and (d / "04_IN_PRODUCTION").exists()]
-                brand_path = candidates[0] if candidates else base_dtc
+                # Auto-detect brand directory containing this project across cwd and workspace roots
+                found = list(cwd.glob(f"*/04_IN_PRODUCTION/{proj_name}"))
+                if not found:
+                    found = list(cwd.glob(f"avatares/*/04_IN_PRODUCTION/{proj_name}"))
+                if not found:
+                    found = list(base_dtc.parent.glob(f"avatares/*/04_IN_PRODUCTION/{proj_name}"))
+                if not found:
+                    found = list(base_dtc.glob(f"*/04_IN_PRODUCTION/{proj_name}"))
+                if found:
+                    brand_path = found[0].parent.parent
+                else:
+                    candidates = [d for d in cwd.iterdir() if d.is_dir() and (d / "04_IN_PRODUCTION").exists() and d.name != "_CREATOR_TEMPLATE"]
+                    if not candidates:
+                        candidates = [d for d in base_dtc.iterdir() if d.is_dir() and (d / "04_IN_PRODUCTION").exists() and d.name != "_CREATOR_TEMPLATE"]
+                    brand_path = candidates[0] if candidates else base_dtc
 
-        report = harness.run_full_project_audit(brand_path, args.project, args.deliverable, precheck=args.precheck)
+        report = harness.run_full_project_audit(brand_path, proj_name, args.deliverable, precheck=args.precheck)
         harness.print_scorecard(report)
     else:
         print("UGC Production & QA Harness listo. Usa --help para ver los comandos.")
