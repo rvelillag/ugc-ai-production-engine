@@ -130,25 +130,34 @@ Para garantizar sincronización de labios exacta, correlación 1:1 entre accione
 
 > **Consistencia de personajes secundarios:** la consistencia no aplica solo al avatar. Toda otra persona recurrente (clienta, paciente, extras de fondo) se define una vez en `secondary_characters` (`role` + `descriptor` sin nombre propio). `prompt_compiler.py` lo inyecta idéntico en el header de cada prompt I2V y en cada `midjourney_prompt_9_16`; el campo `secondary_state` de cada chunk solo describe qué cambia (ej. cabello mojado → seco). GATE_1 falla si hay `right_subject` sin `secondary_characters`. Tip: reutiliza el primer frame del personaje secundario como imagen de referencia en los demás chunks.
 
-### Plantilla Maestra de Video Motion Prompt:
+### Plantilla Maestra de Video Motion Prompt (Compilada por tools/prompt_compiler.py):
 ```text
-Hyper-realistic vertical 9:16 smartphone UGC video. Use the canonical [DETALLES DE ENTORNO/ESCENARIO CANÓNICO]. [DESCRIPTOR FÍSICO DEL AVATAR — NUNCA nombre y apellido, ver nota abajo —, AÑOS APARENTES (ej. 47yo, nunca 'age'/'edad': GATE_3), VESTUARIO EXACTO]. Preserve her identity, clothing, lighting, environment, table position, props and camera style throughout the entire clip.
+Raw unedited vertical 9:16 smartphone UGC video recorded on iPhone 15 Pro 24mm f/1.8 main camera. Subtle natural handheld breathing motion, authentic natural lighting, no CGI. Use the canonical [DETALLES DE ENTORNO/ESCENARIO CANÓNICO]. [DESCRIPTOR FÍSICO DEL AVATAR — NUNCA nombre y apellido, ver nota abajo —, AÑOS APARENTES (ej. 47yo, nunca 'age'/'edad': GATE_3), VESTUARIO EXACTO]. Preserve her identity, clothing, lighting, environment, table position, props and camera style throughout the entire clip.
 
 *ACTION:*
-0–3s: [Tipo de encuadre / plano]. [Acción física y gesticulación con props]. She looks directly into the smartphone camera and says: "[TEXTO EXACTO DE DIÁLOGO DEL SEGMENTO 1]"
+0–3s: [Spatial Grounding inicial de objetos sobre superficie]. [Acción física y mecánica táctil detallada: posición de manos/dedos con prop A]. She looks directly into the smartphone camera and says: "[TEXTO EXACTO DE DIÁLOGO DEL SEGMENTO 1]"
 
-3–8s: [Acción física continua con props / demostración]. She [gesto] while continuing: "[TEXTO EXACTO DE DIÁLOGO DEL SEGMENTO 2]"
+3–8s: [Explicit Release de prop A si aplica y manipulación táctil pausada de prop B]. She [gesto de palma abierta / micro-expresión] while continuing: "[TEXTO EXACTO DE DIÁLOGO DEL SEGMENTO 2]"
 
-Natural realistic hand movements. No cuts. No exaggerated acting.
+Natural realistic hand movements. No cuts. No exaggerated acting. Authentic unretouched smartphone UGC camera feel, natural room lighting, zero CGI or plastic sheen. Skin/Hair Condition Lock: The creator must always be depicted with healthy, glowing, flawless skin and hair in the aspirational after-state, preserving natural visible pore texture. Application Lock: Any product applied glides on invisibly and translucent, without artificial white cast, chalkiness, or cakey residue. UGC Realism: Phone propped at eye level with subtle natural handheld micro-shake, relaxed open-palm gestures, and unhurried tactile prop handling.
 
-*SFX:* [ambience del entorno, sonido físico sutil de contacto con mesa/superficie, sonido natural de manipulación de props e ingredientes].
+*SFX:* [ambience del entorno, sonido físico sutil de contacto con mesa/superficie, foley natural de manipulación de props e ingredientes].
 ```
 
-### Reglas Clave de Redacción de Video Prompts:
-1. **Header de Consistencia Inmutable:** Define la relación de aspecto 9:16, escenario canónico y el candado de continuidad (*"Preserve her identity, clothing, lighting, environment, table position, props and camera style throughout the entire clip"*).
-2. **Bloques `*ACTION:*` con Timestamps de Milisegundo:** Cada segundo de duración ($0\text{–}3\text{s}$, $3\text{–}8\text{s}$, etc.) tiene su acción física correspondiente y su fragmento de diálogo explícito entrecomillado (`says: "..."`, `while continuing: "..."`).
-3. **Restricción de Realismo Cinematográfico:** Obligatorio incluir `"Natural realistic hand movements. No cuts. No exaggerated acting."` para evitar sobreactuación o cortes artificiales de cámara.
-4. **Capa Acústica y Foley (`*SFX:*`):** Define el ruido de fondo del entorno doméstico/estudio y los sonidos dieléctricos reales de los objetos al ser manipulados (líquidos, vidrio, madera, cerámica).
+### Reglas Clave de Redacción de Video Prompts (UGC Script Writing System v2):
+1. **Los 4 Bloques Universales de Dirección:**
+   - **Skin/Hair Condition Lock:** El avatar presente SIEMPRE se muestra en el estado aspiracional posterior (*after-state* con piel y cabello radiantes, textura natural visible). Nunca se muestra el síntoma/problema previo sobre el avatar actual.
+   - **Application Direction Lock:** Los productos tópicos aplicados se deslizan de forma transparente/invisible y se absorben con textura natural, sin residuos blancos ni rayas pastosas.
+   - **B-Roll Sequencing Block:** El producto de solución NO aparece en cámara antes de que el guion lo nombre/justifique. Chunks tempranos usan gestos y props cotidianos de problema.
+   - **UGC Realism Direction Block:** Teléfono a la altura de los ojos con micro-movimiento natural sutil, luz natural de ventana, gestos de palma abierta y postura relajada. Cero rigidez (nunca manos congeladas detrás de la espalda ni en los bolsillos).
+2. **Reglas de Acción a Prueba de Balas (Visual-to-Voiceover Sync & Biomecánica):**
+   - **Visual-to-Voiceover Sync:** La acción física descrita en cada segundo DEBE corresponder en detalle exacto a lo que el avatar dice en ese preciso instante.
+   - **Mecánica Táctil Explícita:** Se debe describir la interacción física precisa (yemas de los dedos, rotación de tapa, presión del gotero, textura). Cero acciones genéricas como `"talks to camera"`.
+   - **Spatial Grounding Inicial:** En el primer beat (`0–3s:`), declarar la disposición física de los objetos sobre la mesa antes de manipularlos.
+   - **Biomechanical Phasing & Explicit Release:** Solo UN objeto activo manipulado a la vez; soltar explícitamente el objeto anterior antes de tomar el siguiente.
+   - **Cero B-Roll Decorativo:** Todo cambio de encuadre o movimiento está motivado por acción física o revelación; prohibidos planos vacíos de muebles o paredes.
+3. **Bloques `*ACTION:*` con Timestamps de Milisegundo:** Cada segmento temporal ($0\text{–}3\text{s}$, $3\text{–}8\text{s}$, etc.) tiene su acción física correspondiente y su fragmento de diálogo explícito entrecomillado.
+4. **Capa Acústica y Foley (`*SFX:*`):** Define el ambiente de sala y los sonidos táctiles de contacto con superficies y props.
 
 
 

@@ -37,11 +37,13 @@ ugc status
 ## Core Non-Negotiables
 - **Clonar vs Modelar:** Always clarify with the user if they want a 1:1 replica or an original derivative concept.
 - **Checkpoint 1 Stop:** Never generate prompts without confirmed Checkpoint 1 (`scene_mode`, `outfit`, `keyword`, `headline`, `wps_target`).
-- **Prompt Architecture:** 
-  - Spatial Grounding (declare all counter props at `0–3s:` before moving them).
-  - Biomechanical Phasing (only 1 active prop manipulated at a time; others `resting stationary`).
-  - Explicit Release (`sets down [A], picks up [B]`).
-  - Optical Triggers: `Raw unedited vertical 9:16 smartphone UGC video recorded on iPhone 15 Pro 24mm f/1.8 main camera. Subtle natural handheld breathing motion, authentic natural lighting, no CGI.`
-  - Midjourney First Frame flags: `--ar 9:16 --style raw --v 6.1 --s 50`.
+- **Prompt Architecture (UGC Script Writing System v2):** 
+  - **Visual-to-Voiceover Sync:** La acción física descrita en cada segundo DEBE corresponder en detalle exacto a lo que el avatar dice en ese momento. Cero acciones genéricas como `"talks to camera"`.
+  - **Mecánica Táctil Explícita:** Detallar posición de dedos/manos, textura de producto y contacto visual con el lente.
+  - **Los 4 Bloques Universales:** Skin/Hair After Lock (siempre en estado posterior aspiracional), Application Lock (deslizamiento transparente e invisible sin residuos), B-Roll Sequencing (no mostrar producto antes de nombrarlo), UGC Realism (teléfono a la altura de ojos, luz natural de ventana, gestos de palma abierta, sin manos en bolsillos).
+  - **Spatial Grounding:** Declarar disposición de props al inicio (`0–3s:`) antes de moverlos.
+  - **Biomechanical Phasing & Explicit Release:** 1 solo prop activo a la vez; soltar explícitamente el anterior.
+  - **Optical Triggers:** `Raw unedited vertical 9:16 smartphone UGC video recorded on iPhone 15 Pro 24mm f/1.8 main camera. Subtle natural handheld breathing motion, authentic natural lighting, no CGI.`
+  - **Midjourney First Frame flags:** `--ar 9:16 --style raw --v 6.1 --s 50`.
 - **Anti-Filter Moderation:** Never use 'age' or 'DM' in scripts; brand conversion decoupled via ManyChat keyword.
 - **Agency Certification:** Final deliverable must achieve **8/8 GATES APROBADOS** via `ugc certify`.
