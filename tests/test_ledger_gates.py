@@ -61,7 +61,9 @@ def test_time_marker_uses_en_dash_and_trims_zeros():
 def test_compiled_prompt_follows_canonical_template():
     pkg = _package([_ledger_chunk()])
     prompt = compile_i2v_prompt(pkg, pkg["chunks"][0])
-    assert prompt.startswith("Raw unedited vertical 9:16 smartphone UGC video recorded on iPhone 15 Pro 24mm f/1.8 main camera. Subtle natural handheld breathing motion, authentic natural lighting, no CGI. Use the canonical ")
+    assert prompt.startswith("Raw unedited vertical 9:16 smartphone UGC video recorded on iPhone 15 Pro 24mm f/1.8 main camera. Subtle natural handheld breathing motion, authentic natural lighting, no CGI. [WARDROBE COLOR LOCK]: ")
+    # El candado de vestuario va primero (evita deriva de color en Kling/Veo); luego identidad y entorno.
+    assert prompt.index("[WARDROBE COLOR LOCK]") < prompt.index("Use the canonical ")
     # No debe llevar el nombre propio del avatar (dispara filtros de "personas reales" en Veo3/Kling);
     # sin avatar_visual_descriptor, cae a un descriptor genérico por edad.
     assert "Avatar," not in prompt

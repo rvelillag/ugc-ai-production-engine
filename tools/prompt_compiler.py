@@ -139,14 +139,28 @@ def compile_i2v_prompt(pkg: dict, chunk: dict) -> str:
         identity_clause = identity.rstrip()
     else:
         identity_clause = f"{identity}, wearing {pkg['wardrobe_assigned']}"
+    chunk_outfit = (chunk.get("composition_audit", {}).get("left_subject") or {}).get("outfit") or pkg.get("wardrobe_assigned", "")
+    outfit_str = _as_noun_phrase(chunk_outfit)
+    if chunk_outfit and re.search(r"She is wearing[^.]*\.", identity_clause):
+        identity_clause = re.sub(r"She is wearing[^.]*\.", f"She is wearing {outfit_str}.", identity_clause, count=1)
+    
+    # Priority WARDROBE LOCK placed early in prompt to prevent diffusion model temporal color drift (e.g. blue morphing to beige/cream in Kling/Veo)
+    wardrobe_lock = (
+        f"[WARDROBE COLOR LOCK]: The creator is wearing {outfit_str}. "
+        f"Her clothing color and fabric texture are strictly locked and must remain 100% {chunk_outfit.lower()} identical to the input image across the entire video. "
+        "Zero color shift, zero fabric morphing, and absolutely no fading or changing to beige, cream, white, grey, or tan."
+    )
+
     secondary = "".join(
         f" Secondary character ({c['role']}), identical in every clip: {c['descriptor'].rstrip('.')}."
         for c in pkg.get("secondary_characters", []))
     if chunk.get("secondary_state") and pkg.get("secondary_characters"):
         secondary += f" In this clip: {chunk['secondary_state'].rstrip('.')}."
     header = (
-        f"Raw unedited vertical 9:16 smartphone UGC video recorded on iPhone 15 Pro 24mm f/1.8 main camera. Subtle natural handheld breathing motion, authentic natural lighting, no CGI. Use the canonical {env}. "
+        f"Raw unedited vertical 9:16 smartphone UGC video recorded on iPhone 15 Pro 24mm f/1.8 main camera. Subtle natural handheld breathing motion, authentic natural lighting, no CGI. "
+        f"{wardrobe_lock} "
         f"{identity_clause.rstrip('.')}.{secondary} "
+        f"Use the canonical {env}. "
         "Preserve her identity, clothing, lighting, environment, table position, props and camera style "
         "throughout the entire clip, and keep every other person's face, hair and clothing identical."
     )
@@ -159,7 +173,11 @@ def compile_i2v_prompt(pkg: dict, chunk: dict) -> str:
             spoke = True
         lines.append(line)
     sfx = chunk.get("sfx") or DEFAULT_SFX
-    return "\n\n".join([header, "\n\n".join(lines), REALISM, f"*SFX:* {sfx}"])
+    realism_block = REALISM
+    if chunk.get("application_lock"):
+        realism_block = re.sub(r"Application Lock: [^.]*\.", f"Application Lock: {chunk['application_lock'].rstrip('.')}.", realism_block)
+    wardrobe_footer = f"Wardrobe Permanence Rule: The creator's {chunk_outfit.lower()} must stay solid, fully saturated, and identical to the first frame throughout the entire clip without turning beige or shifting hues."
+    return "\n\n".join([header, "\n\n".join(lines), f"{realism_block} {wardrobe_footer}", f"*SFX:* {sfx}"])
 
 
 MJ_LOCK_MARKS = ("LOCKS (", "SECONDARY CHARACTERS (lock")
@@ -178,6 +196,9 @@ def lock_first_frame_prompt(pkg: dict, chunk: dict) -> str:
     parts = []
     if pkg.get("avatar_visual_descriptor"):
         avatar_desc = re.sub(r",?\s*(?:8k\s*resolution|photorealistic(?:\s*portrait)?|hyper-realistic)", "", pkg['avatar_visual_descriptor'], flags=re.IGNORECASE)
+        chunk_outfit = (chunk.get("composition_audit", {}).get("left_subject") or {}).get("outfit")
+        if chunk_outfit and re.search(r"She is wearing[^.]*\.", avatar_desc):
+            avatar_desc = re.sub(r"She is wearing[^.]*\.", f"She is wearing {_as_noun_phrase(chunk_outfit)}.", avatar_desc, count=1)
         parts.append(f"AVATAR: {avatar_desc.rstrip('.')}.")
     if pkg.get("environment_descriptor"):
         parts.append(f"ENVIRONMENT: {pkg['environment_descriptor'].rstrip('.')}.")

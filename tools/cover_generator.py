@@ -6,6 +6,7 @@ def generate_cover_advanced(
     input_image_path: Path,
     headline: str,
     output_image_path: Path,
+    output_overlay_path: Path = None,
     target_width: int = 1080,
     target_height: int = 1920,
     highlight_color_hex: str = "#FFE500" # Neon viral yellow
@@ -27,8 +28,13 @@ def generate_cover_advanced(
         img = img.crop((0, offset, img.width, offset + new_height))
 
     img = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
-
-    # Font setup - Impact or Arial Black
+    
+    if not headline.strip() or headline.strip().upper() in ["NONE", "SIN HEADLINE", "NO HEADLINE"]:
+        img.convert("RGB").save(output_image_path, "JPEG", quality=95)
+        if output_overlay_path:
+            empty_overlay = Image.new("RGBA", (target_width, target_height), (0, 0, 0, 0))
+            empty_overlay.save(output_overlay_path, "PNG")
+        return
     font_candidates = [
         "C:/Windows/Fonts/impact.ttf",
         "C:/Windows/Fonts/ariblk.ttf",
@@ -43,7 +49,9 @@ def generate_cover_advanced(
             "Instala una o añade su ruta a font_candidates en cover_generator.py."
         )
 
-    words = headline.strip().split()
+    # Remove unsupported emoji glyphs that render as empty boxes in standard fonts
+    clean_headline = re.sub(r'[^\w\s\$\%\!\?\-\,\.\:\'\"\#]', '', headline).strip()
+    words = clean_headline.split() if clean_headline else headline.strip().split()
 
     # Smart line splitting (max 2-3 words per line for high visual impact)
     lines = []
@@ -155,6 +163,12 @@ def generate_cover_advanced(
         )
 
         curr_box_y += lm["box_h"] + line_gap
+
+    if output_overlay_path:
+        output_overlay_path = Path(output_overlay_path)
+        output_overlay_path.parent.mkdir(parents=True, exist_ok=True)
+        overlay.save(output_overlay_path, "PNG")
+        print(f"Generated Headline Overlay PNG: {output_overlay_path}")
 
     img = Image.alpha_composite(img, overlay)
 

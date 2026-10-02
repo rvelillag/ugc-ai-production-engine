@@ -48,7 +48,8 @@ def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_
     # 2. Transcribe with Whisper
     print("Running Whisper transcription with word timestamps...")
     model = WhisperModel(model_size, device="cpu", compute_type="int8")
-    segments, info = model.transcribe(str(video_path), word_timestamps=True, language=language)
+    lang_param = None if (not language or language.lower() == "auto") else language
+    segments, info = model.transcribe(str(video_path), word_timestamps=True, language=lang_param)
     
     whisper_segments = []
     all_words = []

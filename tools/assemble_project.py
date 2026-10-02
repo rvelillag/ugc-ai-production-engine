@@ -8,6 +8,11 @@ import subprocess
 from pathlib import Path
 from faster_whisper import WhisperModel
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
 # Add project root and auto-captions-service to sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "auto-captions-service"))
@@ -51,7 +56,7 @@ def build_trim_concat_cmd(ffmpeg_bin: str, segments, output_path: Path, fps: str
     ]
     return cmd
 
-def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_padding_start: float = 0.12, silence_padding_end: float = 0.22, language: str = "auto"):
+def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_padding_start: float = 0.12, silence_padding_end: float = 0.22, language: str = "auto", archive: bool = False, no_video_headline: bool = False):
     ffmpeg_bin, ffprobe_bin = FFmpegLocator.get_binaries()
     project_path = Path(project_path_str)
     
@@ -64,11 +69,12 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
         elif (cwd / "04_IN_PRODUCTION" / project_path.name).exists():
             project_path = cwd / "04_IN_PRODUCTION" / project_path.name
         else:
-            # Search in subfolders of cwd
-            found = list(cwd.glob(f"*/04_IN_PRODUCTION/{project_path.name}"))
-            if not found:
-                # Fall back to searching in engine root
-                found = list(engine_root.glob(f"*/04_IN_PRODUCTION/{project_path.name}"))
+            # Search in subfolders of cwd, engine_root, or parent (avatares)
+            found = []
+            for root in (cwd, engine_root, engine_root.parent):
+                found = list(root.glob(f"**/04_IN_PRODUCTION/{project_path.name}"))
+                if found:
+                    break
             if found:
                 project_path = found[0]
             else:
@@ -205,11 +211,36 @@ Caption:
     subprocess.run(cmd_frame, check=True)
 
     cover_badge_path = job_dir / "Cover_Badge.jpg"
+    headline_overlay_path = job_dir / "headline_overlay.png"
     generate_cover_advanced(
         input_image_path=raw_frame_path,
         headline=cover_headline,
-        output_image_path=cover_badge_path
+        output_image_path=cover_badge_path,
+        output_overlay_path=headline_overlay_path
     )
+
+    # 5.5 Overlay hook headline sticker badge during first 3 seconds (0.0s - 3.0s)
+    if not no_video_headline and headline_overlay_path.exists() and cover_headline.strip():
+        print(f"\nStage 4.5: Overlaying hook headline badge ('{cover_headline}') for first 3 seconds...")
+        video_with_hook = job_dir / "output_captioned_with_hook.mp4"
+        cmd_hook = [
+            ffmpeg_bin, "-y",
+            "-i", str(output_burned_video),
+            "-i", str(headline_overlay_path),
+            "-filter_complex", "[0:v][1:v]overlay=0:0:enable='between(t,0,3)'[v]",
+            "-map", "[v]",
+            "-map", "0:a?",
+            "-c:v", "libx264",
+            "-preset", "fast",
+            "-crf", "18",
+            "-pix_fmt", "yuv420p",
+            "-c:a", "copy",
+            str(video_with_hook)
+        ]
+        subprocess.run(cmd_hook, check=True)
+        output_burned_video = video_with_hook
+    else:
+        print("\nStage 4.5: Skipping video hook headline overlay (clean video requested).")
 
     # 6. Deliverables Export
     print("\nStage 5: Exporting canonical deliverable packages...")
@@ -219,11 +250,15 @@ Caption:
         shutil.copy(output_srt, montage_dir / f"{prod_name.split('_')[0]}_{deliv_id}_Subtitles.srt")
     shutil.copy(cover_badge_path, montage_dir / "Cover.jpg")
 
-    # Canonical deliverables (exactly 4 files)
+    # Canonical deliverables
     shutil.copy(output_burned_video, deliv_dir / f"{deliv_id}_Final_1080x1920.mp4")
     if output_srt and output_srt.exists():
         shutil.copy(output_srt, deliv_dir / f"{deliv_id}_Subtitles.srt")
     shutil.copy(cover_badge_path, deliv_dir / f"{deliv_id}_Cover.jpg")
+    shutil.copy(cover_badge_path, deliv_dir / f"{deliv_id}_Cover_Headline.jpg")
+    if raw_frame_path.exists():
+        shutil.copy(raw_frame_path, deliv_dir / f"{deliv_id}_Cover_Clean.jpg")
+        shutil.copy(raw_frame_path, montage_dir / "Cover_Clean.jpg")
     with open(deliv_dir / "post_copy_title_and_caption.txt", "w", encoding="utf-8") as f:
         f.write(copy_content)
 
@@ -257,6 +292,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Assemble raw clips with Smart Silence Trimming into canonical deliverable.")
     parser.add_argument("--project", required=True, help="Project directory name or path (e.g., PROD_001_cuenta_1)")
     parser.add_argument("--language", default="auto", help="Caption language code (es, en, ...) or 'auto' to detect")
+    parser.add_argument("--start-pad", type=float, default=0.12, help="Silence padding start (seconds)")
+    parser.add_argument("--end-pad", type=float, default=0.22, help="Silence padding end (seconds)")
     parser.add_argument("--archive", action="store_true", help="Mover automáticamente a 06_ARCHIVE tras el ensamblado exitoso")
+    parser.add_argument("--no-video-headline", action="store_true", help="Omitir el sticker del headline en el video")
     args = parser.parse_args()
-    assemble_project(args.project, language=args.language, archive=args.archive)
+    assemble_project(
+        args.project,
+        silence_padding_start=args.start_pad,
+        silence_padding_end=args.end_pad,
+        language=args.language,
+        archive=args.archive,
+        no_video_headline=args.no_video_headline
+    )

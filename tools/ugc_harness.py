@@ -386,10 +386,16 @@ class UGCHarness:
                 passed = False
                 details.append(f"Múltiples archivos para {labels[key]}: {hits}")
 
+        # Variantes de portada autorizadas (con headline / sin headline clean)
+        for f in file_names:
+            if f.endswith("_Cover_Clean.jpg") or f.endswith("_Cover_Headline.jpg"):
+                matched.add(f)
+                details.append(f"Variante de portada autorizada presente ({f}).")
+
         extras = [f for f in file_names if f not in matched]
         if extras:
             passed = False
-            details.append(f"Archivos no canónicos (deben ser exactamente 4): {extras}")
+            details.append(f"Archivos no canónicos detectados: {extras}")
 
         copy_file = deliverables_dir / "post_copy_title_and_caption.txt"
         if copy_file.exists() and "HEADLINE DE PORTADA" not in copy_file.read_text(encoding="utf-8"):
