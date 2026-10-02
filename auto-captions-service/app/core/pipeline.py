@@ -161,10 +161,17 @@ class CaptionPipeline:
             progress_cb("Burning animated subtitles with FFmpeg", 80)
 
         output_video_path = self.job_dir / "output_captioned.mp4"
+        fonts_dir = Path(__file__).resolve().parent.parent.parent / "fonts"
+        if not fonts_dir.exists():
+            fonts_dir = Path(__file__).resolve().parents[3] / "fonts"
+        if not fonts_dir.exists():
+            fonts_dir = None
+
         FFmpegBurner.burn_subtitles(
             input_video=input_video_path,
             ass_subtitle=ass_file,
-            output_video=output_video_path
+            output_video=output_video_path,
+            fonts_dir=fonts_dir
         )
 
         if progress_cb:

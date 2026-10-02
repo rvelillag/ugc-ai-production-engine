@@ -55,6 +55,11 @@ class UGCHarness:
 
     MAX_CLIP_DURATION_S = 10
 
+    # Duraciones que el generador de video realmente produce (Veo3: 4/6/8 s). Un clip planeado a 5 o 7 s
+    # sale de 6 u 8 s y todos los marcadores del timeline quedan desfasados. Se puede sobrescribir por
+    # proyecto con "clip_durations": [5, 10] en checkpoint1.json (p. ej. si se usa Kling).
+    DEFAULT_CLIP_DURATIONS_S = (4, 6, 8)
+
     # WPS objetivo: variable por proyecto (checkpoint1.json:wps_target) = WPS real medido de la
     # referencia, sin techo artificial. Estos limites son solo guardarrailes de cordura contra
     # datos corruptos, no una politica de velocidad maxima.
@@ -151,6 +156,14 @@ class UGCHarness:
         gate2_details = []
         chunks = raw_data.get("chunks", [])
 
+        allowed_durations = UGCHarness.DEFAULT_CLIP_DURATIONS_S
+        try:
+            cp_durs = json.loads((Path(json_path).parent.parent / "checkpoint1.json").read_text(encoding="utf-8")).get("clip_durations")
+            if isinstance(cp_durs, list) and cp_durs and all(isinstance(x, (int, float)) and x > 0 for x in cp_durs):
+                allowed_durations = tuple(cp_durs)
+        except Exception:
+            pass
+
         def _timeline_spoken(ch):
             steps = ch.get("action_timeline") or []
             if not isinstance(steps, list):
@@ -174,6 +187,35 @@ class UGCHarness:
             if dur_s > UGCHarness.MAX_CLIP_DURATION_S:
                 gate2_passed = False
                 gate2_details.append(f"Chunk {cid}: duración {dur_s}s excede el máximo de {UGCHarness.MAX_CLIP_DURATION_S}s por clip IA (Veo3/Kling).")
+            if 0 < dur_s <= UGCHarness.MAX_CLIP_DURATION_S and dur_s not in allowed_durations:
+                gate2_passed = False
+                gate2_details.append(
+                    f"Chunk {cid}: duración {dur_s}s no es generable; el generador solo produce "
+                    f"{sorted(allowed_durations)}s (marcadores del timeline quedarían desfasados).")
+
+            # Cadencia por paso: el promedio del clip puede pasar mientras un paso no cabe en su ventana
+            # (la frase se desborda y la acción siguiente se desincroniza del diálogo).
+            for step in (ch.get("action_timeline") or []):
+                if not isinstance(step, dict) or not step.get("dialogue"):
+                    continue
+                try:
+                    step_dur = float(step["t1"]) - float(step["t0"])
+                except (KeyError, TypeError, ValueError):
+                    continue
+                if step_dur <= 0:
+                    continue
+                step_words = len(step["dialogue"].split())
+                # Elasticidad conversacional (+20% y +1 palabra de margen) por paso para permitir
+                # variaciones naturales sin forzar micro-cortes artificiales, mientras el límite
+                # total del chunk (w_count <= int(dur_s * wps_target)) se mantiene estricto.
+                step_max = int(step_dur * wps_target * 1.20) + 1
+                if step_words > step_max:
+                    gate2_passed = False
+                    gate2_details.append(
+                        f"Chunk {cid} paso {step.get('t0')}-{step.get('t1')}s: {step_words} palabras en {step_dur:g}s "
+                        f"({round(step_words / step_dur, 2)} WPS > {round(wps_target * 1.20, 2)} WPS tolerado); máximo {step_max}. "
+                        "Acorta la frase o alarga la ventana del paso.")
+
             declared_wc = ch.get("word_count")
             if declared_wc is not None and declared_wc != w_count:
                 gate2_passed = False

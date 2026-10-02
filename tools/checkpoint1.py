@@ -50,7 +50,8 @@ def find_project(name_or_path: str, base_dir: Path) -> Path:
 
 def write_checkpoint(project_dir: Path, scene_mode: str, outfit: str, keyword: str, headline: str,
                      ledger_confirmed: bool = False, hook_exaggeration: bool = False,
-                     fidelity_target: str = "full_verbatim", wps_target: float = DEFAULT_WPS_TARGET) -> Path:
+                     fidelity_target: str = "full_verbatim", wps_target: float = DEFAULT_WPS_TARGET,
+                     secondary_character: str = None, clip_durations: list = None) -> Path:
     if scene_mode not in SCENE_MODES:
         raise ValueError(f"scene_mode debe ser uno de {SCENE_MODES}")
     if fidelity_target not in FIDELITY_TARGETS:
@@ -74,6 +75,12 @@ def write_checkpoint(project_dir: Path, scene_mode: str, outfit: str, keyword: s
         "secondary_lock_required": True,  # GATE_1 exige secondary_characters si hay otras personas en escena
         "confirmed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
+    if secondary_character and secondary_character.strip():
+        data["secondary_character"] = secondary_character.strip()
+    if clip_durations:
+        if not all(isinstance(x, (int, float)) and x > 0 for x in clip_durations):
+            raise ValueError("clip_durations debe ser una lista de números positivos")
+        data["clip_durations"] = [int(x) for x in clip_durations]
     if ledger_confirmed:
         ledger_path = Path(project_dir) / "01_Reference" / LEDGER_FILE
         if not ledger_path.exists():
@@ -93,6 +100,8 @@ if __name__ == "__main__":
     parser.add_argument("--outfit", required=True)
     parser.add_argument("--keyword", required=True, help="Keyword de ManyChat")
     parser.add_argument("--headline", required=True, help="Cover headline (máx 7 palabras)")
+    parser.add_argument("--secondary-character", default=None,
+                        help="Descripción fija del personaje secundario / paciente (edad, rasgos, ropa)")
     parser.add_argument("--confirmed-by-user", action="store_true", required=True,
                         help="Obligatorio: certifica que el usuario confirmó estos 4 puntos")
     parser.add_argument("--ledger-confirmed", action="store_true",
@@ -108,10 +117,13 @@ if __name__ == "__main__":
                              f"usa el WPS real medido de la referencia (ver 'CADENCIA PROMEDIO' en script_beats_<video>.txt) "
                              f"tal cual, sin recortarlo. Default {DEFAULT_WPS_TARGET} solo si no puedes medirlo. "
                              f"Rechazado fuera de [{MIN_WPS_TARGET}, {MAX_WPS_TARGET}] por ser probablemente un dato corrupto.")
+    parser.add_argument("--clip-durations", nargs="+", type=int, default=None,
+                        help="Duraciones de clip permitidas para este proyecto (ej. 4 6 8 10 o 5 10)")
     args = parser.parse_args()
 
     base = Path(__file__).resolve().parent.parent
     path = write_checkpoint(find_project(args.project, base), args.scene, args.outfit, args.keyword, args.headline,
                             ledger_confirmed=args.ledger_confirmed, hook_exaggeration=args.hook_exaggeration,
-                            fidelity_target=args.fidelity_target, wps_target=args.wps_target)
+                            fidelity_target=args.fidelity_target, wps_target=args.wps_target,
+                            secondary_character=args.secondary_character, clip_durations=args.clip_durations)
     print(f"Checkpoint 1 registrado: {path}")

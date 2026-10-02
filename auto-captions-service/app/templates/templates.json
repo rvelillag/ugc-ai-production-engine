@@ -183,6 +183,28 @@
       "uppercase": true,
       "italic": false,
       "max_words_per_cue": 3
+    },
+    {
+      "name": "poppins_yellow",
+      "description": "CapCut Clásico Viral: Poppins Black, palabra activa en Amarillo Eléctrico #FFE600 con borde negro nítido 4.5px, palabras inactivas en Blanco Puro, animación karaoke/active-word, 3 palabras por bloque, minúsculas naturales",
+      "font_family": "Poppins",
+      "font_size_pct_of_height": 6.0,
+      "primary_color": "#FFFFFF",
+      "highlight_color": "#FFE600",
+      "secondary_color": "#FFFFFF",
+      "outline_color": "#000000",
+      "outline_width": 4.5,
+      "shadow_color": "#000000",
+      "shadow_depth": 1.5,
+      "position": "bottom_center",
+      "vertical_margin_pct": 18.0,
+      "animation": "none",
+      "pop_scale_from": 100.0,
+      "pop_scale_duration_ms": 0,
+      "fade_duration_ms": 40,
+      "uppercase": false,
+      "italic": false,
+      "max_words_per_cue": 3
     }
   ]
 }

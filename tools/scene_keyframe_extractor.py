@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import re
+import shutil
 import subprocess
 from pathlib import Path
 from faster_whisper import WhisperModel
@@ -27,10 +28,55 @@ def beat_label(idx: int, total: int) -> str:
         return f"beat3_{pos + 1}_action"
     return "beat4_action"
 
-def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_size: str = "medium", language: str = None):
+def extract_scenes_and_cadence(video_path: Path, output_dir: Path = None, model_size: str = "medium", language: str = None, project: str = None):
+    video_path = Path(video_path).resolve()
+
+    # 0. Resolve project or protect 03_INBOX_REFERENCES
+    if project:
+        from tools.checkpoint1 import find_project
+        try:
+            proj_dir = find_project(project, video_path.parent)
+        except Exception:
+            cwd = Path.cwd().resolve()
+            proj_dir = cwd / "04_IN_PRODUCTION" / project
+        output_dir = proj_dir / "01_Reference"
+
+    parts_upper = [p.upper() for p in video_path.parts]
+    if "03_INBOX_REFERENCES" in parts_upper and (output_dir is None or "03_INBOX_REFERENCES" in [p.upper() for p in Path(output_dir).parts]):
+        inbox_idx = parts_upper.index("03_INBOX_REFERENCES")
+        avatar_root = Path(*video_path.parts[:inbox_idx])
+        in_prod = avatar_root / "04_IN_PRODUCTION"
+        archive = avatar_root / "06_ARCHIVE"
+        in_prod.mkdir(parents=True, exist_ok=True)
+
+        matching = list(in_prod.glob(f"PROD_*_{video_path.stem}"))
+        if matching:
+            proj_dir = matching[0]
+        else:
+            existing_nums = []
+            for d in list(in_prod.glob("PROD_*")) + list(archive.glob("PROD_*")):
+                m = re.match(r"PROD_(\d+)_", d.name)
+                if m:
+                    existing_nums.append(int(m.group(1)))
+            next_num = max(existing_nums, default=0) + 1
+            proj_dir = in_prod / f"PROD_{next_num:03d}_{video_path.stem}"
+
+        output_dir = proj_dir / "01_Reference"
+        output_dir.mkdir(parents=True, exist_ok=True)
+
     if output_dir is None:
         output_dir = video_path.parent
+    else:
+        output_dir = Path(output_dir).resolve()
+
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Ensure reference video lives inside output_dir
+    dest_video = output_dir / video_path.name
+    if not dest_video.exists():
+        shutil.copy2(video_path, dest_video)
+        print(f"[Pipeline] Video de referencia copiado limpiamente a: {dest_video}")
+    video_path = dest_video
 
     # Ensure full standard 5-folder project tree exists if inside a PROD directory
     proj_dir = output_dir if output_dir.name.startswith("PROD_") else (output_dir.parent if output_dir.parent.name.startswith("PROD_") else None)
@@ -239,11 +285,12 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--video", required=True, help="Path to reference video")
+    parser.add_argument("--project", required=False, help="Project name or path in 04_IN_PRODUCTION")
     parser.add_argument("--output", required=False, help="Output directory")
     parser.add_argument("--model", default="medium", help="Modelo faster-whisper (base/small/medium)")
     parser.add_argument("--language", default=None, help="Idioma del audio (en/es); auto si se omite")
     args = parser.parse_args()
     
     video = Path(args.video)
-    out = Path(args.output) if args.output else video.parent
-    extract_scenes_and_cadence(video, out, model_size=args.model, language=args.language)
+    out = Path(args.output) if args.output else None
+    extract_scenes_and_cadence(video, out, model_size=args.model, language=args.language, project=args.project)

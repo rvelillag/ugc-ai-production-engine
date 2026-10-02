@@ -216,6 +216,13 @@ def test_checkpoint1_rejects_long_headline(tmp_path, package):
         write(proj, "adapt_to_brand", "x", "GLOW", "one two three four five six seven eight")
 
 
+def test_checkpoint1_persists_clip_durations(tmp_path, package):
+    proj, _, write = _cp_setup(tmp_path, package)
+    write(proj, "adapt_to_brand", "x", "GLOW", "Headline", clip_durations=[5, 10])
+    cp = json.loads((proj / "checkpoint1.json").read_text(encoding="utf-8"))
+    assert cp.get("clip_durations") == [5, 10]
+
+
 @pytest.mark.parametrize("bad", ["send me a DM", "drop a d.m now", "D M me", "what ages work", "cuál es tu edad", "it cures acne", "clinically proven"])
 def test_gate3_catches_variants(tmp_path, package, bad):
     package["chunks"][0]["voiceover_clean_tts"] = bad
@@ -305,3 +312,52 @@ def test_compiler_outfit_reads_as_natural_noun_phrase():
     assert _as_noun_phrase("Burgundy satin blouse, gold hoop earrings, delicate gold necklace, ring.") ==         "a burgundy satin blouse, gold hoop earrings, delicate gold necklace, and a ring"
     assert _as_noun_phrase("a navy silk blouse and small earrings") == "a navy silk blouse and small earrings"
     assert _as_noun_phrase("Ivory silk blouse") == "an ivory silk blouse"
+
+
+def _timeline(steps):
+    return [{"t0": a, "t1": b, "ledger_row": "r01", "action": "Does a thing", "props": [], "dialogue": d}
+            for a, b, d in steps]
+
+
+def test_non_generable_clip_duration_fails_gate_2(tmp_path, package):
+    package["chunks"][0]["recommended_duration_s"] = 7
+    r = _run(tmp_path, package)["GATE_2"]
+    assert not r.passed and any("no es generable" in d for d in r.details)
+
+
+def test_generable_durations_pass_gate_2(tmp_path, package):
+    for dur in (4, 6, 8):
+        package["chunks"][0]["recommended_duration_s"] = dur
+        assert _run(tmp_path, package)["GATE_2"].passed, dur
+
+
+def test_clip_durations_can_be_overridden_in_checkpoint1(tmp_path, package):
+    proj = tmp_path / "PROD_001_x"
+    (proj / "02_First_Frames").mkdir(parents=True)
+    (proj / "checkpoint1.json").write_text(json.dumps({"clip_durations": [5, 10]}), encoding="utf-8")
+    package["chunks"][0]["recommended_duration_s"] = 10
+    package["chunks"][0]["voiceover_clean_tts"] = "one two three four five six seven eight"
+    package["chunks"][0]["word_count"] = 8
+    f = proj / "02_First_Frames" / "p.json"
+    f.write_text(json.dumps(package), encoding="utf-8")
+    assert {r.gate_id: r for r in UGCHarness.audit_package_json(f)}["GATE_2"].passed
+
+
+def test_step_over_wps_fails_even_when_clip_average_passes(tmp_path, package):
+    # Clip de 8 s con 12 palabras (1.5 WPS de promedio) pero el paso 1 mete 10 palabras en 2 s (5 WPS).
+    ch = package["chunks"][0]
+    fast, slow = "one two three four five six seven eight nine ten", "eleven twelve"
+    ch["voiceover_clean_tts"] = f"{fast} {slow}"
+    ch["word_count"] = 12
+    ch["action_timeline"] = _timeline([(0, 2, fast), (2, 8, slow)])
+    r = _run(tmp_path, package)["GATE_2"]
+    assert not r.passed and any("paso 0-2s" in d and "WPS" in d for d in r.details)
+
+
+def test_steps_within_wps_pass(tmp_path, package):
+    ch = package["chunks"][0]
+    a, b = "this simple trick changed", "my mornings completely"
+    ch["voiceover_clean_tts"] = f"{a} {b}"
+    ch["word_count"] = 7
+    ch["action_timeline"] = _timeline([(0, 4, a), (4, 8, b)])
+    assert _run(tmp_path, package)["GATE_2"].passed

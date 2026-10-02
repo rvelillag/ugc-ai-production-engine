@@ -85,6 +85,22 @@ def make_draft(project_dir: Path, language, model_size: str, fps: float, force: 
                     str(frames_dir / "f_%04d.jpg")], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
     print(f"Borrador del ledger: {out} ({len(ledger.rows)} filas narrativas completas)")
     print(f"Frames de contacto (f_0001.jpg = t 0s; t = (n-1)/{fps}): {frames_dir}")
+
+    keyframes = sorted(ref_dir.glob("*_beat*.jpg")) or sorted(ref_dir.glob("*.jpg"))
+    if keyframes:
+        print("\n" + "=" * 65)
+        print("📸 CHECKLIST OBLIGATORIO DE INSPECCIÓN VISUAL DE KEYFRAMES:")
+        print("=" * 65)
+        print("Inspecciona visualmente cada frame antes de redactar prompts:")
+        for kf in keyframes:
+            print(f"  * {kf.name}")
+        print("\nVerifica en cada toma:")
+        print("  1. Props activos (recipientes, envases, hornillas, herramientas).")
+        print("  2. Manos y guantes (¿lleva guantes de nitrilo? color y dedos).")
+        print("  3. Paciente/secundario (edad, etnia, rasgos, peinado y vestimenta).")
+        print("  4. Entorno y luz (luz natural de ventana, porche, clínica, mesa).")
+        print("=" * 65 + "\n")
+
     print("Siguiente paso: describir action/framing/props/gaze/gesture de cada fila viendo los frames y marcar is_cta.")
     return out
 

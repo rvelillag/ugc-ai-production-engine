@@ -41,8 +41,11 @@ def build_trim_concat_cmd(ffmpeg_bin: str, segments, output_path: Path, fps: str
             f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
             f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps={fps}[v{i}]"
         )
+        fade_d = min(0.03, max(0.005, (end - start) / 4.0))
+        fade_out_st = max(0.0, (end - start) - fade_d)
         parts.append(
             f"[{i}:a]atrim=start={start:.3f}:end={end:.3f},asetpts=PTS-STARTPTS,"
+            f"afade=t=in:ss=0:d={fade_d:.3f},afade=t=out:st={fade_out_st:.3f}:d={fade_d:.3f},"
             f"aresample=48000,aformat=channel_layouts=stereo[a{i}]"
         )
     joined = "".join(f"[v{i}][a{i}]" for i in range(len(segments)))
@@ -56,7 +59,7 @@ def build_trim_concat_cmd(ffmpeg_bin: str, segments, output_path: Path, fps: str
     ]
     return cmd
 
-def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_padding_start: float = 0.12, silence_padding_end: float = 0.22, language: str = "auto", archive: bool = False, no_video_headline: bool = False):
+def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_padding_start: float = 0.12, silence_padding_end: float = 0.22, language: str = "auto", archive: bool = False, no_video_headline: bool = False, template: str = "poppins_yellow"):
     ffmpeg_bin, ffprobe_bin = FFmpegLocator.get_binaries()
     project_path = Path(project_path_str)
     
@@ -149,8 +152,8 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
     subprocess.run(cmd_concat, check=True)
     print(f"Seamless video created: {concat_video_path}")
 
-    # 4. Auto-Captions Pipeline (viral_yellow_highlight)
-    print("\nStage 3: Burning synchronized dynamic viral captions...")
+    # 4. Auto-Captions Pipeline (dynamic highlight)
+    print(f"\nStage 3: Burning synchronized dynamic viral captions (template: {template})...")
     pipeline = CaptionPipeline(job_dir=job_dir)
     asr_data = pipeline.process_stage_asr(input_video_path=concat_video_path, language=language)
     words = asr_data.get("words", [])
@@ -158,9 +161,8 @@ def assemble_project(project_path_str: str, brand_dir_str: str = None, silence_p
     render_result = pipeline.process_stage_render(
         input_video_path=concat_video_path,
         words=words,
-        template_name="viral_yellow_highlight",
+        template_name=template,
         auto_emoji=True,
-        uppercase=True,
         export_srt=True,
         export_ass=True
     )
@@ -296,6 +298,7 @@ if __name__ == "__main__":
     parser.add_argument("--end-pad", type=float, default=0.22, help="Silence padding end (seconds)")
     parser.add_argument("--archive", action="store_true", help="Mover automáticamente a 06_ARCHIVE tras el ensamblado exitoso")
     parser.add_argument("--no-video-headline", action="store_true", help="Omitir el sticker del headline en el video")
+    parser.add_argument("--template", default="poppins_yellow", help="Subtitle template name (e.g. poppins_yellow, viral_yellow_highlight)")
     args = parser.parse_args()
     assemble_project(
         args.project,
@@ -303,5 +306,6 @@ if __name__ == "__main__":
         silence_padding_end=args.end_pad,
         language=args.language,
         archive=args.archive,
-        no_video_headline=args.no_video_headline
+        no_video_headline=args.no_video_headline,
+        template=args.template
     )

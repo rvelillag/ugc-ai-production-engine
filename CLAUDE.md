@@ -72,9 +72,17 @@ ugc compile --project "[PROJECT_FOLDER_NAME]"
 # 1e. Ver o copiar prompts compilados al portapapeles de Windows (Fase 3)
 ugc prompt --project "[PROJECT_FOLDER_NAME]" --chunk 1 --type i2v --copy
 
+# 1f. Auditar y sanitizar prompts contra filtros de moderación de IA (Fase 3 - Anti-Filter Linter)
+ugc lint --project "[PROJECT_FOLDER_NAME]" [--inplace]
+# (Equivalente: python tools/prompt_safety_linter.py --json "[PATH_TO_production_package.json]" [--inplace])
+
 # 2. Ensamblar video final + Smart Silence Trimming + Subtítulos virales (Fase 4)
 ugc assemble --project "[PROJECT_FOLDER_NAME]" [--language es|en|auto]
 # (Equivalente: python tools/assemble_project.py --project "[PROJECT_FOLDER_NAME]" ...)
+
+# 2b. QA de clips generados: transcribe cada 03_Raw_Clips/N.mp4 y compara texto, duración real y desfase de voz por paso vs el plan
+#     (escribe clip_qa_report.json con la ventana sugerida para re-sincronizar; mide solo audio). Corre ANTES de ensamblar.
+ugc qa --project "[PROJECT_FOLDER_NAME]" [--language en|es|pt|auto] [--model base]
 
 # 3. Auditar con QA Harness (Fase 4 & Certificación 8/8 Gates con fidelidad léxica y orden sintáctico LCS)
 ugc certify --project "[PROJECT_FOLDER_NAME]" [--deliverable "[DELIVERABLE_ID]"]
@@ -141,12 +149,14 @@ Cuando el usuario proporciona un nuevo video de referencia o solicita procesar u
      - **`full_verbatim` (por defecto):** conserva el 100% del guion a `wps_target`.
      - **`trim_to_min`:** además de fijar `wps_target`, recorta el guion dentro del margen de fidelidad permitido (≥85% por fila, GATE_7) si aun así se quiere acortar más.
      - **Si en Fase 4 el clip generado suena distorsionado o con el lip-sync forzado** a ese `wps_target`, es una señal para bajarlo y regenerar ese chunk — el sistema no lo bloquea de antemano porque no hay evidencia empírica de un techo universal para Veo3/Kling.
-6. **Registro del Checkpoint 1:** Solo después de que el usuario confirme A-G, ejecuta `python tools/checkpoint1.py --project [PROJECT] --scene [replicate_1to1|adapt_to_brand|derivative_concept] --outfit "..." --keyword [KEYWORD] --headline "..." --confirmed-by-user --ledger-confirmed --fidelity-target [full_verbatim|trim_to_min] --wps-target [WPS real de la referencia]` (añade `--hook-exaggeration` solo si el usuario lo pidió). GATE_2 usa este `wps_target` (no un 2.4 fijo) para validar la cadencia de cada chunk. GATE_8 exige que el hash del ledger coincida con el confirmado aquí. GATE_1 exige `checkpoint1.json` y que keyword y headline del paquete coincidan con lo confirmado. Nunca lo ejecutes sin confirmación real.
+6. **Registro del Checkpoint 1:** Solo después de que el usuario confirme A-G, ejecuta `python tools/checkpoint1.py --project [PROJECT] --scene [replicate_1to1|adapt_to_brand|derivative_concept] --outfit "..." --keyword [KEYWORD] --headline "..." --confirmed-by-user --ledger-confirmed --fidelity-target [full_verbatim|trim_to_min] --wps-target [WPS real de la referencia]` (añade `--hook-exaggeration` si se pidió y `--secondary-character "..."` si hay pacientes/clientes en escena). GATE_2 usa este `wps_target` (no un 2.4 fijo) para validar la cadencia de cada chunk. GATE_8 exige que el hash del ledger coincida con el confirmado aquí. GATE_1 exige `checkpoint1.json` y que keyword y headline del paquete coincidan con lo confirmado. Nunca lo ejecutes sin confirmación real.
 
 ### Fase 3: Generación JSON-First & Prompts Dinámicos (ugc-viral-video-generator)
 1. **Escenario y Hook (gobierna `scene_mode` del Checkpoint 1):**
    - `replicate_1to1`: se replica el entorno de la referencia. `adapt_to_brand`: se usa el escenario canónico de la marca. Solo cambian avatar, vestuario y (si se eligió) escenario.
    - **Acciones idénticas:** el hook y todas las acciones de la referencia se mantienen tal cual, en el mismo orden. La hiper-exageración solo aplica si `hook_exaggeration` es `true` en `checkpoint1.json`.
+   - **Hook Front-Loading Mandatorio (Chunk 1):** En modelos de difusión (Midjourney/Imagen/Flux), las primeras 12 palabras determinan el 70% del peso semántico. Si el hook contiene una patología o shock visual (edemas, ojeras, inflamación), el prompt DEBE iniciar directamente con la patología en macro extrema: `Extreme macro forced perspective in foreground: [SHOCK/PATHOLOGY], [CLINICAL DETAILS]. [AVATAR ACTION]...` en lugar de nombrar primero al avatar para evitar que la IA sanitice o miniaturice el problema.
+   - **Anti-Filter Sanitizer Activo:** Los prompts se pasan automáticamente por `prompt_safety_linter.py` (`ugc lint`) para neutralizar falsos positivos de censura (reemplazando términos como "bare back" o "pinches skin" por indumentaria atlética y palpación clínica).
 2. **Regla de Fidelidad Verbatim (≥85 %):**
    - El diálogo de cada fila del ledger se conserva ≥85 % palabra por palabra (GATE_7). Solo se permiten ajustes mínimos de voz del avatar y el cambio de marcas/CTA por las fórmulas anti-filtro (las filas `is_cta` están exentas).
    - Cada chunk lleva `ledger_rows`, `ref_window`, `voiceover_reference` y un `action_timeline` (`t0, t1, ledger_row, action, props, dialogue`) contiguo y en el orden del ledger. Toda fila del ledger debe quedar cubierta (GATE_8).
@@ -186,8 +196,9 @@ Cuando el usuario proporciona un nuevo video de referencia o solicita procesar u
 8. Validate with Pydantic model (`tools/schemas/production_package.py`) and render `prompts_and_script_[ID].md` with `python tools/render_package_markdown.py --json ...`.
 
 ### Fase 4: QA Governance & Ensamblaje Canónico (auto-captions-service + ugc_harness.py)
-1. Operator places generated raw clips `1.mp4` to `N.mp4` in `03_Raw_Clips/`.
-2. Assemble final 1080x1920 video with auto-captions (`viral_yellow_highlight`: compact size 4.5%, static uniform, yellow highlight).
+1. Operator places generated raw clips `1.mp4` to `N.mp4` in `03_Raw_Clips/` (idealmente 5 chunks de 8.0s–10.0s bajo la Arquitectura Ágil de 5 Beats).
+2. Assemble final 1080x1920 video with auto-captions (template estándar: `poppins_yellow`: tipografía Poppins Black, palabra activa en Amarillo Neón `#FFE600` con borde negro nítido 4.5px, casing natural y Smart Silence Trimming).
+   Comando: `ugc assemble --project [PROJECT_FOLDER_NAME] --language [es|en] [--template poppins_yellow]`
 3. Generate high-impact centered sticker badge `Cover.jpg`.
 4. Export exactly 4 canonical files in `05_PROCESSED_DELIVERABLES/[ID]/`:
    - `[ID]_Final_1080x1920.mp4`
@@ -202,7 +213,7 @@ Cuando el usuario proporciona un nuevo video de referencia o solicita procesar u
 
 Before approving any project or deliverable, verify that `tools/ugc_harness.py` passes all gates (GATE_8 applies when a reference ledger exists):
 - **GATE_1 (Schema & Anatomy):** JSON validates against Pydantic schema; Cover Headline <= 7 words; si hay otra persona en escena (`right_subject`) el paquete debe traer `secondary_characters` (proyectos con `secondary_lock_required` en `checkpoint1.json`). `checkpoint1.json` exists, is user-confirmed, and matches the package keyword/headline.
-- **GATE_2 (Timing & Cadence):** All chunks have WPS <= `wps_target` (from `checkpoint1.json` = the reference's own measured WPS, no artificial ceiling; defaults to 2.4 if the field is absent) based on allocated durations.
+- **GATE_2 (Timing & Cadence):** All chunks have WPS <= `wps_target` (from `checkpoint1.json` = the reference's own measured WPS, no artificial ceiling; defaults to 2.4 if the field is absent) based on allocated durations. Two more checks: (a) **per step** — each `action_timeline` step with dialogue must also respect `wps_target` in its own window (a clip average can pass while one step overflows and desyncs the next action); (b) **generable durations** — `recommended_duration_s` must be one the video generator really produces (default `4, 6, 8`; override per project with `"clip_durations": [5, 10]` in `checkpoint1.json`, e.g. for Kling).
 - **GATE_3 (Anti-Filter Safety):** Zero banned words ('age', 'DM', medical claims) in video scripts or prompts.
 - **GATE_4 (Brand Decoupling):** Video dialogue discusses generic problem/solution; brand conversion is 100% via ManyChat DM automation.
 - **GATE_5 (Raw Clips Integrity):** All `1.mp4` to `N.mp4` exist, are 9:16 vertical, valid bitrate and audio streams.

@@ -10,7 +10,7 @@ Un sistema integral, modular y escalable para la producción automatizada de vid
 * **Extracción Técnica de Beats:** Transcripción palabra por palabra con Whisper ASR y extracción automática de fotogramas clave con FFmpeg.
 * **Recorte Inteligente de Silencios (*Smart Silence Trimming*):** Detección automática de pausas muertas entre clips de IA mediante Whisper, eliminando silencios iniciales y finales para garantizar un ritmo publicitario continuo y ágil.
 * **Sustitución Automática de Marcas Terceras:** Mapeo inteligente hacia tu catálogo de producto propio (`PRODUCT_CATALOG.yaml`).
-* **Subtitulado Dinámico CapCut/Hormozi (`viral_yellow_highlight`):** Montserrat Bold en mayúsculas, tamaño compacto (4.5% de altura), palabra activa en Amarillo Viral (`#FFD400`), palabras inactivas en Blanco Puro y margen seguro al **18% de altura** (libre de botones de Reels/TikTok). Es la plantilla que ejecuta `tools/assemble_project.py`; `auto-captions-service` incluye otras plantillas alternativas (ej. `capcut_italic_yellow`) para uso manual vía su propio servicio.
+* **Subtitulado Dinámico CapCut/Hormozi (`poppins_yellow`, por defecto):** Poppins Black en minúsculas naturales, palabra activa en Amarillo Neón (`#FFE600`) con borde negro de 4.5px, palabras inactivas en Blanco Puro y margen seguro al **18% de altura** (libre de botones de Reels/TikTok). Es la plantilla por defecto de `ugc assemble`; se cambia con `--template` (ej. `viral_yellow_highlight`: Montserrat Bold en mayúsculas, `#FFD400`). `auto-captions-service` incluye más plantillas (ej. `capcut_italic_yellow`).
 * **Multi-Creador Plug & Play:** Crea nuevos personajes en 1 minuto usando el wizard guiado.
 
 ---
@@ -115,6 +115,7 @@ Una vez instalado, el comando `ugc` puede ejecutarse desde cualquier terminal o 
 | `ugc checkpoint1` | **Fase 2.5:** Registra y confirma el Checkpoint 1 (escenario, vestuario, keyword y headline). |
 | `ugc compile` | **Fase 3:** Compila los prompts de imagen y video I2V desde el action timeline. |
 | `ugc prompt` | Consulta o copia al portapapeles de Windows prompts individuales listos para Kling / Veo3. |
+| `ugc qa` | **QA de clips generados:** transcribe cada clip crudo y compara texto, duración real y desfase de voz por paso contra el plan (reporte con ventanas sugeridas). Ejecutar antes de ensamblar. |
 | `ugc assemble` | **Fase 4:** Ensambla los clips generados con *Smart Silence Trimming* y subtítulos virales. |
 | `ugc certify` | **Auditoría de Agencia:** Evalúa los 8 Gates de calidad de agencia con el QA Harness. |
 | `ugc setup-path` | Registra el comando `ugc` en el PATH de Windows para uso global permanente. |

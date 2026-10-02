@@ -108,8 +108,8 @@ El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
 1. **Recorte Inteligente de Silencios (Smart Silence Trimming Obligatorio):**
    * Antes de concatenar, se auditan con Whisper las marcas de tiempo exactas del primer y último instante de locución en cada clip crudo (`1.mp4` a `N.mp4`).
    * Se recortan automáticamente todos los silencios muertos iniciales y finales dejando únicamente un margen natural de respiración ($\approx 0.12\text{s}$ inicio, $\approx 0.22\text{s}$ fin) para evitar baches incómodos y garantizar un ritmo publicitario fluido y de alta retención.
-2. **Concatenación y Subtitulado Dinámico Oficial (`viral_yellow_highlight`, hardcodeado en `assemble_project.py`):**
-   * Montserrat Bold en mayúsculas, tamaño compacto (4.5% de altura), palabra activa en Amarillo Viral (`#FFD400`), palabras inactivas en Blanco (`#FFFFFF`), contorno negro.
+2. **Concatenación y Subtitulado Dinámico Oficial (`poppins_yellow` por defecto; se cambia con `ugc assemble --template`):**
+   * Poppins Black en minúsculas naturales, tamaño 6.0% de altura, palabra activa en Amarillo Neón (`#FFE600`), palabras inactivas en Blanco (`#FFFFFF`), borde negro de 4.5px. Alternativa: `viral_yellow_highlight` (Montserrat Bold mayúsculas, `#FFD400`).
    * **Zona Segura Inferior (Reels/TikTok Safe Zone):** Margen inferior fijo al **18% de la altura** (`vertical_margin_pct: 18.0%`) para garantizar que el texto nunca quede tapado por la interfaz o botones de Instagram y TikTok.
 3. **Ejecución Unificada Automatizada:**
    ```bash

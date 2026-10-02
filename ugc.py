@@ -413,6 +413,10 @@ def cmd_rename(args):
 def cmd_ingest(args):
     """Fase 1: Ingesta de video de referencia y extraccion de beats."""
     tool_args = ["--video", args.video]
+    if getattr(args, "project", None):
+        tool_args.extend(["--project", args.project])
+    if getattr(args, "output", None):
+        tool_args.extend(["--output", args.output])
     if args.model:
         tool_args.extend(["--model", args.model])
     if args.language:
@@ -443,13 +447,42 @@ def cmd_checkpoint1(args):
         "--confirmed-by-user",
         "--ledger-confirmed",
     ]
+    if getattr(args, "secondary_character", None):
+        tool_args.extend(["--secondary-character", args.secondary_character])
     if args.fidelity_target:
         tool_args.extend(["--fidelity-target", args.fidelity_target])
     if args.wps_target is not None:
         tool_args.extend(["--wps-target", str(args.wps_target)])
+    if getattr(args, "clip_durations", None):
+        tool_args.extend(["--clip-durations"] + [str(d) for d in args.clip_durations])
     if args.hook_exaggeration:
         tool_args.append("--hook-exaggeration")
     return run_tool("checkpoint1.py", tool_args)
+
+
+def cmd_lint(args):
+    """Auditar y sanitizar prompts contra filtros de moderación de IA."""
+    tool_args = []
+    if getattr(args, "project", None):
+        ws = detect_workspace(args.workspace)
+        from tools.checkpoint1 import find_project
+        try:
+            proj_dir = find_project(args.project, ws)
+        except Exception:
+            proj_dir = ws / "04_IN_PRODUCTION" / args.project
+        pkg_files = list((proj_dir / "02_First_Frames").glob("production_package_*.json")) or list(proj_dir.glob("production_package_*.json"))
+        if not pkg_files:
+            print(f"[ERROR] No se encontró production_package_*.json en {proj_dir}")
+            return 1
+        tool_args.extend(["--json", str(pkg_files[0])])
+        if getattr(args, "inplace", False):
+            tool_args.append("--inplace")
+    elif getattr(args, "text", None):
+        tool_args.extend(["--text", args.text])
+    else:
+        print("[ERROR] Debes especificar --project o --text")
+        return 1
+    return run_tool("prompt_safety_linter.py", tool_args)
 
 
 def cmd_compile(args):
@@ -484,6 +517,8 @@ def cmd_assemble(args):
         tool_args.extend(["--end-pad", str(args.end_pad)])
     if getattr(args, "no_video_headline", False):
         tool_args.append("--no-video-headline")
+    if getattr(args, "template", None):
+        tool_args.extend(["--template", args.template])
     if getattr(args, "archive", False):
         tool_args.append("--archive")
     return run_tool("assemble_project.py", tool_args)
@@ -499,6 +534,14 @@ def cmd_certify(args):
     if args.workspace:
         tool_args.extend(["--workspace", args.workspace])
     return run_tool("ugc_harness.py", tool_args)
+
+
+def cmd_qa(args):
+    """Fase 4b: QA de clips generados (texto, duración y desfase de voz vs plan)."""
+    tool_args = ["--project", args.project, "--language", args.language, "--model", args.model]
+    if args.workspace:
+        tool_args.extend(["--workspace", args.workspace])
+    return run_tool("clip_qa.py", tool_args)
 
 
 def cmd_status(args):
@@ -896,6 +939,8 @@ def main():
     # ingest
     p_ingest = subparsers.add_parser("ingest", parents=[common_parser], help="Fase 1: Ingestar video de referencia y extraer beats/keyframes")
     p_ingest.add_argument("--video", required=True, help="Ruta al video .mp4 de referencia")
+    p_ingest.add_argument("--project", default=None, help="Nombre del proyecto en 04_IN_PRODUCTION (ej: PROD_028_xxx)")
+    p_ingest.add_argument("--output", default=None, help="Directorio de salida para keyframes y beats")
     p_ingest.add_argument("--model", default="medium", help="Modelo Whisper (base/small/medium)")
     p_ingest.add_argument("--language", default=None, help="Idioma del audio (en/es/auto)")
     p_ingest.set_defaults(func=cmd_ingest)
@@ -915,10 +960,19 @@ def main():
     p_cp1.add_argument("--outfit", required=True, help="Descripcion del vestuario")
     p_cp1.add_argument("--keyword", required=True, help="Keyword de ManyChat")
     p_cp1.add_argument("--headline", required=True, help="Headline de portada (<= 7 palabras)")
+    p_cp1.add_argument("--secondary-character", default=None, help="Descripción fija del personaje secundario / paciente")
     p_cp1.add_argument("--fidelity-target", default="full_verbatim", choices=["full_verbatim", "trim_to_min"], help="Fidelidad de guion")
     p_cp1.add_argument("--wps-target", type=float, default=None, help="WPS objetivo medido de la referencia")
+    p_cp1.add_argument("--clip-durations", nargs="+", type=int, default=None, help="Duraciones permitidas de clips (ej. 4 6 8 10 o 5 10)")
     p_cp1.add_argument("--hook-exaggeration", action="store_true", help="Activar exageracion visual en el hook")
     p_cp1.set_defaults(func=cmd_checkpoint1)
+
+    # lint
+    p_lint = subparsers.add_parser("lint", parents=[common_parser], help="Auditar y sanitizar prompts contra filtros de moderación de IA")
+    p_lint.add_argument("--project", default=None, help="Nombre del proyecto en 04_IN_PRODUCTION")
+    p_lint.add_argument("--text", default=None, help="Cadena de texto de un prompt a auditar")
+    p_lint.add_argument("--inplace", action="store_true", help="Guardar correcciones automáticamente en el archivo JSON")
+    p_lint.set_defaults(func=cmd_lint)
 
     # compile
     p_compile = subparsers.add_parser("compile", parents=[common_parser], help="Fase 3: Compilar prompts I2V y renderizar Markdown")
@@ -933,6 +987,7 @@ def main():
     p_assemble.add_argument("--start-pad", type=float, default=0.12, help="Padding de silencio inicial")
     p_assemble.add_argument("--end-pad", type=float, default=0.22, help="Padding de silencio final")
     p_assemble.add_argument("--no-video-headline", action="store_true", help="Omitir el sticker del headline en el video")
+    p_assemble.add_argument("--template", default="poppins_yellow", help="Plantilla de subtitulos (ej: poppins_yellow, viral_yellow_highlight)")
     p_assemble.add_argument("--archive", action="store_true", help="Mover automáticamente a 06_ARCHIVE tras el ensamblado exitoso")
     p_assemble.set_defaults(func=cmd_assemble)
 
@@ -942,6 +997,13 @@ def main():
     p_cert.add_argument("--deliverable", default=None, help="Nombre del entregable canónico (ej: Rachel022)")
     p_cert.add_argument("--precheck", action="store_true", help="Precheck rapido sin clips de video")
     p_cert.set_defaults(func=cmd_certify)
+
+    # qa
+    p_qa = subparsers.add_parser("qa", parents=[common_parser], help="Fase 4b: QA de clips generados (texto, duracion y desfase de voz vs plan)")
+    p_qa.add_argument("--project", required=True, help="Nombre del proyecto")
+    p_qa.add_argument("--language", default="en", help="Idioma hablado en los clips (en, es, pt, auto)")
+    p_qa.add_argument("--model", default="base", help="Modelo Whisper (tiny, base, small)")
+    p_qa.set_defaults(func=cmd_qa)
 
     # status
     p_stat = subparsers.add_parser("status", parents=[common_parser], help="Consultar estado del workspace y proyectos")

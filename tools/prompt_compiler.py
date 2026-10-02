@@ -8,6 +8,9 @@ from pathlib import Path
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from tools.prompt_safety_linter import lint_text, verify_hook_front_loading
+
 REALISM = (
     "Natural realistic hand movements. No cuts. No exaggerated acting. "
     "Authentic unretouched smartphone UGC camera feel, natural room lighting, zero CGI or plastic sheen. "
@@ -177,7 +180,9 @@ def compile_i2v_prompt(pkg: dict, chunk: dict) -> str:
     if chunk.get("application_lock"):
         realism_block = re.sub(r"Application Lock: [^.]*\.", f"Application Lock: {chunk['application_lock'].rstrip('.')}.", realism_block)
     wardrobe_footer = f"Wardrobe Permanence Rule: The creator's {chunk_outfit.lower()} must stay solid, fully saturated, and identical to the first frame throughout the entire clip without turning beige or shifting hues."
-    return "\n\n".join([header, "\n\n".join(lines), f"{realism_block} {wardrobe_footer}", f"*SFX:* {sfx}"])
+    raw_prompt = "\n\n".join([header, "\n\n".join(lines), f"{realism_block} {wardrobe_footer}", f"*SFX:* {sfx}"])
+    clean_prompt, _ = lint_text(raw_prompt)
+    return clean_prompt
 
 
 MJ_LOCK_MARKS = ("LOCKS (", "SECONDARY CHARACTERS (lock")
@@ -189,6 +194,7 @@ def lock_first_frame_prompt(pkg: dict, chunk: dict) -> str:
     Avatar and environment are brand constants (from the DNA files); secondary characters are
     constant within this video. The hand-written prompt should only describe the scene.
     Enforces authentic iPhone raw candid parameters (--ar 9:16 --style raw --v 6.1).
+    Sanitizes trigger words against AI safety filters and verifies Hook front-loading on Chunk 1.
     """
     prompt = chunk.get("midjourney_prompt_9_16", "")
     # Strip artificial AI buzzwords
@@ -206,12 +212,22 @@ def lock_first_frame_prompt(pkg: dict, chunk: dict) -> str:
     if chunk.get("secondary_state") and pkg.get("secondary_characters"):
         parts.append(f"State in this frame: {chunk['secondary_state'].rstrip('.')}.")
     if not parts or not prompt:
-        return prompt
+        clean_p, _ = lint_text(prompt)
+        return clean_p
     for mark in MJ_LOCK_MARKS:
         prompt = re.sub(r"\s*" + re.escape(mark) + r".*?\.(?= --|$)", "", prompt, flags=re.DOTALL)
     # Strip existing flags if any to standardize
     head = re.sub(r"\s*--(?:ar\s+\d+:\d+|style\s+\w+|v\s+[\d.]+|s\s+\d+)\b.*", "", prompt).strip()
-    return f"{head.rstrip()} LOCKS (identical in every frame and video): {' '.join(parts)} --ar 9:16 --style raw --v 6.1 --s 50"
+    clean_head, _ = lint_text(head.rstrip())
+
+    # Front-loading check on Chunk 1 Hook
+    cid = chunk.get("chunk_id", 0)
+    if cid == 1 or "hook" in chunk.get("beat_name", "").lower():
+        hook_eval = verify_hook_front_loading(clean_head)
+        if not hook_eval["is_front_loaded"] and hook_eval["has_pathology_or_shock"]:
+            print(f"[WARN Hook Chunk 1] Falta front-loading en el hook visual: {hook_eval['recommendation']}")
+
+    return f"{clean_head} LOCKS (identical in every frame and video): {' '.join(parts)} --ar 9:16 --style raw --v 6.1 --s 50"
 
 
 def render_md(data: dict, json_path: Path) -> None:

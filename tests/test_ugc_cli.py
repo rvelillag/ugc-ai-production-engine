@@ -48,3 +48,25 @@ def test_cli_subparsers_include_essential_commands():
     assert "update" in res.stdout
     assert "rename" in res.stdout
     assert "doctor" in res.stdout
+
+
+def test_ingest_subparser_has_project_and_output():
+    import subprocess
+    res = subprocess.run([sys.executable, str(REPO_ROOT / "ugc.py"), "ingest", "--help"], capture_output=True, text=True)
+    assert "--project" in res.stdout
+    assert "--output" in res.stdout
+
+
+def test_checkpoint1_subparser_has_secondary_character():
+    import subprocess
+    res = subprocess.run([sys.executable, str(REPO_ROOT / "ugc.py"), "checkpoint1", "--help"], capture_output=True, text=True)
+    assert "--secondary-character" in res.stdout
+    assert "--clip-durations" in res.stdout
+
+
+def test_lint_subparser_exists():
+    import subprocess
+    res = subprocess.run([sys.executable, str(REPO_ROOT / "ugc.py"), "lint", "--help"], capture_output=True, text=True)
+    assert "--project" in res.stdout
+    assert "--text" in res.stdout
+    assert "--inplace" in res.stdout
