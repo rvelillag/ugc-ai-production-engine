@@ -1,17 +1,15 @@
-fastapi>=0.110.0
-uvicorn[standard]>=0.28.0
-pydantic>=2.6.0
-pydantic-settings>=2.2.0
-faster-whisper>=1.0.0
-ffmpeg-python>=0.2.0
-httpx>=0.27.0
-python-multipart>=0.0.9
-aiofiles>=23.2.1
-watchdog>=4.0.0
-numpy>=1.24.0
-openai>=1.14.0
-imageio-ffmpeg>=0.4.9
-static-ffmpeg>=2.5
-pyyaml>=6.0.1
-openpyxl>=3.1.2
-Pillow>=10.0.0
+# Motor UGC (CLI `ugc` + tools/). Es lo que instalan install_and_setup.bat y `ugc update`.
+# Rangos compatibles (~=): aceptan parches/minors nuevos pero no saltos de versión mayor.
+# El servicio web (FastAPI) tiene su propio archivo: auto-captions-service/requirements.txt
+
+pydantic~=2.13
+pydantic-settings~=2.15
+faster-whisper~=1.2
+static-ffmpeg~=3.0
+imageio-ffmpeg~=0.6
+pyyaml~=6.0
+Pillow~=12.3
+
+# Opcionales (descomenta solo si los usas):
+# openai~=3.6      # ASR remoto: ASR_ENGINE=openai o definir OPENAI_API_KEY
+# torch            # detección de GPU CUDA para faster-whisper

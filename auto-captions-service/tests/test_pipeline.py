@@ -11,7 +11,8 @@ class TestPipelineAndAPI(unittest.TestCase):
         template_names = [t.name for t in templates]
         self.assertIn("hype_yellow", template_names)
         self.assertIn("clean_white", template_names)
-        self.assertIn("karaoke_highlight", template_names)
+        self.assertIn("karaoke_pink", template_names)
+        self.assertIn("viral_yellow_highlight", template_names)
 
     def test_caption_request_schema(self):
         req = CaptionRequest(

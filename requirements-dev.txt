@@ -1,0 +1,4 @@
+# Entorno de desarrollo: motor + servicio web + pytest (los tests del servicio importan httpx/fastapi).
+-r requirements.txt
+-r auto-captions-service/requirements.txt
+pytest~=9.1

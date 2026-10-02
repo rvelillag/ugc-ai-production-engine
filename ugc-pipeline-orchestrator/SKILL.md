@@ -17,7 +17,7 @@ Esta skill actúa como el director de operaciones y orquestador maestro del sist
 El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
 
 ```
-<Creador>/ (ej. Sofia Torres - GlowLab/)
+<Creador>/ (ej. Rachel Bennett/ — solo el nombre del avatar, sin sufijo de marca)
 ├── 📁 01_KNOWLEDGE_BASE/          # Playbooks, frameworks de copy (fidelidad ≥85% vía ledger) y SOPs
 ├── 📁 02_AVATAR_ASSETS/            # Identidad inmutable del avatar y fondos validados
 │   ├── 📁 01_Character/            # Fotos, Character Sheet y *_CHARACTER_DNA.md (Fuente de Verdad)
@@ -83,14 +83,14 @@ El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
    * **Estructura y Técnica Fieles:** Se respeta la estructura narrativa, los beats, la problemática y el orden de pasos del video original.
    * **Adaptación de Tono:** Se personaliza a la voz del avatar (**el avatar definido en `CHARACTER_DNA.md`**, p. ej. 45 años, estilo confesión doméstica de cocina, empática, honesta y natural).
    * **Regla de Producto Propio (Cero Marcas Terceras):** Queda prohibido incluir marcas o productos comerciales de terceros presentes en el video de referencia (ej. Rhode, NYX, Maybelline, etc.). Toda solución, mecanismo o paso de producto se **adapta e integra obligatoriamente hacia el producto de nuestra marca (la definida en `creator_profile.yaml`)**.
-   * Formato de audio limpio: sin guiones largos (em dashes), sin negritas en texto para locución, ritmo natural fluido (≤2.4 palabras/segundo, límite técnico de lip-sync).
+   * Formato de audio limpio: sin guiones largos (em dashes), sin negritas en texto para locución, ritmo natural fluido a `wps_target` (el WPS real de la referencia, de `checkpoint1.json`; si el lip-sync suena forzado a ese ritmo, se baja `wps_target` para ese chunk y se regenera).
 6. **Composición Fiel y Prompts Limpios (Cero Overlays):**
    * Los prompts de imagen y video deben respetar la **composición y posiciones exactas de la referencia**, aplicando la regla de exageración en el Hook.
    * Queda estrictamente prohibido incorporar overlays de texto, marcas de agua o íconos de redes sociales en los prompts visuales.
 7. **Entrega Doble Obligatoria en el Paquete de Producción:**
    * Guardar en `04_IN_PRODUCTION/PROD_<ID>_<nombre_video>/02_First_Frames/prompts_and_script_PROD_<ID>.md`:
      1. **Standard Production Skeleton** (Toma continua 25-30s).
-     2. **Chunked Production Skeleton (5 Chunks)** con:
+     2. **Chunked Production Skeleton (N chunks, agrupados por tomas reales de `script_beats`, ≤10s cada uno)** con:
         * **Prompt de Imagen (First Frame en Midjourney/Flux)** (9:16 vertical, prosa continua, sin texto).
         * **Prompt de Video / Animación (I2V en Kling/Veo3/Grok/Luma)** con físicas de movimiento, micro-jitter de celular y lipsync.
      3. **Post Copy** (Título + Caption con Follow-gate y ManyChat Keyword).
@@ -137,5 +137,5 @@ El orquestador opera estrictamente sobre la siguiente estructura de carpetas:
 - [ ] Arquetipo correctamente traducido (Clínico vs. Testimonial Mirror+Convert).
 - [ ] Vestuario rotado respecto a la producción inmediata anterior.
 - [ ] Hook con descriptores de problema visualmente exagerados (alto contraste).
-- [ ] Standard Skeleton + 5 Chunked Skeletons con **First Frame Prompt** AND **Video Motion Prompt**.
+- [ ] Standard Skeleton + N Chunked Skeletons (uno por chunk) con **First Frame Prompt** AND **Video Motion Prompt**.
 - [ ] Copy con follow-gate y palabra clave ManyChat lista.

@@ -1,14 +1,20 @@
-fastapi>=0.110.0
-uvicorn[standard]>=0.28.0
-pydantic>=2.6.0
-pydantic-settings>=2.2.0
-faster-whisper>=1.0.0
-ffmpeg-python>=0.2.0
-httpx>=0.27.0
-python-multipart>=0.0.9
-aiofiles>=23.2.1
-watchdog>=4.0.0
-numpy>=1.24.0
-openai>=1.14.0
-imageio-ffmpeg>=0.4.9
-static-ffmpeg>=2.5
+# Servicio web auto-captions (API FastAPI, cola de jobs, watch-folder, webhooks).
+# Incluye el núcleo de captions + el stack web. Este archivo es autónomo (lo usa el Dockerfile).
+
+# Núcleo (compartido con el motor CLI)
+pydantic~=2.13
+pydantic-settings~=2.15
+faster-whisper~=1.2
+static-ffmpeg~=3.0
+imageio-ffmpeg~=0.6
+
+# Stack web
+fastapi~=0.141
+uvicorn[standard]~=0.52
+python-multipart~=0.0.32
+httpx~=0.28
+aiofiles~=25.1
+watchdog~=6.0
+
+# ASR remoto (se usa si ASR_ENGINE=openai o hay OPENAI_API_KEY)
+openai~=3.6

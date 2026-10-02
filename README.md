@@ -71,7 +71,7 @@ c:\...\DTC\
 ├── 📁 sistema/                 # El Motor Central (Git repo, scripts, auto-captions, tests)
 └── 📁 avatares/                # Espacio de Trabajo de Creadores y Marcas
     ├── 📁 Rachel Bennett/      # Carpeta exclusiva con el nombre del avatar
-    └── 📁 Sofia Torres/        # Carpeta exclusiva con el nombre del avatar
+    └── 📁 Carmen Del Valle/    # Carpeta exclusiva con el nombre del avatar
 ```
 
 > **Regla de Nomenclatura de Carpetas:**  
